@@ -30,7 +30,7 @@ export function useTheme() {
   /** Rotate through day → sunset → night → day. */
   function cycleTheme() {
     const currentIndex = THEMES.indexOf(theme.value)
-    const next = THEMES[(currentIndex + 1) % THEMES.length]
+    const next = THEMES[(currentIndex + 1) % THEMES.length] as Theme
     setTheme(next)
   }
 

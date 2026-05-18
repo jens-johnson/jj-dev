@@ -13,12 +13,12 @@ const { data: projects } = await useAsyncData('featured-projects', () =>
 )
 
 /** Map status to a human-readable label + color class. */
-function statusBadge(status: string) {
+function statusBadge(status: string | undefined) {
   return {
     active: { label: 'Active', class: 'bg-accent/10 text-accent' },
     wip: { label: 'In progress', class: 'bg-earth-300/20 text-earth-500' },
     archived: { label: 'Archived', class: 'bg-surface text-ink-subtle' },
-  }[status] ?? { label: status, class: 'bg-surface text-ink-subtle' }
+  }[status ?? ''] ?? { label: status ?? 'unknown', class: 'bg-surface text-ink-subtle' }
 }
 </script>
 
