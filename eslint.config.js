@@ -44,14 +44,17 @@ export default withNuxt(
     },
   },
 
-  // ─── TypeScript ──────────────────────────────────────────────────────────
-  ...typescriptEslint.configs.recommended,
+  // ─── TypeScript rules ────────────────────────────────────────────────────
+  // @nuxt/eslint sets up typescript-eslint in its own config scope. We need
+  // to re-register the plugin in our own config object to add custom rules.
   {
+    plugins: {
+      '@typescript-eslint': typescriptEslint.plugin,
+    },
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-      '@typescript-eslint/no-import-type-side-effects': 'error',
+      '@typescript-eslint/no-require-imports': 'error',
     },
   },
 
@@ -68,7 +71,6 @@ export default withNuxt(
       '@stylistic/object-curly-spacing': ['error', 'always'],
       '@stylistic/array-bracket-spacing': ['error', 'never'],
       '@stylistic/key-spacing': ['error', { beforeColon: false, afterColon: true }],
-      '@stylistic/space-before-function-paren': ['error', { anonymous: 'always', named: 'never', asyncArrow: 'always' }],
       '@stylistic/no-trailing-spaces': 'error',
       '@stylistic/eol-last': ['error', 'always'],
       '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0 }],
