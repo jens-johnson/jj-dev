@@ -1,0 +1,47 @@
+# ─── resume.yml ──────────────────────────────────────────────────────────────
+# Structured resume data. Queried via useAsyncData / queryCollection('resume').
+# Update this file to keep the /about page resume section current.
+
+name: Jens Johnson
+title: Software Engineer
+location: San Diego, CA
+email: jens@jens-johnson.com
+website: https://jens-johnson.com
+summary: >
+  Software engineer with a focus on building thoughtful, well-crafted products.
+  Comfortable across the full stack, with a strong pull toward frontend engineering,
+  design systems, and the intersection of code and craft.
+
+experience:
+  - company: Placeholder Co.
+    role: Senior Software Engineer
+    location: San Diego, CA
+    from: '2023-01'
+    current: true
+    highlights:
+      - Led frontend architecture for a greenfield product used by 10k+ users
+      - Designed and implemented a component library from scratch in Vue 3
+      - Established CI/CD pipeline and coding standards across the eng team
+    stack: [Vue 3, TypeScript, Node.js, PostgreSQL]
+
+  - company: Previous Co.
+    role: Software Engineer
+    location: Remote
+    from: '2021-03'
+    to: '2022-12'
+    highlights:
+      - Built and maintained customer-facing React application
+      - Reduced page load time by 40% through bundle optimization
+    stack: [React, TypeScript, GraphQL, AWS]
+
+education:
+  - institution: University of California San Diego
+    degree: Bachelor of Science
+    field: Computer Science
+    year: 2021
+
+skills:
+  languages: [TypeScript, JavaScript, Python, SQL]
+  frameworks: [Vue 3, Nuxt, React, Next.js, Node.js]
+  tools: [Git, Docker, Vercel, AWS, Figma]
+  design: [Design systems, Tailwind CSS, Sketch, Framer]
