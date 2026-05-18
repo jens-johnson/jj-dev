@@ -1,22 +1,105 @@
 /* ─── main.css ────────────────────────────────────────────────────────────────
- * Global styles and design token CSS custom properties for jj-dev.
+ * Global styles and design token system for jj-dev.
+ * Uses Tailwind v4 CSS-first configuration via @theme.
  *
  * Themes are applied via the `data-theme` attribute on the <html> element:
  *   <html data-theme="day">     → warm cream, earth tones (default)
  *   <html data-theme="sunset">  → deep warm dark, terra rose
  *   <html data-theme="night">   → near-black, sage + sky
  *
- * All Tailwind semantic color classes (bg-bg, text-ink, etc.) reference these
- * variables — a single attribute change switches the entire theme.
+ * All Tailwind utilities (bg-bg, text-ink, font-display, etc.) are generated
+ * from the @theme block below. Per-theme values are overridden via CSS
+ * selectors — a single data-theme attribute change switches the full palette.
  *
  * See: docs/project-planning/phase-1/02-design-tokens.md
  * ────────────────────────────────────────────────────────────────────────── */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* ─── Day (default) ─────────────────────────────────────────────────────── */
+/* ─── Design Tokens (@theme) ─────────────────────────────────────────────── */
+/* Day theme values are defaults. Sunset/Night override below via selectors.  */
+
+@theme {
+  /* ── Semantic color tokens ─────────────────────────────────────────────── */
+  --color-bg:               #F8F4EE;
+  --color-surface:          #F0EBE3;
+  --color-border:           #DDD0BF;
+  --color-ink:              #1C140A;
+  --color-ink-muted:        #6B5744;
+  --color-ink-subtle:       #A8957E;
+  --color-accent:           #8B6534;
+  --color-accent-secondary: #5E8C65;
+
+  /* ── Raw palette (reference only — do not use in components) ──────────── */
+  --color-stone-50:   #F8F4EE;
+  --color-stone-100:  #F0E8DC;
+  --color-stone-200:  #DDD0BF;
+  --color-stone-400:  #A8957E;
+  --color-stone-600:  #6B5744;
+  --color-stone-900:  #1C140A;
+  --color-earth-100:  #EDE0CC;
+  --color-earth-300:  #C8A46E;
+  --color-earth-500:  #8B6534;
+  --color-earth-700:  #5C3D1A;
+  --color-earth-900:  #2E1D0A;
+  --color-sage-100:   #D4E4D8;
+  --color-sage-300:   #9DB8A0;
+  --color-sage-500:   #5E8C65;
+  --color-sage-700:   #3A6040;
+  --color-sky-100:    #D6E8F0;
+  --color-sky-300:    #8ABDD4;
+  --color-sky-500:    #4A8FAD;
+  --color-terra-400:  #D4763B;
+  --color-terra-600:  #A84835;
+
+  /* ── Font families ─────────────────────────────────────────────────────── */
+  --font-display: 'Syne', sans-serif;
+  --font-heading: 'Fraunces', Georgia, serif;
+  --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono:    'Geist Mono', Menlo, 'Courier New', monospace;
+
+  /* ── Type scale ────────────────────────────────────────────────────────── */
+  --text-display:                6rem;
+  --text-display--line-height:   1.05;
+  --text-display--letter-spacing: -0.02em;
+  --text-h1:                     4.5rem;
+  --text-h1--line-height:        1.1;
+  --text-h1--letter-spacing:     -0.01em;
+  --text-h2:                     3rem;
+  --text-h2--line-height:        1.15;
+  --text-h3:                     2rem;
+  --text-h3--line-height:        1.2;
+  --text-h4:                     1.5rem;
+  --text-h4--line-height:        1.3;
+  --text-h5:                     1.125rem;
+  --text-h5--line-height:        1.4;
+  --text-body-lg:                1.25rem;
+  --text-body-lg--line-height:   1.65;
+  --text-body:                   1rem;
+  --text-body--line-height:      1.65;
+  --text-body-sm:                0.875rem;
+  --text-body-sm--line-height:   1.6;
+  --text-caption:                0.75rem;
+  --text-caption--line-height:   1.5;
+  --text-caption--letter-spacing: 0.02em;
+
+  /* ── Border radius ─────────────────────────────────────────────────────── */
+  --radius-sm:   4px;
+  --radius:      8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-2xl:  32px;
+  --radius-full: 9999px;
+
+  /* ── Transition durations ──────────────────────────────────────────────── */
+  --duration-fast:  150ms;
+  --duration:       250ms;
+  --duration-slow:  400ms;
+  --duration-theme: 600ms;
+}
+
+/* ─── Day (default) ──────────────────────────────────────────────────────── */
 :root,
 [data-theme='day'] {
   --color-bg:               #F8F4EE;
@@ -53,17 +136,22 @@
   --color-accent-secondary: #5080C0;
 }
 
-/* ─── Base resets ────────────────────────────────────────────────────────── */
+/* ─── Base layer ─────────────────────────────────────────────────────────── */
 @layer base {
   html {
-    @apply bg-bg text-ink font-body antialiased;
-    transition: background-color 600ms cubic-bezier(0.4, 0, 0.2, 1),
-                color 600ms cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition:
+      background-color var(--duration-theme) cubic-bezier(0.4, 0, 0.2, 1),
+      color var(--duration-theme) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   *,
   *::before,
   *::after {
-    @apply border-border;
+    border-color: var(--color-border);
   }
 }

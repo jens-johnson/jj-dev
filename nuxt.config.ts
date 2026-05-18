@@ -17,7 +17,6 @@ export default defineNuxtConfig({
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
     'nuxt-schema-org',
-    '@nuxtjs/tailwindcss',
   ],
 
   // ─── Devtools ──────────────────────────────────────────────────────────────
@@ -67,12 +66,6 @@ export default defineNuxtConfig({
   // ─── Icon ──────────────────────────────────────────────────────────────────
   icon: {
     serverBundle: 'auto',
-  },
-
-  // ─── Tailwind ──────────────────────────────────────────────────────────────
-  tailwindcss: {
-    configPath: '~/tailwind.config.ts',
-    exposeConfig: false,
   },
 
   // ─── ESLint ────────────────────────────────────────────────────────────────
