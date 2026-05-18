@@ -1,9 +1,18 @@
+<script setup lang="ts">
+// ─── layouts/default.vue ──────────────────────────────────────────────────────
+// Root layout. Applies the persisted theme on mount, renders nav + footer
+// around every page.
+
+const { initTheme } = useTheme()
+onMounted(initTheme)
+</script>
+
 <template>
-  <div class="min-h-screen bg-bg text-ink">
-    <!-- Navigation will live here -->
-    <main>
+  <div class="flex min-h-screen flex-col bg-bg text-ink transition-colors duration-[--duration-theme]">
+    <AppNav />
+    <main class="flex-1">
       <slot />
     </main>
-    <!-- Footer will live here -->
+    <AppFooter />
   </div>
 </template>
