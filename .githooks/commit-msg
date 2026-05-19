@@ -1,3 +1,9 @@
 #!/bin/sh
-# Validates commit message against Conventional Commits via commitlint.
+# ─── commit-msg ───────────────────────────────────────────────────────────────
+# Git hook: validates the commit message against the Conventional Commits spec
+# via commitlint. Runs automatically on every `git commit`.
+#
+# See: https://commitlint.js.org
+
+# Pass the commit message file path ($1) to commitlint for validation.
 npx --no-install commitlint --edit "$1"

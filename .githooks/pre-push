@@ -1,7 +1,14 @@
 #!/bin/sh
-# Runs lint and type-check before push.
+# ─── pre-push ─────────────────────────────────────────────────────────────────
+# Git hook: runs lint and type-check before every `git push`. Aborts the push
+# if either check fails, keeping broken code off the remote.
+
+# Lint — exits 1 on any ESLint error, which aborts the push.
 echo "→ Running lint..."
 npm run lint || exit 1
+
+# Type-check — exits 1 on any TypeScript error, which aborts the push.
 echo "→ Running typecheck..."
 npm run typecheck || exit 1
+
 echo "✓ All checks passed"

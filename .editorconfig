@@ -1,3 +1,9 @@
+# ─── .editorconfig ───────────────────────────────────────────────────────────
+# Editor formatting defaults for jj-dev. Enforces consistent indentation,
+# line endings, and whitespace across all editors that support EditorConfig.
+#
+# See: https://editorconfig.org
+
 root = true
 
 [*]
