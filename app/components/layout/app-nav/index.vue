@@ -1,30 +1,45 @@
 <script setup lang="ts">
-// ─── AppNav ───────────────────────────────────────────────────────────────────
+// ─── LayoutAppNav ─────────────────────────────────────────────────────────────
 // Primary site navigation. Renders the JJ wordmark on the left, nav links in
 // the center, and a theme toggle on the right.
 
-const { theme, cycleTheme } = useTheme()
+const { theme, cycleTheme } = useTheme();
 
 const links = [
-  { label: 'Work', to: '/work' },
-  { label: 'Projects', to: '/projects' },
-  { label: 'Blog', to: '/blog' },
-  { label: 'Lab', to: '/lab' },
-  { label: 'About', to: '/about' },
-]
+  {
+    label: 'Work',
+    to: '/work',
+  },
+  {
+    label: 'Projects',
+    to: '/projects',
+  },
+  {
+    label: 'Blog',
+    to: '/blog',
+  },
+  {
+    label: 'Lab',
+    to: '/lab',
+  },
+  {
+    label: 'About',
+    to: '/about',
+  },
+];
 
 /** Icon name for the current theme — cycles to indicate what's next. */
 const themeIcon = computed(() => ({
   day: 'lucide:sunset',
   sunset: 'lucide:moon',
   night: 'lucide:sun',
-}[theme.value]))
+}[theme.value]));
 
 const themeLabel = computed(() => ({
   day: 'Switch to Sunset theme',
   sunset: 'Switch to Night theme',
   night: 'Switch to Day theme',
-}[theme.value]))
+}[theme.value]));
 </script>
 
 <template>

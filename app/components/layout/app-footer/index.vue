@@ -1,13 +1,21 @@
 <script setup lang="ts">
-// ─── AppFooter ────────────────────────────────────────────────────────────────
+// ─── LayoutAppFooter ──────────────────────────────────────────────────────────
 // Minimal site footer. Left: copyright + colophon. Right: social links.
 
-const year = new Date().getFullYear()
+const year = new Date().getFullYear();
 
 const socials = [
-  { label: 'GitHub', href: 'https://github.com/jens-johnson', icon: 'lucide:github' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/in/jens-johnson', icon: 'lucide:linkedin' },
-]
+  {
+    label: 'GitHub',
+    href: 'https://github.com/jens-johnson',
+    icon: 'lucide:github',
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://linkedin.com/in/jens-johnson',
+    icon: 'lucide:linkedin',
+  },
+];
 </script>
 
 <template>

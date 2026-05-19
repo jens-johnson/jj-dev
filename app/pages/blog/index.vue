@@ -1,3 +1,8 @@
+<script setup lang="ts">
+// ─── pages/blog/index.vue ────────────────────────────────────────────────────
+// Blog index — paginated listing of all published writing. Stub; content TBD.
+</script>
+
 <template>
   <div>
     <!-- TODO: implement page -->

@@ -1,3 +1,23 @@
+Add the standard jj-dev file header to the file the user specifies (or the current file in context).
+
+**Step 1 — Identify the file type:**
+
+- Root config (`.js` / `.ts` at project root, e.g. `nuxt.config.ts`, `eslint.config.js`): use **Template A** (full `/** */` JSDoc logo block).
+- App source (`.vue`, composables, pages, components, server routes): use **Template B** (simple `// ─── Name ───` dashed banner).
+- GitHub Actions `.yml`: use **Template B** adapted with `#` comment syntax.
+
+**Step 2 — Fill in the fields:**
+
+| Field | What to write |
+|---|---|
+| `filename` | Exact filename with extension, e.g. `nuxt.config.ts` |
+| Description | One concise sentence: what the file *is* or *does* |
+| USAGE | CLI commands, import paths, or brief usage example — omit if trivial |
+| SEE | Bullet list of relevant external docs URLs — omit if none |
+
+**Step 3 — Template A** (root config files, `/** */` block, 121-char `█` lines):
+
+```
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
@@ -11,82 +31,33 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████████████████████████ commitlint.config.js ██████████████████████████████████████████████████
+ * ████████████████████████████████████████████████ <FILENAME> ██████████████████████████████████████████████████████████
  *
- * The commitlint configuration for this project.
+ * <DESCRIPTION>
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * Read developer docs for how to set up linting. Runs as an git commit hook while running `npm commit` and enforces
- * conventional commit specification on commit messages, i.e.:
- *
- *  ```
- *  Format: <type>(<scope>): <subject>
- *  Example: feat(nav): add theme toggle to header
- *  ```
+ * <USAGE>
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • https://conventionalcommits.org
- * • https://commitlint.js.org
+ * • <URL>
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+```
 
-/**
- * The commitlint configuration for this project
- * @public
- * @default
- * @constant
- * @type {import('@commitlint/types').UserConfig}
- */
-export default {
-  /* Extend the traditional commitlint config */
-  extends: ['@commitlint/config-conventional'],
+**Step 4 — Template B** (source files, `//` inline comments, 81-char total banner width):
 
-  /* Config rules */
-  rules: {
-    /*  Allow scopes matching our main areas of the codebase */
-    'scope-enum': [
-      2,
-      'always',
-      [
-        'app',
-        'assets',
-        'blog',
-        'ci',
-        'components',
-        'composables',
-        'config',
-        'content',
-        'deps',
-        'design',
-        'docs',
-        'eslint',
-        'lab',
-        'layouts',
-        'pages',
-        'projects',
-        'public',
-        'release',
-        'server',
-        'seo',
-        'styles',
-        'tailwind',
-        'tests',
-        'types',
-        'uses',
-        'work',
-      ],
-    ],
+```
+// ─── <Name> ──────────────────────────────────────────────────────────────────
+// <DESCRIPTION>
+//
+// <OPTIONAL DETAIL — props, events, key notes, or usage snippet>
+//
+// See: <URL>   ← omit if no external docs
+```
 
-    /* Ensure scopes are kebab-cased */
-    'scope-case': [2, 'always', 'kebab-case'],
+For `.vue` files: the header goes inside `<script setup lang="ts">`. If the file has no script block, add one above `<template>`.
 
-    /* Ensure subjects are lower-cased */
-    'subject-case': [2, 'always', 'lower-case'],
-
-    /* Limit body lines to 100 chars */
-    'body-max-line-length': [1, 'always', 100],
-  },
-};
+**Step 5 — Apply the header** by editing the target file. Do not alter any existing code below the header. Confirm the change when done.

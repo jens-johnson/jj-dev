@@ -1,3 +1,8 @@
+<script setup lang="ts">
+// ─── pages/projects.vue ──────────────────────────────────────────────────────
+// Projects listing — full portfolio of case studies and open-source work. Stub; content TBD.
+</script>
+
 <template>
   <div>
     <!-- TODO: implement page -->

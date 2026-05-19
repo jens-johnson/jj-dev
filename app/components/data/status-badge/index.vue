@@ -1,0 +1,46 @@
+<script setup lang="ts">
+// ─── DataStatusBadge ──────────────────────────────────────────────────────────
+// Inline status badge. Displays a human-readable label for a content status
+// value ('active' | 'wip' | 'archived') with a matching color treatment.
+//
+// Usage:
+//   <DataStatusBadge status="active" />
+//   <DataStatusBadge status="wip" />
+
+interface Props {
+  status?: string
+}
+const props = defineProps<Props>();
+
+const config: Record<string, { label: string;
+  cls: string }> = {
+  active: {
+    label: 'Active',
+    cls: 'bg-accent/10 text-accent',
+  },
+  wip: {
+    label: 'In progress',
+    cls: 'bg-earth-300/20 text-earth-500',
+  },
+  archived: {
+    label: 'Archived',
+    cls: 'bg-surface text-ink-subtle',
+  },
+};
+
+const badge = computed(() =>
+  config[props.status ?? ''] ?? {
+    label: props.status ?? '',
+    cls: 'bg-surface text-ink-subtle',
+  },
+);
+</script>
+
+<template>
+  <span
+    class="inline-flex w-fit items-center rounded-full px-2.5 py-0.5 font-mono text-caption font-medium"
+    :class="badge.cls"
+  >
+    {{ badge.label }}
+  </span>
+</template>

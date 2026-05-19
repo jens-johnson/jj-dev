@@ -1,3 +1,8 @@
+<script setup lang="ts">
+// ─── pages/about.vue ─────────────────────────────────────────────────────────
+// About page — background, philosophy, timeline, and stack. Stub; content TBD.
+</script>
+
 <template>
   <div>
     <!-- TODO: implement page -->
