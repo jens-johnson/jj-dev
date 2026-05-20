@@ -1,13 +1,29 @@
-# ─── deploy.yml ──────────────────────────────────────────────────────────────
-# Deploy to Vercel on every push to main (production) and on pull requests
-# (preview). Uses Nitro's Vercel preset to build directly into the Vercel
-# Build Output API format (.vercel/output), then deploys with --prebuilt.
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 #
-# Required secrets (set in GitHub → Settings → Secrets → Actions):
-#   VERCEL_TOKEN      — from vercel.com/account/tokens
-#   VERCEL_ORG_ID     — from .vercel/project.json after `vercel link`
-#   VERCEL_PROJECT_ID — from .vercel/project.json after `vercel link`
-
+#                                ██        ██                     ▄▄
+#                                ▀▀        ▀▀                     ██
+#                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+#                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+#                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+#                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+#                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+#                             ████▀     ████▀
+#
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+# ███████████████████████████████████████████ .github/workflows/deploy.yml ████████████████████████████████████████████
+#
+# Deploy to Vercel on every push to main (production) and on pull requests (preview).
+#
+# ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+#
+# Triggered automatically by GitHub Actions. Requires three repository secrets:
+#   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
+#
+# ─── SEE ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
+#
+# • https://vercel.com/docs/deployments/deploy-hooks
+#
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 name: Deploy
 
 on:
@@ -24,6 +40,9 @@ jobs:
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
+    # Reference the GitHub environment so protection rules and environment-scoped
+    # secrets are applied. Resolves to 'production' on main, 'preview' on PRs.
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
 
     steps:
       - name: Checkout
