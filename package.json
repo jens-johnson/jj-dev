@@ -19,7 +19,8 @@
     "preview": "nuxt preview",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "typecheck": "nuxi typecheck"
+    "typecheck": "nuxi typecheck",
+    "gen:favicon": "node scripts/gen-favicon.mjs"
   },
   "config": {
     "commitizen": {
