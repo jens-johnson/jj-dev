@@ -10,47 +10,37 @@
 #                             ████▀     ████▀
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
-# █████████████████████████████████████████████ .github/workflows/ci.yml ██████████████████████████████████████████████
+# ███████████████████████████████████████ .github/workflows/release-please.yml ████████████████████████████████████████
 #
-# Continuous integration: lint and typecheck on every push to main and on all pull requests.
+# Automated release management via release-please. On every push to main, release-please
+# inspects conventional commits since the last release and either opens or updates a
+# "Release PR". Merging that PR bumps package.json version and publishes a GitHub Release
+# with a generated CHANGELOG.md entry.
 #
-# ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+# ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
 #
-# Triggered automatically by GitHub Actions on push and pull_request events.
+# • https://github.com/googleapis/release-please-action
+# • https://github.com/googleapis/release-please
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
-name: CI
+
+name: Release Please
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+# release-please needs to open/update the Release PR and create GitHub Releases.
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  ci:
-    name: Lint & Typecheck
+  release-please:
+    name: Release Please
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
+      - uses: googleapis/release-please-action@v4
         with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Typecheck
-        run: npm run typecheck
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
