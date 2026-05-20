@@ -1,0 +1,46 @@
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+#
+#                                ██        ██                     ▄▄
+#                                ▀▀        ▀▀                     ██
+#                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+#                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+#                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+#                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+#                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+#                             ████▀     ████▀
+#
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+# ███████████████████████████████████████ .github/workflows/release-please.yml ████████████████████████████████████████
+#
+# Automated release management via release-please. On every push to main, release-please
+# inspects conventional commits since the last release and either opens or updates a
+# "Release PR". Merging that PR bumps package.json version and publishes a GitHub Release
+# with a generated CHANGELOG.md entry.
+#
+# ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+#
+# • https://github.com/googleapis/release-please-action
+# • https://github.com/googleapis/release-please
+#
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+
+# release-please needs to open/update the Release PR and create GitHub Releases.
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Release Please
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
