@@ -1,11 +1,31 @@
 <script setup lang="ts">
-// ─── ContainmentCard ──────────────────────────────────────────────────────────
-// Surface card primitive. Elevated container with border, rounded corners,
-// and a background surface color. The default slot carries all card content.
-//
-// Props:
-//   as  — root element tag. Default 'div'. Use 'article', 'li', etc. as needed.
-//   pad — inner padding preset. Default 'md'.
+/**
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * ██████████████████████████████████████ #components/containment/card/index.vue ███████████████████████████████████████
+ *
+ * Surface card primitive. Elevated container with border, rounded corners, and a background surface color.
+ *
+ * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * <ContainmentCard :as="li" pad="lg">content</ContainmentCard>
+ *
+ * Props:
+ *   as  — root element tag. Default "div". Use "article", "li", etc. as needed.
+ *   pad — inner padding preset. Default "md". One of: none | sm | md | lg.
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ */
 
 type PadPreset = 'sm' | 'md' | 'lg' | 'none';
 

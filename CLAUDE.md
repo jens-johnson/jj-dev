@@ -3,13 +3,14 @@
 ## File Header Convention
 
 **Every source file that supports comment syntax must open with a header block.**
-Use `/header` to add one interactively, or follow the templates below.
+Use `/header` to add one interactively, or follow the template below.
 
-### Template A — Root config files (`.js` / `.ts` at project root)
+### The JJ Logo Block Header
 
-Use a full `/** */` JSDoc block with the JJ ASCII logo, filename banner,
-description, USAGE, and SEE sections. Copy the exact logo art from
-`commitlint.config.js`. Width of the `█` separator lines is 121 chars.
+All files use the same full logo block header. The comment syntax varies by file type.
+
+**For JS / TS / Vue files** — use a `/** */` block. In `.vue` files, place it inside
+`<script setup lang="ts">` (add the script block above `<template>` if the file lacks one):
 
 ```js
 /**
@@ -25,14 +26,13 @@ description, USAGE, and SEE sections. Copy the exact logo art from
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████████████████████ filename.ts █████████████████████████████████████████████████████████
+ * ████████████████████████████████████████████████ #pages/index.vue █████████████████████████████████████████████████
  *
  * One-line description of what this file does.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * How to run / invoke / configure this file. Include CLI commands or code
- * snippets where helpful.
+ * How to run / invoke / configure this file. Omit this section if trivial.
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -42,59 +42,43 @@ description, USAGE, and SEE sections. Copy the exact logo art from
  */
 ```
 
-### Template B — App source files (`.vue`, `composables/`, `pages/`, `components/`)
+**For shell scripts, YAML, `.envrc`, `.env.example`, `.editorconfig`, etc.** — prefix every
+header line with `# ` (or just `#` for empty logo lines):
 
-Use a single-line dashed banner followed by a short description block.
-The banner line is exactly 81 characters wide (name + trailing `─` dashes).
-
-```ts
-// ─── ComponentOrFilename ─────────────────────────────────────────────────────
-// What it does — one concise sentence.
-//
-// Optional second paragraph: API surface, props, emitted events, key
-// implementation notes, or architectural decisions worth remembering.
-//
-// Usage:
-//   const { foo } = useFoo()           ← for composables
-//   <MyComponent :prop="val" />        ← for components
-//
-// See: https://relevant-docs.example.com
+```sh
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+#
+#                                ██        ██                     ▄▄
+# ...logo art...
+#
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+# ████████████████████████████████████████████████████ .envrc ████████████████████████████████████████████████████████
+#
+# One-line description.
+#
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 ```
 
 **Rules:**
-- The `─── Name` banner always lands on line 1 of the `<script setup>` block
-  (or line 1 of the file for plain `.ts` files).
-- For `.vue` files without a script block, add `<script setup lang="ts">` above
-  `<template>` and put the header inside it.
-- USAGE is optional for trivial stubs; SEE is optional if no external docs exist.
-- GitHub Actions `.yml` files use `#` comments with the same dashed-line style.
+- The filename in the banner uses the path from the project root (e.g. `.editorconfig`) OR the
+  Nuxt alias-prefixed path for app source files (e.g. `#pages/index.vue`, `#components/layout/app-nav/index.vue`).
+- USAGE and SEE sections are optional — omit if not needed.
+- 120-char line limit applies to description and section content lines (the `█` separator lines
+  are a fixed-width design element and may exceed 120).
+- Separator line content (`█` chars) = 117. With ` * ` prefix = 120 chars; with `# ` prefix = 119 chars.
+- Filename banner: center the filename with `floor((115 − len) / 2)` left-padding `█` chars,
+  remainder on the right, total content = 117 chars.
 
----
+### Section Dividers (JS / TS)
 
-## Script Commenting Convention
+Use `/* */` block style for in-file section dividers. Width = exactly 120 chars:
 
-Any file that **executes as a script** (shell hooks, `bin/` scripts, `.envrc`,
-bash functions inside config files) must have:
-
-1. **A Template B header** at the top (after the shebang line if present),
-   using `#` comment syntax.
-2. **Block comments before each logical section or function** — a `# ─── Label ───`
-   dashed section header followed by one or two lines explaining what the block
-   does. Not every single line needs a comment, but every distinct operation or
-   grouping should be preceded by a brief explanation.
-
-```sh
-#!/bin/sh
-# ─── script-name ──────────────────────────────────────────────────────────────
-# What this script does — one sentence.
-
-# ─── Step description ─────────────────────────────────────────────────────────
-# What this block does and why.
-some_command || exit 1
+```ts
+/* ─── Section Name ────────────────────────────────────────────────────────────────────────────────────────────────── */
 ```
 
-Apply this when **authoring or editing** any script file, even if the file
-previously had no comments.
+Formula: `/* ─── NAME ` + `─` × (103 − len(NAME)) + ` */` = 120 chars
+(If inside indented code, subtract the indent from the total: e.g. 2-space indent → 118 chars of content.)
 
 ---
 

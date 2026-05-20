@@ -1,16 +1,40 @@
 <script setup lang="ts">
-// ─── PrimitivesBaseHero ───────────────────────────────────────────────────────
-// Base hero section layout primitive. Provides a full-viewport section shell
-// with named slots for composing layered parallax heroes.
-//
-// Slots:
-//   #backdrop — behind content: logo mark, gradient orbs, grain overlay
-//   #default  — foreground content: headlines, CTAs, body copy
-//   #hint     — bottom decoration: scroll indicator
-//
-// Attributes (class, @mousemove, ref, etc.) fall through to the root <section>
-// automatically via inheritAttrs. Widgets apply their own mouse-tracking ref
-// and handler directly on <PrimitivesBaseHero>.
+/**
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * ████████████████████████████████████ #components/primitives/base-hero/index.vue █████████████████████████████████████
+ *
+ * Base hero section layout primitive. Full-viewport section shell with named slots for composing layered parallax heroes.
+ *
+ * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * <PrimitivesBaseHero>
+ *   <template #backdrop>...logo, orbs, grain...</template>
+ *   <template #default>...headline, CTAs...</template>
+ *   <template #hint>...scroll indicator...</template>
+ * </PrimitivesBaseHero>
+ *
+ * Slots:
+ *   #backdrop — behind content: logo mark, gradient orbs, grain overlay.
+ *   #default  — foreground content: headlines, CTAs, body copy.
+ *   #hint     — bottom decoration: scroll indicator.
+ *
+ * Attributes (class, @mousemove, ref, etc.) fall through to the root <section>
+ * automatically via inheritAttrs.
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ */
+
 </script>
 
 <template>

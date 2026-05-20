@@ -1,11 +1,29 @@
-// ─── composables/useTheme.ts ──────────────────────────────────────────────────
-// Manages the active site theme (day / sunset / night).
-//
-// Theme is persisted to localStorage and applied as a `data-theme` attribute on
-// <html>. SSR-safe: attribute is only written on the client.
-//
-// Usage:
-//   const { theme, setTheme, cycleTheme } = useTheme()
+/**
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * █████████████████████████████████████████████ #composables/useTheme.ts ██████████████████████████████████████████████
+ *
+ * Manages the active site theme (day / sunset / night).
+ *
+ * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * const {{ theme, setTheme, cycleTheme, initTheme }} = useTheme()
+ *
+ * Theme is persisted to localStorage and applied as a `data-theme` attribute on <html>.
+ * SSR-safe: the attribute is only written on the client.
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ */
 
 export type Theme = 'day' | 'sunset' | 'night';
 

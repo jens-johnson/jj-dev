@@ -209,7 +209,7 @@ export default defineNuxtConfig({
     serverBundle: 'auto',
   },
 
-  // ─── ESLint ────────────────────────────────────────────────────────────────
+  /* ─── ESLint ───────────────────────────────────────────────────────────────────────────────────────────────────── */
   /**
    * @nuxt/eslint module integration — generates .nuxt/eslint.config.mjs
    * @see https://eslint.nuxt.com/packages/module

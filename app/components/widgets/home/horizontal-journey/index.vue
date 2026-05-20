@@ -1,10 +1,31 @@
 <script setup lang="ts">
-// ─── WidgetsHomeHorizontalJourney ─────────────────────────────────────────────
-// Vertical scroll → horizontal panel sweep.
-// The outer wrapper is PANELS × 100vh tall; a sticky inner container translates
-// the panel track left as you scroll, so every scroll pixel = horizontal travel.
-//
-// Panels:  01 About · 02 Projects · 03 Writing · 04 Connect
+/**
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * ███████████████████████████████ #components/widgets/home/horizontal-journey/index.vue ███████████████████████████████
+ *
+ * Vertical scroll to horizontal panel sweep. The outer wrapper is PANELS × 100vh tall; a sticky container translates the track.
+ *
+ * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * Panels: 01 About · 02 Projects · 03 Writing · 04 Connect.
+ *
+ * Scroll position drives lerpProgress (0–1), which translates the panel track
+ * left by (progress × (PANELS-1) × 100vw). Panel indicator dots navigate by
+ * programmatic scrollTo.
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ */
 
 const PANELS      = 4;
 const PANEL_NAMES = ['About', 'Projects', 'Writing', 'Connect'];

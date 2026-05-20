@@ -1,21 +1,41 @@
 <script setup lang="ts">
-// ─── PrimitivesBaseParallax ───────────────────────────────────────────────────
-// Mouse + scroll parallax behaviour primitive.
-//
-// Tracks normalised mouse position (-1 → 1) within its root element and the
-// page scroll offset. Lerps both values each animation frame and exposes them
-// to the default slot via scoped-slot props so child layers can produce
-// parallax transforms without reimplementing the tracking loop.
-//
-// Slot props:
-//   layerStyle(mx, my, sy?) → CSSProperties
-//     mx / my — max pixel offset driven by mouse position
-//     sy      — scroll multiplier (0.3 = moves up at 30% of scroll speed)
-//   smoothX   — lerped horizontal mouse value (-1 → 1)
-//   smoothY   — lerped vertical mouse value (-1 → 1)
-//   scrollY   — current window.scrollY
-//   markStyle(p) → CSSProperties  (scroll-reveal helper for a backdrop mark)
-//     p — 0-to-1 scroll progress through the hero height
+/**
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * ██████████████████████████████████ #components/primitives/base-parallax/index.vue ███████████████████████████████████
+ *
+ * Mouse and scroll parallax behaviour primitive. Lerps mouse position and scroll offset, exposing them via a scoped slot.
+ *
+ * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * <PrimitivesBaseParallax v-slot="{ layerStyle, markStyle, smoothX, smoothY, scrollY }">
+ *   ...slot content using layerStyle(mx, my, sy?) and markStyle()...
+ * </PrimitivesBaseParallax>
+ *
+ * Slot props:
+ *   layerStyle(mx, my, sy?) → CSSProperties  — translate driven by mouse + scroll.
+ *     mx / my — max pixel offset driven by lerped mouse position.
+ *     sy      — scroll multiplier (e.g. 0.3 moves up at 30% of scroll speed).
+ *   markStyle()             → CSSProperties  — scroll-reveal helper for a backdrop mark.
+ *   smoothX / smoothY       — lerped mouse values in the range -1 → 1.
+ *   scrollY                 — current window.scrollY.
+ *
+ * Props:
+ *   lerp         — lerp factor; lower = smoother/slower. Default 0.055.
+ *   heroFraction — hero height as fraction of viewport for markStyle progress. Default 0.92.
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ */
 
 interface Props {
   /** Lerp factor — lower = smoother/slower. Default 0.055. */

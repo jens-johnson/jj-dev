@@ -1,10 +1,30 @@
 <script setup lang="ts">
-// ─── BrandLogoMark ────────────────────────────────────────────────────────────
-// Jens Johnson botanical JJ mark — exported from Sketch, cleaned for inline SVG.
-// Renders in currentColor so it follows theme changes automatically.
-//
-// Two mirrored gestural strokes form the JJ: the first is a single curved J
-// with a leaf/bud flourish at the top, the second is its mirror-reflected twin.
+/**
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * ███████████████████████████████████████ #components/brand/logo-mark/index.vue ███████████████████████████████████████
+ *
+ * Jens Johnson botanical JJ mark — exported from Sketch, cleaned for inline SVG.
+ *
+ * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * Renders in currentColor so it follows theme changes automatically.
+ *
+ * Two mirrored gestural strokes form the JJ: the first is a single curved J with a leaf/bud
+ * flourish at the top, the second is its mirror-reflected twin.
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ */
 </script>
 
 <template>

@@ -1,7 +1,23 @@
 <script setup lang="ts">
-// ─── WidgetsHomeHeroParallax ──────────────────────────────────────────────────
-// Home hero widget. Composes PrimitivesBaseHero + PrimitivesBaseParallax to
-// produce the full scroll-reveal parallax hero section.
+/**
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * █████████████████████████████████ #components/widgets/home/hero-parallax/index.vue ██████████████████████████████████
+ *
+ * Home hero widget. Composes PrimitivesBaseHero and PrimitivesBaseParallax to produce the full scroll-reveal parallax hero.
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ */
 
 const revealed = ref(false);
 

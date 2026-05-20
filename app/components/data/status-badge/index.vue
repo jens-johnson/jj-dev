@@ -1,11 +1,29 @@
 <script setup lang="ts">
-// ─── DataStatusBadge ──────────────────────────────────────────────────────────
-// Inline status badge. Displays a human-readable label for a content status
-// value ('active' | 'wip' | 'archived') with a matching color treatment.
-//
-// Usage:
-//   <DataStatusBadge status="active" />
-//   <DataStatusBadge status="wip" />
+/**
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * ██████████████████████████████████████ #components/data/status-badge/index.vue ██████████████████████████████████████
+ *
+ * Inline status badge for a content status value — active | wip | archived — with matching color treatment.
+ *
+ * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * <DataStatusBadge status="active" />
+ * <DataStatusBadge status="wip" />
+ * <DataStatusBadge status="archived" />
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ */
 
 interface Props {
   status?: string
