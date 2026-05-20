@@ -1,23 +1,41 @@
-/* ─── main.css ────────────────────────────────────────────────────────────────
- * Global styles and design token system for jj-dev.
- * Uses Tailwind v4 CSS-first configuration via @theme.
+/**
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * ██████████████████████████████████████████ app/assets/css/main.css ███████████████████████████████████████████████████
+ *
+ * Global styles and design token system for jj-dev. Tailwind v4 CSS-first configuration via @theme.
+ *
+ * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
  * Themes are applied via the `data-theme` attribute on the <html> element:
- *   <html data-theme="day">     → warm cream, earth tones (default)
- *   <html data-theme="sunset">  → deep warm dark, terra rose
- *   <html data-theme="night">   → near-black, sage + sky
+ *   <html data-theme="day">    → warm cream, earth tones (default)
+ *   <html data-theme="sunset"> → deep warm dark, terra rose
+ *   <html data-theme="night">  → near-black, sage + sky
  *
- * All Tailwind utilities (bg-bg, text-ink, font-display, etc.) are generated
- * from the @theme block below. Per-theme values are overridden via CSS
- * selectors — a single data-theme attribute change switches the full palette.
+ * All Tailwind utilities (bg-bg, text-ink, font-display, shadow-md, etc.) are generated from the @theme block.
+ * Per-theme values override defaults via data-theme selectors — one attribute change switches the full palette.
  *
- * See: docs/project-planning/phase-1/02-design-tokens.md
- * ────────────────────────────────────────────────────────────────────────── */
+ * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * • docs/project-planning/phase-1/02-design-tokens.md
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ */
 
 @import "tailwindcss";
 
-/* ─── Design Tokens (@theme) ─────────────────────────────────────────────── */
-/* Day theme values are defaults. Sunset/Night override below via selectors.  */
+/* ─── Design Tokens (@theme) ──────────────────────────────────────────────────────────────────────────────────────── */
+/* Day theme values are defaults. Sunset/Night override below via data-theme selectors.                                */
 
 @theme {
   /* ── Semantic color tokens ─────────────────────────────────────────────── */
@@ -83,6 +101,16 @@
   --text-caption--line-height:   1.5;
   --text-caption--letter-spacing: 0.02em;
 
+  /* ── Spacing additions (extends Tailwind's 4px-base scale) ────────────── */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+  --spacing-26: 6.5rem;
+  --spacing-30: 7.5rem;
+
+  /* ── Max widths ────────────────────────────────────────────────────────── */
+  --container-prose:   720px;
+  --container-content: 1280px;
+
   /* ── Border radius ─────────────────────────────────────────────────────── */
   --radius-sm:   4px;
   --radius:      8px;
@@ -92,6 +120,11 @@
   --radius-2xl:  32px;
   --radius-full: 9999px;
 
+  /* ── Shadows ───────────────────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 3px rgba(28, 20, 10, 0.08);
+  --shadow-md: 0 4px 12px rgba(28, 20, 10, 0.10);
+  --shadow-lg: 0 12px 32px rgba(28, 20, 10, 0.12);
+
   /* ── Transition durations ──────────────────────────────────────────────── */
   --duration-fast:  150ms;
   --duration:       250ms;
@@ -99,7 +132,7 @@
   --duration-theme: 600ms;
 }
 
-/* ─── Day (default) ──────────────────────────────────────────────────────── */
+/* ─── Day (default) ───────────────────────────────────────────────────────────────────────────────────────────────── */
 :root,
 [data-theme='day'] {
   --color-bg:               #F8F4EE;
@@ -112,7 +145,7 @@
   --color-accent-secondary: #5E8C65;
 }
 
-/* ─── Sunset ─────────────────────────────────────────────────────────────── */
+/* ─── Sunset ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 [data-theme='sunset'] {
   --color-bg:               #140C08;
   --color-surface:          #201208;
@@ -124,7 +157,7 @@
   --color-accent-secondary: #7AAA78;
 }
 
-/* ─── Night ──────────────────────────────────────────────────────────────── */
+/* ─── Night ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 [data-theme='night'] {
   --color-bg:               #080C12;
   --color-surface:          #0E1820;
@@ -136,14 +169,14 @@
   --color-accent-secondary: #5080C0;
 }
 
-/* ─── Custom animations ──────────────────────────────────────────────────── */
+/* ─── Custom animations ───────────────────────────────────────────────────────────────────────────────────────────── */
 @keyframes scrollPulse {
   0%   { transform: scaleY(0); opacity: 1; }
   60%  { transform: scaleY(1); opacity: 1; }
   100% { transform: scaleY(1); opacity: 0; }
 }
 
-/* ─── Base layer ─────────────────────────────────────────────────────────── */
+/* ─── Base layer ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 @layer base {
   html {
     background-color: var(--color-bg);
