@@ -40,6 +40,9 @@ jobs:
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
+    # Reference the GitHub environment so protection rules and environment-scoped
+    # secrets are applied. Resolves to 'production' on main, 'preview' on PRs.
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
 
     steps:
       - name: Checkout
