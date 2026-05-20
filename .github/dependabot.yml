@@ -1,0 +1,72 @@
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+#
+#                                ██        ██                     ▄▄
+#                                ▀▀        ▀▀                     ██
+#                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+#                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+#                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+#                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+#                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+#                             ████▀     ████▀
+#
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+# ████████████████████████████████████████████████ .github/dependabot.yml ████████████████████████████████████████████
+#
+# Dependabot configuration. Automatically opens PRs for npm dependency updates on a
+# weekly schedule. Security alerts are surfaced immediately regardless of schedule.
+#
+# ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+#
+# • https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+#
+# █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+
+version: 2
+
+updates:
+  # ─── npm ──────────────────────────────────────────────────────────────────────
+  # Weekly check for outdated npm packages. Groups minor + patch updates into a
+  # single PR to reduce noise; major version bumps get their own PR per package.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Los_Angeles
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # Pin major versions of framework packages — upgrade intentionally.
+      - dependency-name: nuxt
+        update-types: [version-update:semver-major]
+      - dependency-name: vue
+        update-types: [version-update:semver-major]
+      - dependency-name: tailwindcss
+        update-types: [version-update:semver-major]
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore
+      prefix-development: chore
+      include: scope
+
+  # ─── GitHub Actions ───────────────────────────────────────────────────────────
+  # Weekly check for outdated action versions in workflow files.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Los_Angeles
+    labels:
+      - dependencies
+      - ci
+    commit-message:
+      prefix: ci
+      include: scope
