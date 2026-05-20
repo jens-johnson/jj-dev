@@ -40,6 +40,10 @@ jobs:
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
+    # Skip for Dependabot PRs — they cannot access repository secrets by design,
+    # so the Vercel deploy would always fail. CI (lint + typecheck) is sufficient
+    # for dependency-update PRs.
+    if: github.actor != 'dependabot[bot]'
     # Reference the GitHub environment so protection rules and environment-scoped
     # secrets are applied. Resolves to 'production' on main, 'preview' on PRs.
     environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
