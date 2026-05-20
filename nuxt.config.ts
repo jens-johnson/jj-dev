@@ -33,6 +33,32 @@
  */
 export default defineNuxtConfig({
   /**
+   * App-level head metadata — favicon and touch icon links
+   * @see https://nuxt.com/docs/4.x/api/nuxt-config#app
+   */
+  app: {
+    head: {
+      link: [
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          href: '/favicon.svg',
+        },
+        {
+          rel: 'icon',
+          type: 'image/x-icon',
+          href: '/favicon.ico',
+        },
+        {
+          rel: 'apple-touch-icon',
+          sizes: '180x180',
+          href: '/apple-touch-icon.png',
+        },
+      ],
+    },
+  },
+
+  /**
    * The compatibility date for this version of Nuxt
    * @see https://nuxt.com/docs/4.x/api/nuxt-config#compatibilitydate
    */
