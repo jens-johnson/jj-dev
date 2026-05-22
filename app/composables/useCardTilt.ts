@@ -38,7 +38,8 @@ export interface CardTiltOptions {
   shineOpacity?: number;
 }
 
-export function useCardTilt(options: CardTiltOptions = {}) {
+export function useCardTilt(options: CardTiltOptions = {
+}) {
   const { intensity = 10, scale = 1.025, shineOpacity = 0.12 } = options;
 
   const rotateX = ref(0);
@@ -91,5 +92,11 @@ export function useCardTilt(options: CardTiltOptions = {}) {
     transition: active.value ? 'opacity 0.15s ease' : 'opacity 0.4s ease',
   }));
 
-  return { tiltStyle, shineStyle, onMouseMove, onMouseEnter, onMouseLeave };
+  return {
+    tiltStyle,
+    shineStyle,
+    onMouseMove,
+    onMouseEnter,
+    onMouseLeave,
+  };
 }

@@ -27,7 +27,9 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { CardTiltOptions } from '~/composables/useCardTilt';
+import type {
+  CardTiltOptions,
+} from '~/composables/useCardTilt';
 
 const props = withDefaults(defineProps<CardTiltOptions>(), {
   intensity: 10,
@@ -35,7 +37,9 @@ const props = withDefaults(defineProps<CardTiltOptions>(), {
   shineOpacity: 0.12,
 });
 
-const { tiltStyle, shineStyle, onMouseMove, onMouseEnter, onMouseLeave } = useCardTilt({
+const {
+  tiltStyle, shineStyle, onMouseMove, onMouseEnter, onMouseLeave,
+} = useCardTilt({
   intensity: props.intensity,
   scale: props.scale,
   shineOpacity: props.shineOpacity,

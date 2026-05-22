@@ -19,8 +19,6 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import { useWindowScroll } from '@vueuse/core';
-
 useSeoMeta({
   title: 'About — Jens Johnson',
   description: 'Full-stack software engineer based in San Diego, CA. I build data-rich applications, design systems, and tools that make a real difference.',
@@ -69,15 +67,6 @@ function typeStep() {
   }
 }
 
-/* ─── Parallax ────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-const { y } = useWindowScroll();
-
-const imageTransform = computed(() => {
-  const clamped = Math.min(y.value, 600);
-  return `translateY(${clamped * 0.07}px) rotate(${clamped * 0.007}deg)`;
-});
-
 /* ─── Stack ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 const stack = [
@@ -88,9 +77,16 @@ const stack = [
   {
     category: 'Frontend',
     items: [
-      'Vue.js', 'Nuxt', 'Next.js', 'React', 'Tailwind CSS',
-      'Pinia / Redux', 'SSR / SSG / ISR / Hybrid Rendering',
-      'TanStack', 'Vite / Webpack', 'Vitest / Jest / Cypress / Nightwatch',
+      'Vue.js',
+      'Nuxt',
+      'Next.js',
+      'React',
+      'Tailwind CSS',
+      'Pinia / Redux',
+      'SSR / SSG / ISR / Hybrid Rendering',
+      'TanStack',
+      'Vite / Webpack',
+      'Vitest / Jest / Cypress / Nightwatch',
     ],
   },
   {
@@ -100,8 +96,15 @@ const stack = [
   {
     category: 'AWS',
     items: [
-      'Lambda', 'API Gateway', 'IAM', 'EC2', 'Cognito',
-      'VPC / PrivateLink / Transit Gateway', 'EventBridge', 'Secrets Manager', 'Systems Manager',
+      'Lambda',
+      'API Gateway',
+      'IAM',
+      'EC2',
+      'Cognito',
+      'VPC / PrivateLink / Transit Gateway',
+      'EventBridge',
+      'Secrets Manager',
+      'Systems Manager',
     ],
   },
   {
@@ -189,10 +192,22 @@ const experience = [
 /* ─── Hero background carousel ───────────────────────────────────────────────────────────────────────────────────── */
 
 const heroBgImages = [
-  { src: '/images/jens-images/paragliding.jpg', alt: 'Paragliding in the Swiss Alps' },
-  { src: '/images/jens-images/maroon-bells.jpg', alt: 'Hiking at Maroon Bells, Colorado' },
-  { src: '/images/jens-images/skiing.jpg', alt: 'Skiing with friends' },
-  { src: '/images/jens-images/festival.jpg', alt: 'Catching a set at Outside Lands' },
+  {
+    src: '/images/jens-images/paragliding.jpg',
+    alt: 'Paragliding in the Swiss Alps',
+  },
+  {
+    src: '/images/jens-images/maroon-bells.jpg',
+    alt: 'Hiking at Maroon Bells, Colorado',
+  },
+  {
+    src: '/images/jens-images/skiing.jpg',
+    alt: 'Skiing with friends',
+  },
+  {
+    src: '/images/jens-images/festival.jpg',
+    alt: 'Catching a set at Outside Lands',
+  },
 ];
 
 const heroBgIdx = ref(0);

@@ -68,7 +68,8 @@ interface StravaActivity {
 }
 
 export interface MetricsWeek {
-  days: { count: number; level: 0 | 1 | 2 | 3 | 4 }[];
+  days: { count: number;
+    level: 0 | 1 | 2 | 3 | 4 }[];
 }
 
 export interface MetricsResponse {
@@ -109,7 +110,10 @@ function groupIntoWeeks(contributions: GhContribution[], numWeeks: number): Metr
   for (let w = 0; w < numWeeks; w++) {
     const slice = days.slice(w * 7, w * 7 + 7);
     result.push({
-      days: slice.map(d => ({ count: d.count, level: d.level })),
+      days: slice.map((d) => ({
+        count: d.count,
+        level: d.level,
+      })),
     });
   }
   return result;
@@ -130,7 +134,7 @@ function buildWeeklyMiles(activities: StravaActivity[], numWeeks: number): numbe
     }
   }
 
-  return buckets.map(v => Math.round(v * 10) / 10);
+  return buckets.map((v) => Math.round(v * 10) / 10);
 }
 
 /* ─── Handler ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -148,7 +152,7 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
 
   const ghRes = await fetch(
     `https://github-contributions-api.jogruber.de/v4/jens-johnson?y=${year}`,
-  ).then(r => r.json() as Promise<GhContributionsResponse>);
+  ).then((r) => r.json() as Promise<GhContributionsResponse>);
 
   const totalContributions = ghRes.total[year] ?? 0;
   const weeks = groupIntoWeeks(ghRes.contributions, 26);
@@ -157,30 +161,40 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
 
   const tokenRes = await fetch('https://www.strava.com/oauth/token', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({
       client_id: config.stravaClientId,
       client_secret: config.stravaClientSecret,
       refresh_token: config.stravaRefreshToken,
       grant_type: 'refresh_token',
     }),
-  }).then(r => r.json());
+  }).then((r) => r.json());
 
   if (tokenRes.errors || !tokenRes.access_token) {
     console.error('[metrics] Strava token exchange failed:', JSON.stringify(tokenRes));
-    throw createError({ statusCode: 502, message: `Strava auth failed: ${tokenRes.message ?? JSON.stringify(tokenRes)}` });
+    throw createError({
+      statusCode: 502,
+      message: `Strava auth failed: ${tokenRes.message ?? JSON.stringify(tokenRes)}`,
+    });
   }
 
   const { access_token } = tokenRes as StravaTokenResponse;
 
   // Get the authenticated athlete to retrieve their ID
   const athleteRes = await fetch('https://www.strava.com/api/v3/athlete', {
-    headers: { Authorization: `Bearer ${access_token}` },
-  }).then(r => r.json());
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  }).then((r) => r.json());
 
   if (!athleteRes.id) {
     console.error('[metrics] Could not resolve Strava athlete:', JSON.stringify(athleteRes));
-    throw createError({ statusCode: 502, message: 'Could not resolve Strava athlete' });
+    throw createError({
+      statusCode: 502,
+      message: 'Could not resolve Strava athlete',
+    });
   }
 
   const athleteId: number = athleteRes.id;
@@ -189,16 +203,23 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
 
   const [statsRes, activitiesRes] = await Promise.all([
     fetch(`https://www.strava.com/api/v3/athletes/${athleteId}/stats`, {
-      headers: { Authorization: `Bearer ${access_token}` },
-    }).then(r => r.json() as Promise<StravaStatsResponse>),
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    }).then((r) => r.json() as Promise<StravaStatsResponse>),
 
     fetch('https://www.strava.com/api/v3/athlete/activities?per_page=100', {
-      headers: { Authorization: `Bearer ${access_token}` },
-    }).then(r => r.json() as Promise<StravaActivity[]>),
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    }).then((r) => r.json() as Promise<StravaActivity[]>),
   ]);
 
   const data: MetricsResponse = {
-    github: { totalContributions, weeks },
+    github: {
+      totalContributions,
+      weeks,
+    },
     strava: {
       ytdMiles: metresToMiles(statsRes.ytd_run_totals.distance),
       ytdRuns: statsRes.ytd_run_totals.count,
