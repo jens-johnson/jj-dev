@@ -146,6 +146,13 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
   }
 
   const config = useRuntimeConfig();
+
+  // Fall back to process.env directly — Nuxt's runtimeConfig auto-override
+  // requires the NUXT_ prefix, but Vercel injects the bare env var names too.
+  const stravaClientId = config.stravaClientId || process.env.STRAVA_CLIENT_ID;
+  const stravaClientSecret = config.stravaClientSecret || process.env.STRAVA_CLIENT_SECRET;
+  const stravaRefreshToken = config.stravaRefreshToken || process.env.STRAVA_REFRESH_TOKEN;
+
   const year = new Date().getFullYear();
 
   /* ─── GitHub ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -165,9 +172,9 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      client_id: config.stravaClientId,
-      client_secret: config.stravaClientSecret,
-      refresh_token: config.stravaRefreshToken,
+      client_id: stravaClientId,
+      client_secret: stravaClientSecret,
+      refresh_token: stravaRefreshToken,
       grant_type: 'refresh_token',
     }),
   }).then((r) => r.json());
