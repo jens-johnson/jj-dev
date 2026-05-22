@@ -246,13 +246,12 @@ onUnmounted(() => {
 
       <!-- Blended background carousel -->
       <div class="absolute inset-0">
-        <NuxtImg
+        <img
           :src="heroBgImages[heroBgIdx]?.src"
           :alt="heroBgImages[heroBgIdx]?.alt"
           class="h-full w-full object-cover transition-opacity duration-[1200ms] ease-in-out"
           :class="heroBgFading ? 'opacity-0' : 'opacity-[0.18]'"
-          loading="eager"
-        />
+        >
         <!-- Fade edges into bg so it blends seamlessly -->
         <div class="absolute inset-0 bg-gradient-to-r from-bg via-transparent to-bg" />
         <div class="absolute inset-0 bg-gradient-to-b from-bg/60 via-transparent to-bg" />
