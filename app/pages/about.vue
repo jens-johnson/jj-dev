@@ -47,6 +47,7 @@ const typeTimer = ref<ReturnType<typeof setTimeout> | null>(null);
 
 function typeStep() {
   const word = TYPEWRITER_WORDS[typeWordIdx.value];
+  if (!word) return;
   if (typeIsDeleting.value) {
     typeText.value = word.slice(0, typeText.value.length - 1);
     if (typeText.value.length === 0) {
@@ -246,8 +247,8 @@ onUnmounted(() => {
       <!-- Blended background carousel -->
       <div class="absolute inset-0">
         <NuxtImg
-          :src="heroBgImages[heroBgIdx].src"
-          :alt="heroBgImages[heroBgIdx].alt"
+          :src="heroBgImages[heroBgIdx]?.src"
+          :alt="heroBgImages[heroBgIdx]?.alt"
           class="h-full w-full object-cover transition-opacity duration-[1200ms] ease-in-out"
           :class="heroBgFading ? 'opacity-0' : 'opacity-[0.18]'"
           loading="eager"

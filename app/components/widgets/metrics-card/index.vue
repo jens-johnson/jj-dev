@@ -22,7 +22,7 @@
 
 import type {
   MetricsResponse,
-} from '~/server/api/metrics.get';
+} from '../../../../server/api/metrics.get';
 
 /* ─── Data fetch ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
