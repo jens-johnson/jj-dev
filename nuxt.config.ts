@@ -65,6 +65,17 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-17',
 
   /**
+   * Runtime config — public values are exposed to the client, private values are server-only.
+   * Strava credentials are private and only accessible in server/ routes.
+   * @see https://nuxt.com/docs/guide/going-further/runtime-config
+   */
+  runtimeConfig: {
+    stravaClientId: process.env.STRAVA_CLIENT_ID,
+    stravaClientSecret: process.env.STRAVA_CLIENT_SECRET,
+    stravaRefreshToken: process.env.STRAVA_REFRESH_TOKEN,
+  },
+
+  /**
    * Nuxt modules
    * @see https://nuxt.com/docs/4.x/api/nuxt-config#modules
    */
