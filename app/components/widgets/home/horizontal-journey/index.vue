@@ -31,15 +31,6 @@ const PANELS      = 4;
 const PANEL_NAMES = ['About', 'Projects', 'Writing', 'Connect'];
 
 // ── Data ──────────────────────────────────────────────────────────────────────
-const { data: projects } = await useAsyncData('journey-projects', () =>
-  queryCollection('projects')
-    .where('featured', '=', true)
-    .where('draft', '=', false)
-    .order('order', 'ASC')
-    .limit(3)
-    .all(),
-);
-
 const { data: posts } = await useAsyncData('journey-posts', () =>
   queryCollection('blog')
     .where('draft', '=', false)
@@ -92,72 +83,6 @@ const trackStyle = computed(() => ({
 const activePanel = computed(() =>
   Math.min(PANELS - 1, Math.round(rawProgress.value * (PANELS - 1))),
 );
-
-// ── 3D tilt (Projects panel) ──────────────────────────────────────────────────
-const MAX_TILT = 7;
-
-interface TiltState { rx: number;
-  ry: number;
-  gx: number;
-  gy: number;
-  on: boolean }
-
-const tilts = ref<TiltState[]>(Array.from({
-  length: 3,
-}, () =>
-  ({
-    rx: 0,
-    ry: 0,
-    gx: 50,
-    gy: 50,
-    on: false,
-  }),
-));
-
-function onTiltMove(e: MouseEvent, i: number) {
-  const el = e.currentTarget as HTMLElement;
-  const {
-    left, top, width, height,
-  } = el.getBoundingClientRect();
-  const x = (e.clientX - left) / width;
-  const y = (e.clientY - top)  / height;
-  tilts.value[i] = {
-    rx: (0.5 - y) * MAX_TILT,
-    ry: (x - 0.5) * MAX_TILT,
-    gx: x * 100,
-    gy: y * 100,
-    on: true,
-  };
-}
-function onTiltLeave(i: number) {
-  tilts.value[i] = {
-    rx: 0,
-    ry: 0,
-    gx: 50,
-    gy: 50,
-    on: false,
-  };
-}
-function tiltStyle(i: number) {
-  const t = tilts.value[i];
-  if (!t) return {
-  };
-  return {
-    transform: `perspective(900px) rotateX(${t.rx}deg) rotateY(${t.ry}deg) scale(${t.on ? 1.02 : 1})`,
-    transition: t.on ? 'transform 0.08s ease-out' : 'transform 0.55s ease-out',
-  };
-}
-function glareStyle(i: number) {
-  const t = tilts.value[i];
-  if (!t) return {
-    opacity: '0',
-  };
-  return {
-    background: `radial-gradient(circle at ${t.gx}% ${t.gy}%, rgba(255,255,255,0.10), transparent 60%)`,
-    opacity: t.on ? '1' : '0',
-    transition: 'opacity 0.3s ease',
-  };
-}
 
 // ── Navigation click (indicator dots) ────────────────────────────────────────
 function scrollToPanel(i: number) {

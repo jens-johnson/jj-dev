@@ -19,7 +19,10 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-useSeoMeta({ title: 'Writing — Jens Johnson', robots: 'noindex' });
+useSeoMeta({
+  title: 'Writing — Jens Johnson',
+  robots: 'noindex',
+});
 </script>
 
 <template>

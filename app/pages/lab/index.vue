@@ -19,7 +19,10 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-useSeoMeta({ title: 'Lab — Jens Johnson', robots: 'noindex' });
+useSeoMeta({
+  title: 'Lab — Jens Johnson',
+  robots: 'noindex',
+});
 </script>
 
 <template>
