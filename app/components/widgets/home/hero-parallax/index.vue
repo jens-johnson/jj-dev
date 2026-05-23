@@ -133,8 +133,8 @@ onMounted(() => {
           style="transition: opacity 0.7s ease, transform 0.7s ease; transition-delay: 340ms"
           :style="{ opacity: revealed ? '1' : '0', transform: revealed ? 'translateY(0)' : 'translateY(12px)' }"
         >
-          I build thoughtful software and write about the process.
-          Currently crafting products at the intersection of engineering and design.
+          Building thoughtful and impactful software at the intersection of
+          engineering, design, and human experience.
         </p>
 
         <!-- CTAs -->

@@ -489,7 +489,7 @@ onUnmounted(() => {
               LinkedIn
             </a>
             <a
-              href="mailto:hello@jens-johnson.com"
+              href="mailto:jens@jens-johnson.com"
               class="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-body text-body-sm font-semibold text-stone-50 transition-opacity hover:opacity-90"
             >
               <Icon name="lucide:mail" size="15" />
