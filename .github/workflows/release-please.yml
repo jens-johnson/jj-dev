@@ -22,6 +22,13 @@
 # • https://github.com/googleapis/release-please-action
 # • https://github.com/googleapis/release-please
 #
+# ─── SETUP: PROMOTE_PAT secret (recommended, shared with promote-staging.yml) ────────────────────────────────────────
+#
+# release-please opens a "Release PR" with auto-bumped version + CHANGELOG. If created via the default GITHUB_TOKEN,
+# downstream workflows (CI) won't trigger on that PR — same recursion-prevention restriction documented in
+# promote-staging.yml. Set a repo secret `PROMOTE_PAT` (single fine-grained PAT, see promote-staging.yml header for
+# creation steps) to fix that. Without it the workflow still runs, just won't trigger downstream checks on the PR.
+#
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
 name: Release Please
@@ -44,4 +51,4 @@ jobs:
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          token: ${{ secrets.PROMOTE_PAT || secrets.GITHUB_TOKEN }}
