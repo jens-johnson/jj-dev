@@ -162,7 +162,11 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
   ).then((r) => r.json() as Promise<GhContributionsResponse>);
 
   const totalContributions = ghRes.total[year] ?? 0;
-  const weeks = groupIntoWeeks(ghRes.contributions, 26);
+  // Filter out future-dated entries — the API returns the full calendar year,
+  // and a naive .slice(-182) would grab months that haven't happened yet.
+  const today = new Date().toISOString().slice(0, 10);
+  const pastContributions = ghRes.contributions.filter((c) => c.date <= today);
+  const weeks = groupIntoWeeks(pastContributions, 26);
 
   /* ─── Strava token exchange ──────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -215,7 +219,7 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
       },
     }).then((r) => r.json() as Promise<StravaStatsResponse>),
 
-    fetch('https://www.strava.com/api/v3/athlete/activities?per_page=100', {
+    fetch('https://www.strava.com/api/v3/athlete/activities?per_page=200', {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
