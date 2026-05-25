@@ -20,6 +20,22 @@
 # Triggered automatically on every push to `staging`. No manual invocation needed.
 # Requires repo setting: Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
 #
+# ─── SETUP: PROMOTE_PAT secret ───────────────────────────────────────────────────────────────────────────────────────
+#
+# Recommended (but optional): set a `PROMOTE_PAT` repository secret to a fine-grained Personal Access Token. This is
+# required for the auto-opened promotion PR to trigger downstream workflows like CI's required status checks — GitHub
+# silently swallows downstream triggers for actions performed with the default GITHUB_TOKEN to prevent recursion loops.
+#
+# Without PAT: the workflow still opens the PR, but required checks like "Lint & Typecheck" won't fire and the PR
+#              can't be merged until you manually close + reopen it (which re-triggers checks under your identity).
+# With PAT:    the PR is opened under your identity, all downstream workflows trigger normally.
+#
+# To create:
+#   1. https://github.com/settings/personal-access-tokens → "Generate new token (fine-grained)"
+#   2. Repository access: this repo only
+#   3. Permissions: Pull requests (Read and write) + Contents (Read and write)
+#   4. Add as repo secret named `PROMOTE_PAT` (Settings → Secrets and variables → Actions)
+#
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 name: Promote Staging
 
@@ -35,7 +51,7 @@ jobs:
   promote:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -102,8 +118,15 @@ jobs:
       - name: Open or update promotion PR
         if: steps.check.outputs.ahead != '0'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Prefer PROMOTE_PAT (fine-grained PAT) so downstream workflows like CI trigger normally.
+          # Falls back to GITHUB_TOKEN — the PR will still open, but required status checks won't fire
+          # and the PR will need a manual close+reopen to be mergeable. See header comment for PAT setup.
+          GH_TOKEN: ${{ secrets.PROMOTE_PAT || secrets.GITHUB_TOKEN }}
         run: |
+          if [ -z "${{ secrets.PROMOTE_PAT }}" ]; then
+            echo "::warning::PROMOTE_PAT secret not set — falling back to GITHUB_TOKEN. Downstream workflows like CI won't trigger on the opened PR. See .github/workflows/promote-staging.yml header for setup instructions."
+          fi
+
           TITLE="release: promote staging → main"
           EXISTING=$(gh pr list --base main --head staging --state open --json number --jq '.[0].number // empty')
 
