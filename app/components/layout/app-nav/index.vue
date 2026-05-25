@@ -31,10 +31,6 @@ const menuOpen = ref(false);
 
 const links = [
   {
-    label: 'Work',
-    to: '/work',
-  },
-  {
     label: 'Projects',
     to: '/projects',
   },
