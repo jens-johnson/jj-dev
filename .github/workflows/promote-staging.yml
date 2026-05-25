@@ -39,13 +39,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check if staging is ahead of main
+      - name: Check if staging has real content changes vs main
         id: check
         run: |
           git fetch origin main
-          AHEAD=$(git rev-list --count origin/main..origin/staging)
-          echo "ahead=$AHEAD" >> "$GITHUB_OUTPUT"
-          echo "Staging is $AHEAD commit(s) ahead of main."
+          # Check for actual content diff, not just commit count. After a sync merge
+          # (`git merge main` on staging), staging is technically 1 commit ahead but
+          # has zero content diff — we don't want to open a no-op promotion PR.
+          if git diff --quiet origin/main origin/staging; then
+            echo "ahead=0" >> "$GITHUB_OUTPUT"
+            echo "No content diff between main and staging — nothing to promote."
+          else
+            AHEAD=$(git rev-list --count origin/main..origin/staging)
+            echo "ahead=$AHEAD" >> "$GITHUB_OUTPUT"
+            echo "Staging has content changes ($AHEAD commit(s) ahead)."
+          fi
 
       - name: Build PR body grouped by conventional commit type
         if: steps.check.outputs.ahead != '0'
