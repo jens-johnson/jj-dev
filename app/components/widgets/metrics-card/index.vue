@@ -14,8 +14,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ████████████████████████████ #components/widgets/metrics-card/index.vue ██████████████████████████████████████████████
  *
- * Bento tile showing live GitHub contribution heatmap and Strava YTD running stats. Data is
- * fetched server-side via /api/metrics and rendered as a compact heatmap grid + mileage sparkline.
+ * Bento tile showing live GitHub contributions and Strava YTD running stats. Data is
+ * fetched server-side via /api/metrics and rendered as twin weekly sparklines.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
@@ -28,16 +28,24 @@ import type {
 
 const { data, status } = await useFetch<MetricsResponse>('/api/metrics');
 
-/* ─── GitHub heatmap ──────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── GitHub sparkline ────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Maps contribution level (0–4) to a Tailwind opacity class. */
-const levelOpacity: Record<number, string> = {
-  0: 'opacity-[0.08]',
-  1: 'opacity-30',
-  2: 'opacity-55',
-  3: 'opacity-75',
-  4: 'opacity-100',
-};
+/** Sum day-level counts into weekly totals, last 16 weeks to match the Strava sparkline. */
+const weeklyContributions = computed<number[]>(() =>
+  (data.value?.github.weeks ?? [])
+    .slice(-16)
+    .map((w) => w.days.reduce((sum, d) => sum + d.count, 0)),
+);
+
+const maxWeeklyContributions = computed(() =>
+  Math.max(...weeklyContributions.value, 1),
+);
+
+function ghBarHeight(count: number): string {
+  if (count === 0) return '3px';
+  const pct = count / maxWeeklyContributions.value;
+  return `${Math.max(6, Math.round(pct * 52))}px`;
+}
 
 /* ─── Strava sparkline ────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -93,21 +101,22 @@ function barHeight(miles: number): string {
           </p>
         </div>
 
-        <!-- Contribution heatmap — 26 weeks × 7 days -->
-        <div class="flex gap-[3px]">
-          <div
-            v-for="(week, wi) in data.github.weeks"
-            :key="wi"
-            class="flex flex-col gap-[3px]"
-          >
+        <!-- Weekly contributions sparkline -->
+        <div>
+          <p class="mb-2 font-mono text-[10px] uppercase tracking-widest text-ink-subtle/60">Weekly contributions · last 16 wks</p>
+          <div class="flex h-[52px] items-end gap-[3px]">
             <div
-              v-for="(day, di) in week.days"
-              :key="di"
-              class="size-[7px] rounded-[2px] bg-accent"
-              :class="levelOpacity[day.level]"
-              :title="`${day.count} contribution${day.count !== 1 ? 's' : ''}`"
+              v-for="(count, i) in weeklyContributions"
+              :key="i"
+              class="flex-1 rounded-sm transition-all duration-300"
+              :class="count > 0 ? 'bg-accent/80' : 'bg-border'"
+              :style="{ height: ghBarHeight(count) }"
+              :title="`${count} contribution${count !== 1 ? 's' : ''}`"
             />
           </div>
+          <p class="mt-2 font-mono text-[9px] italic text-ink-subtle/50">
+            * Public contributions only — excludes activity in enterprise GitHub organizations.
+          </p>
         </div>
       </div>
 
