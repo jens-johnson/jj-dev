@@ -82,6 +82,21 @@ Formula: `/* ─── NAME ` + `─` × (103 − len(NAME)) + ` */` = 120 chars
 
 ---
 
+## Git Workflow & Deployment
+
+Three permanent branches map to three environments:
+
+| Branch    | Environment | URL                          |
+|-----------|-------------|------------------------------|
+| `main`    | Production  | jens-johnson.com             |
+| `staging` | Pre-prod    | staging.jens-johnson.com     |
+| feature   | —           | Vercel preview URL (per PR)  |
+
+**Flow:** `feat/*` → PR into `staging` (UAT review) → PR into `main` (prod).  
+After merging to `main`, keep `staging` in sync: `git merge main` on the staging branch.
+
+---
+
 ## Commit Convention
 
 Conventional Commits enforced by commitlint. Format: `type(scope): subject`
