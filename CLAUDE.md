@@ -92,8 +92,13 @@ Three permanent branches map to three environments:
 | `staging` | Pre-prod    | staging.jens-johnson.com     |
 | feature   | —           | Vercel preview URL (per PR)  |
 
-**Flow:** `feat/*` → PR into `staging` (UAT review) → PR into `main` (prod).  
-After merging to `main`, keep `staging` in sync: `git merge main` on the staging branch.
+**Flow:** `feat/*` → PR into `staging` (UAT review) → auto-PR into `main` (prod).
+
+When `staging` gets ahead of `main`, the [`promote-staging.yml`](.github/workflows/promote-staging.yml)
+workflow auto-opens (or updates) a `staging → main` PR with conventional-commit-grouped changelog.
+Just merge it when you're ready to ship.
+
+After merging to `main`, sync `staging` back: `git merge main` on the staging branch.
 
 ---
 
