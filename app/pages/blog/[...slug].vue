@@ -30,7 +30,11 @@ const { data: post } = await useAsyncData(`blog-${route.path}`, () =>
 );
 
 if (!post.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Post not found', fatal: true });
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Post not found',
+    fatal: true,
+  });
 }
 
 useSeoMeta({
