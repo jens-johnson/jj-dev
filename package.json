@@ -100,7 +100,7 @@
     "npm-run-all2": "^9.0.1",
     "nuxt-schema-org": "latest",
     "prettier": "^3.4.0",
-    "prettier-plugin-tailwindcss": "^0.6.0",
+    "prettier-plugin-tailwindcss": "^0.8.0",
     "stylelint": "^17.0.0",
     "stylelint-config-recommended-vue": "^1.5.0",
     "stylelint-config-standard": "^40.0.0",
