@@ -24,7 +24,7 @@ onMounted(initTheme);
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-bg text-ink transition-colors duration-[--duration-theme]">
+  <div class="bg-bg text-ink flex min-h-screen flex-col transition-colors duration-[--duration-theme]">
     <FeedbackScrollProgress />
     <LayoutAppNav />
     <main class="flex-1">

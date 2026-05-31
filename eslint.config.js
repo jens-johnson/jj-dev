@@ -31,13 +31,11 @@
 // @ts-check
 
 import stylisticPlugin from '@stylistic/eslint-plugin';
-import {
-  importX as importXPlugin,
-} from 'eslint-plugin-import-x';
+import prettierConfig from 'eslint-config-prettier';
+import { importX as importXPlugin } from 'eslint-plugin-import-x';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import sonarjsPlugin from 'eslint-plugin-sonarjs';
 import globals from 'globals';
-import typescriptEslint from 'typescript-eslint';
 
 import withNuxt from './.nuxt/eslint.config.mjs';
 
@@ -54,14 +52,7 @@ export default withNuxt(
    * Files ignored globally
    */
   {
-    ignores: [
-      '.nuxt/**',
-      '.output/**',
-      'node_modules/**',
-      'dist/**',
-      'coverage/**',
-      'public/**',
-    ],
+    ignores: ['.nuxt/**', '.output/**', 'node_modules/**', 'dist/**', 'coverage/**', 'public/**'],
     name: 'jj-dev/ignores',
   },
 
@@ -106,13 +97,13 @@ export default withNuxt(
    */
   {
     name: 'jj-dev/typescript',
-    plugins: {
-      '@typescript-eslint': typescriptEslint.plugin,
-    },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['error', {
-        argsIgnorePattern: '^_',
-      }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+        },
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-require-imports': 'error',
     },
@@ -121,7 +112,9 @@ export default withNuxt(
   /**
    * ─── Stylistic ─────────────────────────────────────────────────────────────────────────────────────────────────────
    *
-   * Stylistic plugin configuration
+   * Formatting is owned by Prettier — see `.prettierrc.json`. We keep the @stylistic plugin registered for any
+   * non-formatting stylistic rules that might be added later, but no formatting rules live here. The
+   * `eslint-config-prettier` import at the end of this file disables any rule that conflicts with Prettier.
    * @see https://eslint.style/
    */
   {
@@ -129,52 +122,7 @@ export default withNuxt(
     plugins: {
       '@stylistic': stylisticPlugin,
     },
-    rules: {
-      '@stylistic/indent': ['error', 2],
-      '@stylistic/quotes': ['error', 'single', {
-        avoidEscape: true,
-      }],
-      '@stylistic/semi': ['error', 'always'],
-      '@stylistic/comma-dangle': ['error', 'always-multiline'],
-      '@stylistic/arrow-parens': ['error', 'always'],
-      '@stylistic/brace-style': ['error', '1tbs', {
-        allowSingleLine: true,
-      }],
-      '@stylistic/object-curly-spacing': ['error', 'always'],
-      '@stylistic/array-bracket-spacing': ['error', 'never'],
-      '@stylistic/key-spacing': ['error', {
-        beforeColon: false,
-        afterColon: true,
-      }],
-      // Every property on its own line — no inline objects, ever.
-      '@stylistic/object-property-newline': ['error', {
-        allowAllPropertiesOnSameLine: false,
-      }],
-      // Braces always get their own lines for object literals.
-      // Imports and destructuring stay flexible (inline up to 3 members).
-      '@stylistic/object-curly-newline': ['error', {
-        ObjectExpression: 'always',
-        ObjectPattern: {
-          minProperties: 4,
-        },
-        ImportDeclaration: 'always',
-        ExportDeclaration: {
-          minProperties: 4,
-        },
-      }],
-      // Once any element breaks to its own line, all elements must follow suit.
-      // Allows ['a', 'b'] inline but enforces each-on-own-line once broken.
-      '@stylistic/array-element-newline': ['error', 'consistent'],
-      // Opening/closing brackets match: inline when elements are inline,
-      // own line when elements are each on their own line.
-      '@stylistic/array-bracket-newline': ['error', 'consistent'],
-      '@stylistic/no-trailing-spaces': 'error',
-      '@stylistic/eol-last': ['error', 'always'],
-      '@stylistic/no-multiple-empty-lines': ['error', {
-        max: 1,
-        maxEOF: 0,
-      }],
-    },
+    rules: {},
   },
 
   /**
@@ -228,10 +176,7 @@ export default withNuxt(
                         fix(fixer) {
                           const comma = context.sourceCode.getTokenAfter(curr);
                           const afterComma = context.sourceCode.getTokenAfter(comma);
-                          return fixer.replaceTextRange(
-                            [comma.range[0], afterComma.range[0]],
-                            ',\n  ',
-                          );
+                          return fixer.replaceTextRange([comma.range[0], afterComma.range[0]], ',\n  ');
                         },
                       });
                     }
@@ -244,7 +189,8 @@ export default withNuxt(
       },
     },
     rules: {
-      'local/import-specifier-newline': 'error',
+      // Disabled — Prettier owns import wrapping. Plugin kept registered so re-enabling is trivial if needed.
+      'local/import-specifier-newline': 'off',
     },
   },
 
@@ -260,9 +206,12 @@ export default withNuxt(
       sonarjs: sonarjsPlugin,
     },
     rules: {
-      'sonarjs/no-duplicate-string': ['warn', {
-        threshold: 4,
-      }],
+      'sonarjs/no-duplicate-string': [
+        'warn',
+        {
+          threshold: 4,
+        },
+      ],
       'sonarjs/no-identical-functions': 'warn',
       'sonarjs/cognitive-complexity': ['warn', 15],
     },
@@ -276,14 +225,25 @@ export default withNuxt(
   {
     name: 'jj-dev/general',
     rules: {
-      'no-console': ['warn', {
-        allow: ['warn', 'error'],
-      }],
+      'no-console': [
+        'warn',
+        {
+          allow: ['warn', 'error'],
+        },
+      ],
       'no-debugger': 'error',
       'prefer-const': 'error',
       'no-var': 'error',
       'object-shorthand': 'error',
-      'eqeqeq': ['error', 'always'],
+      eqeqeq: ['error', 'always'],
     },
   },
+
+  /**
+   * ─── Prettier compatibility ─────────────────────────────────────────────────────────────────────────────────────────
+   *
+   * Disables any ESLint rules that conflict with Prettier formatting. Must be last so it can override earlier configs.
+   * Prettier owns formatting; ESLint owns code quality.
+   */
+  prettierConfig,
 );

@@ -51,34 +51,45 @@ const links = [
 /* ─── Theme toggle ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /** Icon hints at the *next* theme — what you'll switch to. */
-const themeIcon = computed(() => ({
-  day: 'lucide:sunset',
-  sunset: 'lucide:moon',
-  night: 'lucide:sun',
-}[theme.value]));
+const themeIcon = computed(
+  () =>
+    ({
+      day: 'lucide:sunset',
+      sunset: 'lucide:moon',
+      night: 'lucide:sun',
+    })[theme.value],
+);
 
-const themeLabel = computed(() => ({
-  day: 'Switch to Sunset theme',
-  sunset: 'Switch to Night theme',
-  night: 'Switch to Day theme',
-}[theme.value]));
+const themeLabel = computed(
+  () =>
+    ({
+      day: 'Switch to Sunset theme',
+      sunset: 'Switch to Night theme',
+      night: 'Switch to Day theme',
+    })[theme.value],
+);
 
 /* ─── Mobile menu ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /** Close the menu whenever the route changes (link tapped). */
-watch(() => route.path, () => { menuOpen.value = false; });
+watch(
+  () => route.path,
+  () => {
+    menuOpen.value = false;
+  },
+);
 </script>
 
 <template>
-  <header class="sticky top-0 z-50 border-b border-border bg-bg/80 backdrop-blur-md transition-colors duration-[--duration-theme]">
-
+  <header
+    class="border-border bg-bg/80 sticky top-0 z-50 border-b backdrop-blur-md transition-colors duration-[--duration-theme]"
+  >
     <!-- ─── Main bar ─────────────────────────────────────────────────────────── -->
     <nav class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-
       <!-- Logo mark + wordmark -->
       <NuxtLink
         to="/"
-        class="flex items-center gap-2.5 text-ink transition-colors hover:text-accent"
+        class="text-ink hover:text-accent flex items-center gap-2.5 transition-colors"
         aria-label="Jens Johnson — home"
       >
         <BrandLogoMark class="size-7 shrink-0" />
@@ -90,14 +101,14 @@ watch(() => route.path, () => { menuOpen.value = false; });
         <li v-for="link in links" :key="link.to">
           <NuxtLink
             :to="link.to"
-            class="relative text-body-sm font-medium text-ink-muted transition-colors hover:text-ink"
+            class="text-body-sm text-ink-muted hover:text-ink relative font-medium transition-colors"
             active-class="text-ink"
           >
             {{ link.label }}
             <!-- Active underline dot -->
             <span
               v-if="route.path.startsWith(link.to)"
-              class="absolute -bottom-1 left-1/2 size-1 -translate-x-1/2 rounded-full bg-accent"
+              class="bg-accent absolute -bottom-1 left-1/2 size-1 -translate-x-1/2 rounded-full"
               aria-hidden="true"
             />
           </NuxtLink>
@@ -106,11 +117,10 @@ watch(() => route.path, () => { menuOpen.value = false; });
 
       <!-- Right controls -->
       <div class="flex items-center gap-2">
-
         <!-- Theme toggle -->
         <button
           type="button"
-          class="flex size-9 items-center justify-center rounded-full border border-border text-ink-muted transition-colors hover:border-accent hover:text-accent"
+          class="border-border text-ink-muted hover:border-accent hover:text-accent flex size-9 items-center justify-center rounded-full border transition-colors"
           :aria-label="themeLabel"
           @click="cycleTheme"
         >
@@ -120,14 +130,13 @@ watch(() => route.path, () => { menuOpen.value = false; });
         <!-- Hamburger (mobile only) -->
         <button
           type="button"
-          class="flex size-9 items-center justify-center rounded-full border border-border text-ink-muted transition-colors hover:border-accent hover:text-accent md:hidden"
+          class="border-border text-ink-muted hover:border-accent hover:text-accent flex size-9 items-center justify-center rounded-full border transition-colors md:hidden"
           :aria-label="menuOpen ? 'Close menu' : 'Open menu'"
           :aria-expanded="menuOpen"
           @click="menuOpen = !menuOpen"
         >
           <Icon :name="menuOpen ? 'lucide:x' : 'lucide:menu'" size="16" />
         </button>
-
       </div>
     </nav>
 
@@ -140,12 +149,12 @@ watch(() => route.path, () => { menuOpen.value = false; });
       leave-from-class="opacity-100 translate-y-0"
       leave-to-class="opacity-0 -translate-y-2"
     >
-      <div v-if="menuOpen" class="border-t border-border md:hidden">
+      <div v-if="menuOpen" class="border-border border-t md:hidden">
         <ul class="mx-auto max-w-6xl space-y-1 px-6 py-3" role="list">
           <li v-for="link in links" :key="link.to">
             <NuxtLink
               :to="link.to"
-              class="block rounded-md px-3 py-2.5 text-body font-medium text-ink-muted transition-colors hover:bg-surface hover:text-ink"
+              class="text-body text-ink-muted hover:bg-surface hover:text-ink block rounded-md px-3 py-2.5 font-medium transition-colors"
               active-class="bg-surface text-ink"
             >
               {{ link.label }}
@@ -154,6 +163,5 @@ watch(() => route.path, () => { menuOpen.value = false; });
         </ul>
       </div>
     </Transition>
-
   </header>
 </template>

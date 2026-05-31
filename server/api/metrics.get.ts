@@ -46,8 +46,8 @@ interface StravaTokenResponse {
 
 interface StravaTotals {
   count: number;
-  distance: number;      // metres
-  moving_time: number;   // seconds
+  distance: number; // metres
+  moving_time: number; // seconds
   elapsed_time: number;
   elevation_gain: number;
 }
@@ -63,25 +63,24 @@ interface StravaActivity {
   name: string;
   type: string;
   start_date: string;
-  distance: number;      // metres
-  moving_time: number;   // seconds
+  distance: number; // metres
+  moving_time: number; // seconds
 }
 
 export interface MetricsWeek {
-  days: { count: number;
-    level: 0 | 1 | 2 | 3 | 4 }[];
+  days: { count: number; level: 0 | 1 | 2 | 3 | 4 }[];
 }
 
 export interface MetricsResponse {
   github: {
     totalContributions: number;
-    weeks: MetricsWeek[];        // last 26 weeks, each with 7 days
+    weeks: MetricsWeek[]; // last 26 weeks, each with 7 days
   };
   strava: {
     ytdMiles: number;
     ytdRuns: number;
     ytdElevationFt: number;
-    weeklyMiles: number[];       // last 16 weeks, miles per week (for sparkline)
+    weeklyMiles: number[]; // last 16 weeks, miles per week (for sparkline)
   };
 }
 
@@ -157,9 +156,9 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
 
   /* ─── GitHub ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-  const ghRes = await fetch(
-    `https://github-contributions-api.jogruber.de/v4/jens-johnson?y=${year}`,
-  ).then((r) => r.json() as Promise<GhContributionsResponse>);
+  const ghRes = await fetch(`https://github-contributions-api.jogruber.de/v4/jens-johnson?y=${year}`).then(
+    (r) => r.json() as Promise<GhContributionsResponse>,
+  );
 
   const totalContributions = ghRes.total[year] ?? 0;
   // Filter out future-dated entries — the API returns the full calendar year,

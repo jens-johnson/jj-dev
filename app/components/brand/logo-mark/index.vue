@@ -28,12 +28,7 @@
 </script>
 
 <template>
-  <svg
-    viewBox="0 0 500 500"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="currentColor"
-    aria-hidden="true"
-  >
+  <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true">
     <!-- J — left stroke with top flourish (rotated 13°) -->
     <path
       fill-rule="nonzero"

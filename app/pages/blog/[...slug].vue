@@ -25,9 +25,7 @@ const route = useRoute();
 
 /* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const { data: post } = await useAsyncData(`blog-${route.path}`, () =>
-  queryCollection('blog').path(route.path).first(),
-);
+const { data: post } = await useAsyncData(`blog-${route.path}`, () => queryCollection('blog').path(route.path).first());
 
 if (!post.value) {
   throw createError({
@@ -57,38 +55,36 @@ function formatDate(iso: string): string {
 </script>
 
 <template>
-  <article v-if="post" class="min-h-screen bg-bg">
-
+  <article v-if="post" class="bg-bg min-h-screen">
     <!-- ─── Header ────────────────────────────────────────────────────────────── -->
-    <header class="border-b border-border">
-      <div class="mx-auto max-w-3xl px-6 pb-12 pt-20 md:pt-28">
-
+    <header class="border-border border-b">
+      <div class="mx-auto max-w-3xl px-6 pt-20 pb-12 md:pt-28">
         <!-- Back link -->
         <NuxtLink
           to="/blog"
-          class="mb-8 inline-flex items-center gap-1.5 font-mono text-caption uppercase tracking-widest text-ink-subtle transition-colors hover:text-accent"
+          class="text-caption text-ink-subtle hover:text-accent mb-8 inline-flex items-center gap-1.5 font-mono tracking-widest uppercase transition-colors"
         >
           <Icon name="lucide:arrow-left" size="13" /> All writing
         </NuxtLink>
 
         <!-- Meta -->
         <div class="mb-6 flex flex-wrap items-center gap-3">
-          <p class="font-mono text-caption text-ink-subtle">{{ formatDate(post.publishedAt) }}</p>
-          <span v-if="post.series" class="font-mono text-caption text-ink-subtle">
+          <p class="text-caption text-ink-subtle font-mono">{{ formatDate(post.publishedAt) }}</p>
+          <span v-if="post.series" class="text-caption text-ink-subtle font-mono">
             · {{ post.series.name }} · Part {{ post.series.part }}
           </span>
-          <span v-if="post.readingTime" class="font-mono text-caption text-ink-subtle">
+          <span v-if="post.readingTime" class="text-caption text-ink-subtle font-mono">
             · {{ post.readingTime }} min read
           </span>
         </div>
 
         <!-- Title -->
-        <h1 class="mb-6 font-display text-h2 font-bold leading-tight tracking-tight text-ink">
+        <h1 class="font-display text-h2 text-ink mb-6 leading-tight font-bold tracking-tight">
           {{ post.title }}
         </h1>
 
         <!-- Description -->
-        <p class="mb-8 font-body text-body-lg leading-relaxed text-ink-muted">
+        <p class="font-body text-body-lg text-ink-muted mb-8 leading-relaxed">
           {{ post.description }}
         </p>
 
@@ -97,7 +93,7 @@ function formatDate(iso: string): string {
           <span
             v-for="tag in post.tags"
             :key="tag"
-            class="rounded-full bg-surface px-3 py-1 font-mono text-caption text-ink-muted"
+            class="bg-surface text-caption text-ink-muted rounded-full px-3 py-1 font-mono"
           >
             {{ tag }}
           </span>
@@ -113,23 +109,23 @@ function formatDate(iso: string): string {
     </div>
 
     <!-- ─── Footer ────────────────────────────────────────────────────────────── -->
-    <footer class="border-t border-border bg-surface">
+    <footer class="border-border bg-surface border-t">
       <div class="mx-auto max-w-3xl px-6 py-12">
-        <p class="mb-4 font-mono text-caption uppercase tracking-widest text-ink-subtle">Keep reading</p>
+        <p class="text-caption text-ink-subtle mb-4 font-mono tracking-widest uppercase">Keep reading</p>
         <NuxtLink
           to="/blog"
-          class="inline-flex items-center gap-1.5 font-display text-h5 font-bold text-ink transition-colors hover:text-accent"
+          class="font-display text-h5 text-ink hover:text-accent inline-flex items-center gap-1.5 font-bold transition-colors"
         >
           All writing <Icon name="lucide:arrow-right" size="15" />
         </NuxtLink>
       </div>
     </footer>
-
   </article>
 </template>
 
 <style scoped>
 /* ─── Prose styling for rendered markdown ─────────────────────────────────────────────────────────────────────────── */
+
 /* Custom rather than @tailwindcss/typography to keep our earth-tone tokens and Syne/Plus Jakarta type system intact. */
 
 .prose-jj :deep(h2) {

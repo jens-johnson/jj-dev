@@ -64,7 +64,7 @@ function resize() {
   W = canvas.offsetWidth;
   H = canvas.offsetHeight;
   if (W === 0 || H === 0) return;
-  canvas.width  = Math.round(W * dpr);
+  canvas.width = Math.round(W * dpr);
   canvas.height = Math.round(H * dpr);
   ctx = canvas.getContext('2d');
   ctx?.scale(dpr, dpr);
@@ -92,22 +92,26 @@ function computePeak(x: number, baseY: number, mx: number, my: number): number {
 function traceContour(baseY: number, phase: number, mx: number, my: number, active: boolean) {
   for (let x = 0; x <= W; x += 3) {
     const wave =
-      Math.sin(x * 0.0075 + t * 0.9  + phase)       * 26 +
-      Math.sin(x * 0.0140 - t * 0.65 + phase * 1.6) * 15 +
-      Math.sin(x * 0.0240 + t * 1.20 + phase * 0.7) *  7 +
+      Math.sin(x * 0.0075 + t * 0.9 + phase) * 26 +
+      Math.sin(x * 0.014 - t * 0.65 + phase * 1.6) * 15 +
+      Math.sin(x * 0.024 + t * 1.2 + phase * 0.7) * 7 +
       Math.cos(x * 0.0046 + t * 0.45 - phase * 0.4) * 11;
     const peak = active ? computePeak(x, baseY, mx, my) : 0;
     const y = baseY + wave + peak;
-    if (x === 0) { ctx!.moveTo(x, y); } else { ctx!.lineTo(x, y); }
+    if (x === 0) {
+      ctx!.moveTo(x, y);
+    } else {
+      ctx!.lineTo(x, y);
+    }
   }
 }
 
 /** Draw a soft radial glow centred on the cursor. */
 function drawGlow(mx: number, my: number) {
   const grad = ctx!.createRadialGradient(mx, my, 0, mx, my, 180);
-  grad.addColorStop(0,   `rgba(${ACCENT_RGB}, 0.07)`);
+  grad.addColorStop(0, `rgba(${ACCENT_RGB}, 0.07)`);
   grad.addColorStop(0.5, `rgba(${ACCENT_RGB}, 0.025)`);
-  grad.addColorStop(1,   `rgba(${ACCENT_RGB}, 0)`);
+  grad.addColorStop(1, `rgba(${ACCENT_RGB}, 0)`);
   ctx!.fillStyle = grad;
   ctx!.fillRect(0, 0, W, H);
 }
@@ -122,27 +126,29 @@ function draw() {
   t += SPEED;
   lerpMouse();
 
-  const mx     = smoothMX.value;
-  const my     = smoothMY.value;
+  const mx = smoothMX.value;
+  const my = smoothMY.value;
   const active = mouseActive.value && mx >= 0;
 
   for (let i = 0; i < NUM_LINES; i++) {
-    const frac  = i / (NUM_LINES - 1);   // 0 → 1 top to bottom
+    const frac = i / (NUM_LINES - 1); // 0 → 1 top to bottom
     const baseY = frac * H;
-    const phase = i * 0.38;              // per-line phase offset
+    const phase = i * 0.38; // per-line phase offset
 
-    const proximity  = active ? Math.exp(-((baseY - my) ** 2) / 18_000) : 0;
-    const midBoost   = 1 - Math.abs(frac - 0.5) * 2;   // peaks at vertical centre
+    const proximity = active ? Math.exp(-((baseY - my) ** 2) / 18_000) : 0;
+    const midBoost = 1 - Math.abs(frac - 0.5) * 2; // peaks at vertical centre
     const baseOpacity = 0.06 + midBoost * 0.14 + proximity * 0.28;
 
     ctx.beginPath();
     ctx.strokeStyle = `rgba(${ACCENT_RGB}, ${Math.min(baseOpacity, 0.55)})`;
-    ctx.lineWidth   = 0.65 + midBoost * 0.35 + proximity * 0.7;
+    ctx.lineWidth = 0.65 + midBoost * 0.35 + proximity * 0.7;
     traceContour(baseY, phase, mx, my, active);
     ctx.stroke();
   }
 
-  if (active) { drawGlow(mx, my); }
+  if (active) {
+    drawGlow(mx, my);
+  }
 }
 
 /* ─── Mouse handlers ─────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -158,8 +164,8 @@ function onMove(e: MouseEvent) {
 
 function onLeave() {
   mouseActive.value = false;
-  smoothMX.value    = -1;
-  smoothMY.value    = -1;
+  smoothMX.value = -1;
+  smoothMY.value = -1;
 }
 
 /* ─── Lifecycle ──────────────────────────────────────────────────────────────────────────────────────────────────── */

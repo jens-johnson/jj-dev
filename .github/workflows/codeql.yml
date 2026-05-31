@@ -1,4 +1,3 @@
-#!/bin/sh
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 #
 #                                ██        ██                     ▄▄
@@ -11,20 +10,42 @@
 #                             ████▀     ████▀
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
-# ████████████████████████████████████████████████ .githooks/pre-push █████████████████████████████████████████████████
+# ████████████████████████████████████████████ .github/workflows/codeql.yml ███████████████████████████████████████████
 #
-# Git hook: runs lint and type-check before every git push. Aborts if either check fails.
-#
-# ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-#
-# Runs automatically on `git push`. Exits 1 on any ESLint or TypeScript error.
+# CodeQL — GitHub-native static analysis. Findings land in the Security tab. Runs on PRs (changed files only — fast)
+# and on a weekly schedule (full sweep).
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
-echo "→ Running lint..."
-npm run lint || exit 1
 
-# Type-check — exits 1 on any TypeScript error, which aborts the push.
-echo "→ Running typecheck..."
-npm run typecheck || exit 1
+name: CodeQL
 
-echo "✓ All checks passed"
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Mondays at 06:00 UTC.
+    - cron: '0 6 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze ${{ matrix.language }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:${{ matrix.language }}'

@@ -8,16 +8,10 @@
 //
 // See: docs/project-planning/phase-1/02-design-tokens.md
 
-import type {
-  Config,
-} from 'tailwindcss';
+import type { Config } from 'tailwindcss';
 
 export default {
-  content: [
-    './app/**/*.{vue,ts,tsx}',
-    './components/**/*.{vue,ts,tsx}',
-    './content/**/*.md',
-  ],
+  content: ['./app/**/*.{vue,ts,tsx}', './components/**/*.{vue,ts,tsx}', './content/**/*.md'],
 
   theme: {
     extend: {
@@ -79,46 +73,76 @@ export default {
 
       // ─── Type scale ───────────────────────────────────────────────────────
       fontSize: {
-        display: ['6rem', {
-          lineHeight: '1.05',
-          letterSpacing: '-0.02em',
-        }],
-        h1: ['4.5rem', {
-          lineHeight: '1.1',
-          letterSpacing: '-0.01em',
-        }],
-        h2: ['3rem', {
-          lineHeight: '1.15',
-          letterSpacing: '0',
-        }],
-        h3: ['2rem', {
-          lineHeight: '1.2',
-          letterSpacing: '0',
-        }],
-        h4: ['1.5rem', {
-          lineHeight: '1.3',
-          letterSpacing: '0',
-        }],
-        h5: ['1.125rem', {
-          lineHeight: '1.4',
-          letterSpacing: '0',
-        }],
-        'body-lg': ['1.25rem', {
-          lineHeight: '1.65',
-          letterSpacing: '0',
-        }],
-        body: ['1rem', {
-          lineHeight: '1.65',
-          letterSpacing: '0',
-        }],
-        'body-sm': ['0.875rem', {
-          lineHeight: '1.6',
-          letterSpacing: '0',
-        }],
-        caption: ['0.75rem', {
-          lineHeight: '1.5',
-          letterSpacing: '0.02em',
-        }],
+        display: [
+          '6rem',
+          {
+            lineHeight: '1.05',
+            letterSpacing: '-0.02em',
+          },
+        ],
+        h1: [
+          '4.5rem',
+          {
+            lineHeight: '1.1',
+            letterSpacing: '-0.01em',
+          },
+        ],
+        h2: [
+          '3rem',
+          {
+            lineHeight: '1.15',
+            letterSpacing: '0',
+          },
+        ],
+        h3: [
+          '2rem',
+          {
+            lineHeight: '1.2',
+            letterSpacing: '0',
+          },
+        ],
+        h4: [
+          '1.5rem',
+          {
+            lineHeight: '1.3',
+            letterSpacing: '0',
+          },
+        ],
+        h5: [
+          '1.125rem',
+          {
+            lineHeight: '1.4',
+            letterSpacing: '0',
+          },
+        ],
+        'body-lg': [
+          '1.25rem',
+          {
+            lineHeight: '1.65',
+            letterSpacing: '0',
+          },
+        ],
+        body: [
+          '1rem',
+          {
+            lineHeight: '1.65',
+            letterSpacing: '0',
+          },
+        ],
+        'body-sm': [
+          '0.875rem',
+          {
+            lineHeight: '1.6',
+            letterSpacing: '0',
+          },
+        ],
+        caption: [
+          '0.75rem',
+          {
+            lineHeight: '1.5',
+            letterSpacing: '0.02em',
+          },
+        ],
       },
 
       // ─── Spacing additions ────────────────────────────────────────────────

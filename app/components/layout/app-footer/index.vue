@@ -36,9 +36,8 @@ const socials = [
 </script>
 
 <template>
-  <footer class="border-t border-border">
+  <footer class="border-border border-t">
     <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-10 sm:flex-row">
-
       <!-- Colophon -->
       <p class="text-caption text-ink-subtle">
         © {{ year }} Jens Johnson · Built with
@@ -46,15 +45,17 @@ const socials = [
           href="https://nuxt.com"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-ink-muted transition-colors hover:text-ink"
-        >Nuxt</a>
+          class="text-ink-muted hover:text-ink transition-colors"
+          >Nuxt</a
+        >
         ·
         <a
           href="https://github.com/jens-johnson/jj-dev"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-ink-muted transition-colors hover:text-ink"
-        >Source</a>
+          class="text-ink-muted hover:text-ink transition-colors"
+          >Source</a
+        >
       </p>
 
       <!-- Socials -->
@@ -65,13 +66,12 @@ const socials = [
             target="_blank"
             rel="noopener noreferrer"
             :aria-label="social.label"
-            class="flex size-8 items-center justify-center text-ink-subtle transition-colors hover:text-ink"
+            class="text-ink-subtle hover:text-ink flex size-8 items-center justify-center transition-colors"
           >
             <Icon :name="social.icon" size="16" />
           </a>
         </li>
       </ul>
-
     </div>
   </footer>
 </template>

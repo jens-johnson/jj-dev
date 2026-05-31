@@ -39,7 +39,7 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="fixed left-0 top-0 z-[100] h-[2px] origin-left bg-accent"
+    class="bg-accent fixed top-0 left-0 z-[100] h-[2px] origin-left"
     :style="{ transform: `scaleX(${progress})` }"
     aria-hidden="true"
   />
