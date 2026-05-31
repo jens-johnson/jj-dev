@@ -39,9 +39,9 @@
 
 interface Props {
   /** Lerp factor — lower = smoother/slower. Default 0.055. */
-  lerp?: number
+  lerp?: number;
   /** Hero height fraction of viewport for markStyle progress. Default 0.92. */
-  heroFraction?: number
+  heroFraction?: number;
 }
 const props = withDefaults(defineProps<Props>(), {
   lerp: 0.055,
@@ -50,22 +50,22 @@ const props = withDefaults(defineProps<Props>(), {
 
 const rootEl = useTemplateRef<HTMLElement>('root');
 
-const rawX    = ref(0);
-const rawY    = ref(0);
+const rawX = ref(0);
+const rawY = ref(0);
 const smoothX = ref(0);
 const smoothY = ref(0);
 const scrollY = ref(0);
 let raf: number;
 
-function lerpFn(a: number, b: number, t: number) { return a + (b - a) * t; }
+function lerpFn(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
 
 function onMouseMove(e: MouseEvent) {
   if (!rootEl.value) return;
-  const {
-    left, top, width, height,
-  } = rootEl.value.getBoundingClientRect();
-  rawX.value = ((e.clientX - left) / width  - 0.5) * 2;
-  rawY.value = ((e.clientY - top)  / height - 0.5) * 2;
+  const { left, top, width, height } = rootEl.value.getBoundingClientRect();
+  rawX.value = ((e.clientX - left) / width - 0.5) * 2;
+  rawY.value = ((e.clientY - top) / height - 0.5) * 2;
 }
 
 function tick() {
@@ -82,12 +82,12 @@ function layerStyle(mx: number, my: number, sy = 0) {
 }
 
 function markStyle() {
-  const heroH   = import.meta.client ? window.innerHeight * props.heroFraction : 800;
-  const p       = Math.min(scrollY.value / heroH, 1);
+  const heroH = import.meta.client ? window.innerHeight * props.heroFraction : 800;
+  const p = Math.min(scrollY.value / heroH, 1);
   const opacity = 0.02 + p * 0.22;
-  const scale   = 0.84 + p * 0.16;
-  const tx      = smoothX.value * 68;
-  const ty      = smoothY.value * 52 + scrollY.value * -0.40;
+  const scale = 0.84 + p * 0.16;
+  const tx = smoothX.value * 68;
+  const ty = smoothY.value * 52 + scrollY.value * -0.4;
   return {
     transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
     opacity,
@@ -97,9 +97,15 @@ function markStyle() {
 
 onMounted(() => {
   raf = requestAnimationFrame(tick);
-  window.addEventListener('scroll', () => { scrollY.value = window.scrollY; }, {
-    passive: true,
-  });
+  window.addEventListener(
+    'scroll',
+    () => {
+      scrollY.value = window.scrollY;
+    },
+    {
+      passive: true,
+    },
+  );
 });
 onUnmounted(() => cancelAnimationFrame(raf));
 </script>

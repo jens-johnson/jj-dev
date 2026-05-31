@@ -10,11 +10,11 @@
 
 ### Options
 
-| Approach | How it works | Pros | Cons |
-|---|---|---|---|
-| **Nuxt Content** (recommended) | Markdown/MDX files in `content/` directory, queried via `queryCollection()` | Git-versioned, no CMS login, great Nuxt DX, works with SSG | Content authoring = editing files in IDE |
-| Headless CMS (Contentful, Sanity) | External CMS with API + SDK | Rich admin UI, non-dev authoring | Added complexity, cost, external dependency |
-| MongoDB-backed | Dynamic content served via API routes | Fully dynamic, easy to extend | Requires admin UI to author, more infra |
+| Approach                          | How it works                                                                | Pros                                                       | Cons                                        |
+| --------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------- |
+| **Nuxt Content** (recommended)    | Markdown/MDX files in `content/` directory, queried via `queryCollection()` | Git-versioned, no CMS login, great Nuxt DX, works with SSG | Content authoring = editing files in IDE    |
+| Headless CMS (Contentful, Sanity) | External CMS with API + SDK                                                 | Rich admin UI, non-dev authoring                           | Added complexity, cost, external dependency |
+| MongoDB-backed                    | Dynamic content served via API routes                                       | Fully dynamic, easy to extend                              | Requires admin UI to author, more infra     |
 
 ### Recommendation
 
@@ -35,15 +35,16 @@
 
 ### Options
 
-| Platform | Nuxt support | Complexity | Cost | Best for |
-|---|---|---|---|---|
-| **Vercel** (recommended) | First-class | Very low | Free tier generous | Nuxt SSR/SSG, preview deploys, edge |
-| AWS (Amplify or CloudFront + S3) | Good (Amplify) | High | Pay-per-use | Full AWS ecosystem control |
-| Netlify | Good | Low | Free tier | Similar to Vercel |
+| Platform                         | Nuxt support   | Complexity | Cost               | Best for                            |
+| -------------------------------- | -------------- | ---------- | ------------------ | ----------------------------------- |
+| **Vercel** (recommended)         | First-class    | Very low   | Free tier generous | Nuxt SSR/SSG, preview deploys, edge |
+| AWS (Amplify or CloudFront + S3) | Good (Amplify) | High       | Pay-per-use        | Full AWS ecosystem control          |
+| Netlify                          | Good           | Low        | Free tier          | Similar to Vercel                   |
 
 ### Recommendation
 
 **Vercel** for the Nuxt application. Reasons:
+
 - Zero-config Nuxt deployment (no `output: 'static'` required, SSR just works)
 - Automatic preview deployments per PR — essential for design review workflow
 - Globally distributed edge network
@@ -107,11 +108,11 @@ All reference projects (LatticeCraft, FWB API, PES, CPTL) use Nx monorepos. Howe
 
 ### Analysis
 
-| Scenario | Right choice |
-|---|---|
+| Scenario                               | Right choice           |
+| -------------------------------------- | ---------------------- |
 | One Nuxt app, server routes handle API | Single Nuxt app, no Nx |
-| Nuxt app + separate admin app | Nx monorepo |
-| Nuxt app + shared npm package | Nx monorepo |
+| Nuxt app + separate admin app          | Nx monorepo            |
+| Nuxt app + shared npm package          | Nx monorepo            |
 
 ### Recommendation
 
@@ -144,12 +145,12 @@ Auth can be revisited in a later phase if dynamic features (like a public commen
 
 ### Options
 
-| Approach | Pros | Cons |
-|---|---|---|
-| Tailwind-only | Maximum control, zero conflicts | More hand-built components |
-| **Nuxt UI + Tailwind** (recommended) | Built for Nuxt, Tailwind-native, excellent DX | Opinionated component API |
-| Vuetify | Feature-rich | Conflicts with Tailwind, heavy, hard to customize |
-| shadcn-vue | Composable, copy-paste | Less mature ecosystem than Nuxt UI |
+| Approach                             | Pros                                          | Cons                                              |
+| ------------------------------------ | --------------------------------------------- | ------------------------------------------------- |
+| Tailwind-only                        | Maximum control, zero conflicts               | More hand-built components                        |
+| **Nuxt UI + Tailwind** (recommended) | Built for Nuxt, Tailwind-native, excellent DX | Opinionated component API                         |
+| Vuetify                              | Feature-rich                                  | Conflicts with Tailwind, heavy, hard to customize |
+| shadcn-vue                           | Composable, copy-paste                        | Less mature ecosystem than Nuxt UI                |
 
 ### Recommendation
 
@@ -177,16 +178,16 @@ Use `nuxt-seo` (or `@nuxtjs/seo` suite) which bundles sitemap, robots, OG, and s
 
 ## Summary: Decision Matrix
 
-| Decision | Confirmed Path | Status |
-|---|---|---|
-| Content architecture | Nuxt Content (markdown-in-repo) | ✅ Confirmed |
-| Hosting | Vercel + MongoDB Atlas | ✅ Confirmed |
-| Design system | Sketch → Tailwind tokens | ✅ Complete |
+| Decision                 | Confirmed Path                            | Status       |
+| ------------------------ | ----------------------------------------- | ------------ |
+| Content architecture     | Nuxt Content (markdown-in-repo)           | ✅ Confirmed |
+| Hosting                  | Vercel + MongoDB Atlas                    | ✅ Confirmed |
+| Design system            | Sketch → Tailwind tokens                  | ✅ Complete  |
 | Information architecture | `/about /work /projects /blog /lab /uses` | ✅ Confirmed |
-| Monorepo | Single Nuxt app (no Nx for now) | ✅ Confirmed |
-| Authentication | None in Phase 1 (markdown content flow) | ✅ Confirmed |
-| Component library | Tailwind + Nuxt UI for complex components | ✅ Confirmed |
-| SEO strategy | `@nuxtjs/seo` suite, define early | ✅ Confirmed |
+| Monorepo                 | Single Nuxt app (no Nx for now)           | ✅ Confirmed |
+| Authentication           | None in Phase 1 (markdown content flow)   | ✅ Confirmed |
+| Component library        | Tailwind + Nuxt UI for complex components | ✅ Confirmed |
+| SEO strategy             | `@nuxtjs/seo` suite, define early         | ✅ Confirmed |
 
 ---
 

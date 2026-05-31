@@ -28,11 +28,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import {
-  defineCollection,
-  defineContentConfig,
-  z,
-} from '@nuxt/content';
+import { defineCollection, defineContentConfig, z } from '@nuxt/content';
 
 /* ─── Schemas ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -49,12 +45,14 @@ const baseSchema = z.object({
   updatedAt: z.string().date().optional(),
   draft: z.boolean().default(false),
   tags: z.array(z.string()).default([]),
-  cover: z.object({
-    src: z.string(),
-    alt: z.string(),
-    width: z.number().optional(),
-    height: z.number().optional(),
-  }).optional(),
+  cover: z
+    .object({
+      src: z.string(),
+      alt: z.string(),
+      width: z.number().optional(),
+      height: z.number().optional(),
+    })
+    .optional(),
 });
 
 /**
@@ -73,10 +71,12 @@ const blogSchema = baseSchema.extend({
    * Series grouping. Articles in a series link to each other.
    * i.e. `{ name: 'Building jj-dev', part: 1 }`
    */
-  series: z.object({
-    name: z.string(),
-    part: z.number(),
-  }).optional(),
+  series: z
+    .object({
+      name: z.string(),
+      part: z.number(),
+    })
+    .optional(),
 });
 
 /**
@@ -110,11 +110,13 @@ const projectsSchema = baseSchema.extend({
   /**
    * Links associated with the project
    */
-  links: z.object({
-    live: z.string().url().optional(),
-    github: z.string().url().optional(),
-    caseStudy: z.string().url().optional(),
-  }).optional(),
+  links: z
+    .object({
+      live: z.string().url().optional(),
+      github: z.string().url().optional(),
+      caseStudy: z.string().url().optional(),
+    })
+    .optional(),
 
   /**
    * Primary technologies / stack used
@@ -142,14 +144,7 @@ const labSchema = baseSchema.extend({
   /**
    * Category for grouping lab entries
    */
-  category: z.enum([
-    'animation',
-    'generative',
-    'interaction',
-    'typography',
-    'tool',
-    'other',
-  ]).default('other'),
+  category: z.enum(['animation', 'generative', 'interaction', 'typography', 'tool', 'other']).default('other'),
 
   /**
    * Live demo URL (iframe embed or external link)
@@ -176,23 +171,27 @@ const resumeSchema = z.object({
   website: z.string().url(),
   summary: z.string(),
 
-  experience: z.array(z.object({
-    company: z.string(),
-    role: z.string(),
-    location: z.string().optional(),
-    from: z.string(),
-    to: z.string().optional(),
-    current: z.boolean().default(false),
-    highlights: z.array(z.string()).default([]),
-    stack: z.array(z.string()).default([]),
-  })),
+  experience: z.array(
+    z.object({
+      company: z.string(),
+      role: z.string(),
+      location: z.string().optional(),
+      from: z.string(),
+      to: z.string().optional(),
+      current: z.boolean().default(false),
+      highlights: z.array(z.string()).default([]),
+      stack: z.array(z.string()).default([]),
+    }),
+  ),
 
-  education: z.array(z.object({
-    institution: z.string(),
-    degree: z.string(),
-    field: z.string(),
-    year: z.number(),
-  })),
+  education: z.array(
+    z.object({
+      institution: z.string(),
+      degree: z.string(),
+      field: z.string(),
+      year: z.number(),
+    }),
+  ),
 
   skills: z.object({
     languages: z.array(z.string()).default([]),

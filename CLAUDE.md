@@ -60,12 +60,13 @@ header line with `# ` (or just `#` for empty logo lines):
 ```
 
 **Rules:**
+
 - The filename in the banner uses the path from the project root (e.g. `.editorconfig`) OR the
   Nuxt alias-prefixed path for app source files (e.g. `#pages/index.vue`, `#components/layout/app-nav/index.vue`).
 - USAGE and SEE sections are optional — omit if not needed.
 - 120-char line limit applies to description and section content lines (the `█` separator lines
   are a fixed-width design element and may exceed 120).
-- Separator line content (`█` chars) = 117. With ` * ` prefix = 120 chars; with `# ` prefix = 119 chars.
+- Separator line content (`█` chars) = 117. With `*` prefix = 120 chars; with `# ` prefix = 119 chars.
 - Filename banner: center the filename with `floor((115 − len) / 2)` left-padding `█` chars,
   remainder on the right, total content = 117 chars.
 
@@ -86,11 +87,11 @@ Formula: `/* ─── NAME ` + `─` × (103 − len(NAME)) + ` */` = 120 chars
 
 Three permanent branches map to three environments:
 
-| Branch    | Environment | URL                          |
-|-----------|-------------|------------------------------|
-| `main`    | Production  | jens-johnson.com             |
-| `staging` | Pre-prod    | staging.jens-johnson.com     |
-| feature   | —           | Vercel preview URL (per PR)  |
+| Branch    | Environment | URL                         |
+| --------- | ----------- | --------------------------- |
+| `main`    | Production  | jens-johnson.com            |
+| `staging` | Pre-prod    | staging.jens-johnson.com    |
+| feature   | —           | Vercel preview URL (per PR) |
 
 **Flow:** `feat/*` → PR into `staging` (UAT review) → auto-PR into `main` (prod).
 
@@ -133,6 +134,7 @@ components/
 ```
 
 Auto-import names follow full directory path:
+
 - `brand/logo-mark/index.vue` → `<BrandLogoMark>`
 - `layout/app-nav/index.vue` → `<LayoutAppNav>`
 - `primitives/base-hero/index.vue` → `<PrimitivesBaseHero>`
@@ -153,3 +155,20 @@ from the slot to drive per-layer transforms without duplicating tracking logic.
 - **@nuxt/content v3** — `defineCollection` + Zod schemas in `content.config.ts`
 - Three themes: `day` / `sunset` / `night` via `data-theme` on `<html>`
 - `useState` must be called inside a composable function, never at module level
+
+---
+
+## Tooling
+
+- **Package manager:** `pnpm 10.10.0` pinned via Corepack (`packageManager` field). First install:
+  `corepack enable && pnpm install`. Lockfile is `pnpm-lock.yaml`; no `package-lock.json`.
+- **Lint:** `pnpm lint` runs ESLint + Prettier + Stylelint in parallel. `pnpm lint:fix` autofixes all three.
+- **Typecheck:** `pnpm typecheck` (vue-tsc via Nuxt).
+- **Full local CI gate:** `pnpm check` — runs lint → typecheck → build sequentially.
+- **Git hooks:** managed by [`lefthook`](./lefthook.yml), installed automatically via the `prepare` script
+  on `pnpm install`. Runs lint-staged on `pre-commit`, commitlint on `commit-msg`, and `pnpm lint && pnpm typecheck`
+  on `pre-push`. Bypass a single hook: `LEFTHOOK_EXCLUDE=<name> git commit`. Skip everything: `LEFTHOOK=0 git commit`.
+- **Prettier owns formatting.** Don't reach for stylistic ESLint rules that fight with it — `eslint-config-prettier`
+  is loaded last to neutralize conflicts. The `.prettierrc.json` file is the source of truth.
+- **Stylelint** lints `main.css` and `<style>` blocks in `.vue` files. Tailwind directives are whitelisted in
+  `stylelint.config.mjs`.

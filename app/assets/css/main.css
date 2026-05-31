@@ -32,73 +32,74 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ─── Design Tokens (@theme) ──────────────────────────────────────────────────────────────────────────────────────── */
+
 /* Day theme values are defaults. Sunset/Night override below via data-theme selectors.                                */
 
 @theme {
   /* ── Semantic color tokens ─────────────────────────────────────────────── */
-  --color-bg:               #F8F4EE;
-  --color-surface:          #F0EBE3;
-  --color-border:           #DDD0BF;
-  --color-ink:              #1C140A;
-  --color-ink-muted:        #6B5744;
-  --color-ink-subtle:       #A8957E;
-  --color-accent:           #8B6534;
-  --color-accent-secondary: #5E8C65;
+  --color-bg: #f8f4ee;
+  --color-surface: #f0ebe3;
+  --color-border: #ddd0bf;
+  --color-ink: #1c140a;
+  --color-ink-muted: #6b5744;
+  --color-ink-subtle: #a8957e;
+  --color-accent: #8b6534;
+  --color-accent-secondary: #5e8c65;
 
   /* ── Raw palette (reference only — do not use in components) ──────────── */
-  --color-stone-50:   #F8F4EE;
-  --color-stone-100:  #F0E8DC;
-  --color-stone-200:  #DDD0BF;
-  --color-stone-400:  #A8957E;
-  --color-stone-600:  #6B5744;
-  --color-stone-900:  #1C140A;
-  --color-earth-100:  #EDE0CC;
-  --color-earth-300:  #C8A46E;
-  --color-earth-500:  #8B6534;
-  --color-earth-700:  #5C3D1A;
-  --color-earth-900:  #2E1D0A;
-  --color-sage-100:   #D4E4D8;
-  --color-sage-300:   #9DB8A0;
-  --color-sage-500:   #5E8C65;
-  --color-sage-700:   #3A6040;
-  --color-sky-100:    #D6E8F0;
-  --color-sky-300:    #8ABDD4;
-  --color-sky-500:    #4A8FAD;
-  --color-terra-400:  #D4763B;
-  --color-terra-600:  #A84835;
+  --color-stone-50: #f8f4ee;
+  --color-stone-100: #f0e8dc;
+  --color-stone-200: #ddd0bf;
+  --color-stone-400: #a8957e;
+  --color-stone-600: #6b5744;
+  --color-stone-900: #1c140a;
+  --color-earth-100: #ede0cc;
+  --color-earth-300: #c8a46e;
+  --color-earth-500: #8b6534;
+  --color-earth-700: #5c3d1a;
+  --color-earth-900: #2e1d0a;
+  --color-sage-100: #d4e4d8;
+  --color-sage-300: #9db8a0;
+  --color-sage-500: #5e8c65;
+  --color-sage-700: #3a6040;
+  --color-sky-100: #d6e8f0;
+  --color-sky-300: #8abdd4;
+  --color-sky-500: #4a8fad;
+  --color-terra-400: #d4763b;
+  --color-terra-600: #a84835;
 
   /* ── Font families ─────────────────────────────────────────────────────── */
   --font-display: 'Syne', sans-serif;
   --font-heading: 'Fraunces', Georgia, serif;
-  --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-mono:    'Geist Mono', Menlo, 'Courier New', monospace;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', Menlo, 'Courier New', monospace;
 
   /* ── Type scale ────────────────────────────────────────────────────────── */
-  --text-display:                6rem;
-  --text-display--line-height:   1.05;
+  --text-display: 6rem;
+  --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.02em;
-  --text-h1:                     4.5rem;
-  --text-h1--line-height:        1.1;
-  --text-h1--letter-spacing:     -0.01em;
-  --text-h2:                     3rem;
-  --text-h2--line-height:        1.15;
-  --text-h3:                     2rem;
-  --text-h3--line-height:        1.2;
-  --text-h4:                     1.5rem;
-  --text-h4--line-height:        1.3;
-  --text-h5:                     1.125rem;
-  --text-h5--line-height:        1.4;
-  --text-body-lg:                1.25rem;
-  --text-body-lg--line-height:   1.65;
-  --text-body:                   1rem;
-  --text-body--line-height:      1.65;
-  --text-body-sm:                0.875rem;
-  --text-body-sm--line-height:   1.6;
-  --text-caption:                0.75rem;
-  --text-caption--line-height:   1.5;
+  --text-h1: 4.5rem;
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.01em;
+  --text-h2: 3rem;
+  --text-h2--line-height: 1.15;
+  --text-h3: 2rem;
+  --text-h3--line-height: 1.2;
+  --text-h4: 1.5rem;
+  --text-h4--line-height: 1.3;
+  --text-h5: 1.125rem;
+  --text-h5--line-height: 1.4;
+  --text-body-lg: 1.25rem;
+  --text-body-lg--line-height: 1.65;
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.6;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.5;
   --text-caption--letter-spacing: 0.02em;
 
   /* ── Spacing additions (extends Tailwind's 4px-base scale) ────────────── */
@@ -108,72 +109,83 @@
   --spacing-30: 7.5rem;
 
   /* ── Max widths ────────────────────────────────────────────────────────── */
-  --container-prose:   720px;
+  --container-prose: 720px;
   --container-content: 1280px;
 
   /* ── Border radius ─────────────────────────────────────────────────────── */
-  --radius-sm:   4px;
-  --radius:      8px;
-  --radius-md:   12px;
-  --radius-lg:   16px;
-  --radius-xl:   24px;
-  --radius-2xl:  32px;
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
   --radius-full: 9999px;
 
   /* ── Shadows ───────────────────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 3px rgba(28, 20, 10, 0.08);
-  --shadow-md: 0 4px 12px rgba(28, 20, 10, 0.10);
-  --shadow-lg: 0 12px 32px rgba(28, 20, 10, 0.12);
+  --shadow-sm: 0 1px 3px rgb(28, 20, 10, 8%);
+  --shadow-md: 0 4px 12px rgb(28, 20, 10, 10%);
+  --shadow-lg: 0 12px 32px rgb(28, 20, 10, 12%);
 
   /* ── Transition durations ──────────────────────────────────────────────── */
-  --duration-fast:  150ms;
-  --duration:       250ms;
-  --duration-slow:  400ms;
+  --duration-fast: 150ms;
+  --duration: 250ms;
+  --duration-slow: 400ms;
   --duration-theme: 600ms;
 }
 
 /* ─── Day (default) ───────────────────────────────────────────────────────────────────────────────────────────────── */
 :root,
 [data-theme='day'] {
-  --color-bg:               #F8F4EE;
-  --color-surface:          #F0EBE3;
-  --color-border:           #DDD0BF;
-  --color-ink:              #1C140A;
-  --color-ink-muted:        #6B5744;
-  --color-ink-subtle:       #A8957E;
-  --color-accent:           #8B6534;
-  --color-accent-secondary: #5E8C65;
+  --color-bg: #f8f4ee;
+  --color-surface: #f0ebe3;
+  --color-border: #ddd0bf;
+  --color-ink: #1c140a;
+  --color-ink-muted: #6b5744;
+  --color-ink-subtle: #a8957e;
+  --color-accent: #8b6534;
+  --color-accent-secondary: #5e8c65;
 }
 
 /* ─── Sunset ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 [data-theme='sunset'] {
-  --color-bg:               #140C08;
-  --color-surface:          #201208;
-  --color-border:           #2C1608;
-  --color-ink:              #F0D8C0;
-  --color-ink-muted:        #B08060;
-  --color-ink-subtle:       #664030;
-  --color-accent:           #A84835;
-  --color-accent-secondary: #7AAA78;
+  --color-bg: #140c08;
+  --color-surface: #201208;
+  --color-border: #2c1608;
+  --color-ink: #f0d8c0;
+  --color-ink-muted: #b08060;
+  --color-ink-subtle: #664030;
+  --color-accent: #a84835;
+  --color-accent-secondary: #7aaa78;
 }
 
 /* ─── Night ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 [data-theme='night'] {
-  --color-bg:               #080C12;
-  --color-surface:          #0E1820;
-  --color-border:           #162030;
-  --color-ink:              #D0E8F0;
-  --color-ink-muted:        #4878A0;
-  --color-ink-subtle:       #243850;
-  --color-accent:           #60B870;
-  --color-accent-secondary: #5080C0;
+  --color-bg: #080c12;
+  --color-surface: #0e1820;
+  --color-border: #162030;
+  --color-ink: #d0e8f0;
+  --color-ink-muted: #4878a0;
+  --color-ink-subtle: #243850;
+  --color-accent: #60b870;
+  --color-accent-secondary: #5080c0;
 }
 
 /* ─── Custom animations ───────────────────────────────────────────────────────────────────────────────────────────── */
-@keyframes scrollPulse {
-  0%   { transform: scaleY(0); opacity: 1; }
-  60%  { transform: scaleY(1); opacity: 1; }
-  100% { transform: scaleY(1); opacity: 0; }
+@keyframes scroll-pulse {
+  0% {
+    transform: scaleY(0);
+    opacity: 1;
+  }
+
+  60% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
 }
 
 /* ─── Base layer ──────────────────────────────────────────────────────────────────────────────────────────────────── */

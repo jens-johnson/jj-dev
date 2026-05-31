@@ -1,9 +1,8 @@
-<script setup lang="ts">
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
  *                                ██        ██                     ▄▄
- *                                ██        ██                     ██
+ *                                ▀▀        ▀▀                     ██
  *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
  *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
  *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
@@ -12,40 +11,61 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████ #components/containment/bento-card/index.vue ████████████████████████████████████████████
+ * ████████████████████████████████████████████████ stylelint.config.mjs ████████████████████████████████████████████████
  *
- * Wrapper that adds 3D mouse-tilt + radial shimmer to any bento grid tile. Passes all attrs
- * (class, style, grid sizing) through to the root element via Vue's default inheritAttrs behaviour,
- * so callers can use it as a drop-in replacement for a plain <div>.
+ * Stylelint config — Tailwind v4 aware. Lints `main.css` and `<style>` blocks in `.vue` files.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * <ContainmentBentoCard class="rounded-2xl border bg-surface p-8 lg:col-span-7">
- *   ...tile content...
- * </ContainmentBentoCard>
+ * `pnpm lint:stylelint` to check, `pnpm fix:stylelint` to autofix.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { CardTiltOptions } from '~/composables/useCardTilt';
-
-const props = withDefaults(defineProps<CardTiltOptions>(), {
-  intensity: 10,
-  scale: 1.025,
-  shineOpacity: 0.12,
-});
-
-const { tiltStyle, shineStyle, onMouseMove, onMouseEnter, onMouseLeave } = useCardTilt({
-  intensity: props.intensity,
-  scale: props.scale,
-  shineOpacity: props.shineOpacity,
-});
-</script>
-
-<template>
-  <div :style="tiltStyle" @mousemove="onMouseMove" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
-    <!-- Radial shimmer that follows the cursor -->
-    <div class="pointer-events-none absolute inset-0 z-10 rounded-[inherit]" :style="shineStyle" />
-    <slot />
-  </div>
-</template>
+export default {
+  extends: ['stylelint-config-standard', 'stylelint-config-recommended-vue'],
+  rules: {
+    // Tailwind directives — don't flag.
+    'at-rule-no-unknown': [
+      true,
+      {
+        ignoreAtRules: [
+          'tailwind',
+          'apply',
+          'layer',
+          'config',
+          'screen',
+          'variants',
+          'responsive',
+          'theme',
+          'utility',
+          'custom-variant',
+          'reference',
+        ],
+      },
+    ],
+    // OKLCH is current, well-supported.
+    'color-function-notation': null,
+    // Tailwind v4 uses CSS vars heavily; allow them in custom-property names.
+    'custom-property-pattern': null,
+    // Tailwind utilities dominate — no need to enforce class naming.
+    'selector-class-pattern': null,
+    // Empty `@layer base {}` blocks are fine as scaffolding.
+    'block-no-empty': null,
+    // Font family names like Menlo, Consolas are conventionally cased.
+    'value-keyword-case': [
+      'lower',
+      {
+        ignoreProperties: ['/font/i', 'font-family'],
+        camelCaseSvgKeywords: true,
+      },
+    ],
+    // OKLCH's third arg is hue in degrees — the spec accepts a bare number.
+    'hue-degree-notation': null,
+    // We group tokens by section with blank lines for readability.
+    'custom-property-empty-line-before': null,
+    // Tailwind v4's documented syntax is `@import 'tailwindcss';` (no url()).
+    'import-notation': null,
+  },
+  ignoreFiles: ['.nuxt/**', '.output/**', 'node_modules/**', 'dist/**', 'coverage/**'],
+};

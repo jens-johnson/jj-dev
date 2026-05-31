@@ -18,9 +18,14 @@ Animating `--color-*` properties directly doesn't work without `@property` regis
 
 ```css
 @keyframes breathe {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 ```
 
-> *Demo coming once the lab page is built.*
+> _Demo coming once the lab page is built._
