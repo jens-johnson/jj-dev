@@ -1,4 +1,3 @@
-#!/bin/sh
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 #
 #                                ██        ██                     ▄▄
@@ -11,17 +10,36 @@
 #                             ████▀     ████▀
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
-# ███████████████████████████████████████████████ .githooks/commit-msg ████████████████████████████████████████████████
+# ████████████████████████████████████████████████████ lefthook.yml ████████████████████████████████████████████████████
 #
-# Git hook: validates the commit message against the Conventional Commits spec via commitlint.
+# Lefthook — git hooks that ship with the repo. Installed automatically via the `prepare` script on `pnpm install`.
 #
-# ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+# ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
 #
-# Runs automatically on every `git commit`. Invoked by git with the commit message file path as $1.
+# Bypass a single hook: `LEFTHOOK_EXCLUDE=<name> git commit`
+# Skip everything (use sparingly): `LEFTHOOK=0 git commit`
 #
-# ─── SEE ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
+# ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
 #
-# • https://commitlint.js.org
+# • https://lefthook.dev/configuration/
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
-npx --no-install commitlint --edit "$1"
+
+pre-commit:
+  parallel: true
+  commands:
+    lint-staged:
+      run: pnpm exec lint-staged
+
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm exec commitlint --edit {1}
+
+pre-push:
+  parallel: false
+  commands:
+    lint:
+      run: pnpm lint
+    typecheck:
+      run: pnpm typecheck

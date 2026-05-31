@@ -38,8 +38,7 @@ export interface CardTiltOptions {
   shineOpacity?: number;
 }
 
-export function useCardTilt(options: CardTiltOptions = {
-}) {
+export function useCardTilt(options: CardTiltOptions = {}) {
   const { intensity = 10, scale = 1.025, shineOpacity = 0.12 } = options;
 
   const rotateX = ref(0);
@@ -79,9 +78,7 @@ export function useCardTilt(options: CardTiltOptions = {
     const s = active.value ? scale : 1;
     return {
       transform: `perspective(900px) rotateX(${rotateX.value}deg) rotateY(${rotateY.value}deg) scale3d(${s},${s},1)`,
-      transition: active.value
-        ? 'transform 0.08s linear'
-        : 'transform 0.5s cubic-bezier(0.16,1,0.3,1)',
+      transition: active.value ? 'transform 0.08s linear' : 'transform 0.5s cubic-bezier(0.16,1,0.3,1)',
       willChange: 'transform',
     };
   });

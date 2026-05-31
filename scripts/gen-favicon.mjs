@@ -6,22 +6,10 @@
  * Usage: npm run gen:favicon
  */
 
-import {
-  execSync,
-  spawnSync,
-} from 'child_process';
-import {
-  readFileSync,
-  unlinkSync,
-  writeFileSync,
-} from 'fs';
-import {
-  dirname,
-  join,
-} from 'path';
-import {
-  fileURLToPath,
-} from 'url';
+import { execSync, spawnSync } from 'child_process';
+import { readFileSync, unlinkSync, writeFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -53,9 +41,9 @@ function buildICO(png16, png32, outPath) {
   const data32 = readFileSync(png32);
 
   const header = Buffer.alloc(6);
-  header.writeUInt16LE(0, 0);  // reserved
-  header.writeUInt16LE(1, 2);  // type = ICO
-  header.writeUInt16LE(2, 4);  // 2 images
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // type = ICO
+  header.writeUInt16LE(2, 4); // 2 images
 
   const offsetBase = 6 + 16 * 2;
 
@@ -86,10 +74,7 @@ function buildICO(png16, png32, outPath) {
 /** Build an SVG with a solid background rect for the apple-touch-icon. */
 function buildAppleSvg(tmpPath) {
   const src = readFileSync(SVG, 'utf8');
-  const withBg = src.replace(
-    /(<svg[^>]*>)/,
-    '$1\n  <rect width="500" height="500" fill="#F8F4EE"/>',
-  );
+  const withBg = src.replace(/(<svg[^>]*>)/, '$1\n  <rect width="500" height="500" fill="#F8F4EE"/>');
   writeFileSync(tmpPath, withBg);
 }
 

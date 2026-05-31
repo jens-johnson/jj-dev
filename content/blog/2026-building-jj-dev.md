@@ -30,16 +30,16 @@ Before I touched any Nuxt code, I spent a couple evenings establishing the desig
 
 ```css
 @theme {
-  --color-bg:               #F8F4EE;
-  --color-surface:          #F0EBE3;
-  --color-border:           #DDD0BF;
-  --color-ink:              #1C140A;
-  --color-accent:           #8B6534;
-  --color-accent-secondary: #5E8C65;
+  --color-bg: #f8f4ee;
+  --color-surface: #f0ebe3;
+  --color-border: #ddd0bf;
+  --color-ink: #1c140a;
+  --color-accent: #8b6534;
+  --color-accent-secondary: #5e8c65;
 
   --font-display: 'Syne', sans-serif;
-  --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-mono:    'Geist Mono', Menlo, monospace;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', Menlo, monospace;
 }
 ```
 
@@ -91,11 +91,11 @@ Three things on that page I'm particularly happy with:
 
 The branch and deploy model is the part I'm most surprised by how much I enjoy. Three permanent branches map to three environments:
 
-| Branch    | Environment | URL                          |
-|-----------|-------------|------------------------------|
-| `main`    | Production  | jens-johnson.com             |
-| `staging` | Pre-prod    | staging.jens-johnson.com     |
-| feature   | —           | Vercel preview URL (per PR)  |
+| Branch    | Environment | URL                         |
+| --------- | ----------- | --------------------------- |
+| `main`    | Production  | jens-johnson.com            |
+| `staging` | Pre-prod    | staging.jens-johnson.com    |
+| feature   | —           | Vercel preview URL (per PR) |
 
 Feature branches PR into `staging`. Once `staging` is ahead of `main`, a GitHub Action notices and automatically opens a `staging → main` promotion PR — with a body that lists every commit since the last release, grouped by conventional-commit type (Features / Fixes / Refactors / etc.). Merging that PR ships to prod.
 

@@ -26,12 +26,11 @@
  */
 
 interface Props {
-  status?: string
+  status?: string;
 }
 const props = defineProps<Props>();
 
-const config: Record<string, { label: string;
-  cls: string }> = {
+const config: Record<string, { label: string; cls: string }> = {
   active: {
     label: 'Active',
     cls: 'bg-accent/10 text-accent',
@@ -46,17 +45,18 @@ const config: Record<string, { label: string;
   },
 };
 
-const badge = computed(() =>
-  config[props.status ?? ''] ?? {
-    label: props.status ?? '',
-    cls: 'bg-surface text-ink-subtle',
-  },
+const badge = computed(
+  () =>
+    config[props.status ?? ''] ?? {
+      label: props.status ?? '',
+      cls: 'bg-surface text-ink-subtle',
+    },
 );
 </script>
 
 <template>
   <span
-    class="inline-flex w-fit items-center rounded-full px-2.5 py-0.5 font-mono text-caption font-medium"
+    class="text-caption inline-flex w-fit items-center rounded-full px-2.5 py-0.5 font-mono font-medium"
     :class="badge.cls"
   >
     {{ badge.label }}

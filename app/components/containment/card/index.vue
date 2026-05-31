@@ -30,8 +30,8 @@
 type PadPreset = 'sm' | 'md' | 'lg' | 'none';
 
 interface Props {
-  as?: string
-  pad?: PadPreset
+  as?: string;
+  pad?: PadPreset;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -50,7 +50,7 @@ const padClass: Record<PadPreset, string> = {
 <template>
   <component
     :is="props.as"
-    class="overflow-hidden rounded-2xl border border-border bg-surface"
+    class="border-border bg-surface overflow-hidden rounded-2xl border"
     :class="padClass[props.pad]"
   >
     <slot />
