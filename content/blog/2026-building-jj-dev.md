@@ -1,145 +1,111 @@
 ---
-title: Building jj-dev — a portfolio that doesn't feel like a portfolio
+title: Building jj-dev
+subtitle: A portfolio, a passion project, or something else?
 description: >
-  How I rebuilt my personal site from scratch in Nuxt 4 and Tailwind v4 — earth-tone
-  design tokens, a three-theme color system, a bento About page with live metrics,
-  and a CI/CD setup that promotes itself.
+  The introductory meta-post: how I built this site, why I'm here and (maybe) why you're reading this.
 publishedAt: '2026-05-25'
-tags: [nuxt, tailwind, design, process, devops]
+tags: [Design, Process, Web Development, Nuxt, Tailwind]
 series:
   name: Building jj-dev
   part: 1
 ---
 
-Every few years I rebuild my personal site. Each rebuild has roughly the same arc — a burst of momentum, a stack swap, half-finished pages, and eventually a `coming soon` placeholder that quietly outlives the energy that made me start. This time I wanted to do it differently. Not differently in the "I'll finish this time, I promise" sense — differently in the sense of treating the site itself as a project worth documenting. So this is the first post in what will hopefully be a small series about that process.
+Welcome to `jj-dev`, the self-coined moniker for a project of mine that has been several years in the making: my personal website. I wanted to dedicate the introductory post for this site to the what, why, and how of this project: what this site is _(and is eventually (hopefully) going to be)_, how I created it, and perhaps, most importantly, why I built it.
 
-## The brief I gave myself
+This post represents the first in a series of explanatory deep dives I want to create to illustrate the process of creating this project. I hope that in documenting my process, showing how the foundational components of an application/technology come together from ideation to implementation, and explaining the design rationale, engineering patterns, and workflows that I have put into place not only serve to make `jj-dev` a self-documenting artifact, but also something that **you**, the reader can take in as inspiration and a resource should you choose to create your own website.
 
-A few constraints upfront, written down so I could come back to them when I inevitably drifted:
+Building software doesn't have to be an arid, leaden process, and I hope if the reader can take anything away from this project or this post, it's that it should be fun! I want this to be a platform for me to express myself, more akin to a metaphorical digital canvas and paintbrush than an exercise in drudgery and monotony. So, if you, the reader, have made it this far, first of all, congratulations, for bearing through my yapping. But more importantly, I look forward to dispelling the myth that technology and software development is some mythical, complex endeavor for introverts sitting behind a glowing screen in a dark room — it's a beautiful, manifold space where we can express ourselves, embrace creativity, and solve problems in a unique and fun way.
 
-- **No template, no theme.** Every token — color, spacing, type — defined from scratch.
-- **Three themes**, all driven by a single attribute swap on `<html>`: a warm `day`, a deeper `sunset`, and a near-black `night`. One CSS variable cascade, three moods.
-- **Earthy, not corporate.** Cream, clay, sage. The opposite of the "neutral grey + electric accent" template that's been the default for the last five years.
-- **Build it in public.** The repo is open from day one. Every PR is real. The site documents itself.
+## A Passion Project, a Headache, and Many Iterations
 
-Most of the early decisions came from staring at color swatches in Sketch and asking whether I'd want to stare at them for an hour at a time. The answer ruled out a lot of palettes I might have shipped if I'd been moving faster.
+Before we get into the current state of things, let's rewind a bit. As a software engineer by trade, a designer and creator by passion, and an easily distracted, project-starter-and-dropper by habit, `jj-dev` has been an effort of multiple iterations.
 
-## Design tokens first
+I've always wanted a personal website, and when I saw the `jens-johnson.com` domain for sale back in 2020, the nascent, naive engineer in me thought _"What the hell, let's buy it and start building."_
 
-Before I touched any Nuxt code, I spent a couple evenings establishing the design system. Tailwind v4 made this surprisingly pleasant — the entire token system lives in a single `@theme` block in `main.css`:
+This decision resulted in the 6+ year cyclical saga of building, tearing down, designing, and re-building this project. Over the course of resculpting and reimplementing `jj-dev`, it's gone through a spectrum of different stacks, tools, and technologies, including:
 
-```css
-@theme {
-  --color-bg: #f8f4ee;
-  --color-surface: #f0ebe3;
-  --color-border: #ddd0bf;
-  --color-ink: #1c140a;
-  --color-accent: #8b6534;
-  --color-accent-secondary: #5e8c65;
+- A GitHub Sites native-approach using [Jekyll](https://jekyllrb.com/) templates and flavored markdown
+- An [AWS Lightsail](https://aws.amazon.com/lightsail/) deployment with an [Express.js](https://expressjs.com/) backend and React-flavored UI
+- A [Django](https://www.djangoproject.com/) / [Flask](https://flask.palletsprojects.com/) Python build _(oof, that one was painful)_
+- A pure [Vue](https://vuejs.org/) / [Vuetify](https://vuetifyjs.com/) / [TypeScript](https://www.typescriptlang.org/) stack
+- ... and countless others
 
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-mono: 'Geist Mono', Menlo, monospace;
-}
-```
+Each of these approaches has had roughly the same pattern:
 
-Every Tailwind utility (`bg-bg`, `text-ink`, `font-display`) is generated from those declarations. No config file, no JavaScript build step for tokens, no separate theme module. Just CSS variables.
+::iteration-cycle
+::
 
-The three themes are layered on top via `data-theme` selectors — `[data-theme="sunset"]` and `[data-theme="night"]` override the same semantic tokens. One ref toggle, one DOM attribute, and the whole site shifts. It feels closer to physical lighting than a "dark mode."
+I suppose `jj-dev` has been the perfect microcosm of my ADHD / obsessive personality: I get hyperfocused on something, build momentum, but then it tapers off. This time I wanted to do things differently, and hopefully this inaugural post highlights just that.
 
-## Tech choices, briefly
+## Creating It Right This Time
 
-The stack — for anyone running through the same decisions:
+My previous efforts on `jj-dev` taught me a few things:
 
-- **Nuxt 4** — file-based routing, auto-imports, SSR/SSG/hybrid out of the box, and Vue 3 underneath. Felt like the right balance of structure and freedom.
-- **Tailwind v4** — CSS-first config is a quiet game-changer. No `tailwind.config.ts`, no transpilation of arbitrary plugin code. Faster builds, fewer moving parts.
-- **Nuxt Content v3** — markdown collections with Zod schemas. The blog you're reading is just `content/blog/*.md` with a typed frontmatter shape. TypeScript types flow from the schema definition into every component that queries the collection.
-- **Vercel** — hosting, preview deployments, custom domain wiring. Three environments mapped to three branches (more on that below).
+1. **Maintainability** is a key feature for this project: it should be lightweight enough to maintain / support after it has been scaffolded and created. I want my portfolio / personal site to be self-sustaining: once the bones are in place, upkeep and overhead should be minimal.
+2. **Don't reinvent the (digital) wheel**: The web application development space is one of the most wonderfully supported and maintained software engineering areas. There is a vast wealth of resources for projects like this, for all facets, from testing to accessibility. Learn to leverage and build upon the primitives rather than recreating them.
+3. **Personal touch is a key feature, not an afterthought.** I want `jj-dev` to be a representation of me, Jens Johnson, not a soul-less, corporate-y resume wrapper that reads like a LinkedIn page. Sure, I want to highlight my professional skills and accomplishments — those are important. But they are no less important than showing the other facets of me: my passion for environmental stewardship and nature, my musings and ramblings on technology and culture, my not-so-precise-and-technical baking skills (of which I am still honing). I hope this can serve to be a window into all things _me_, and that needed to be a foundational consideration when beginning this undertaking.
 
-The thing I kept coming back to: every tool here either eliminates a config file or replaces it with one that's much smaller. I'd rather express intent in code than in configuration.
+In addition to these, a fourth, more novel finding:
 
-## Component architecture — atomic, but loosely
+4. **Embrace and harness agentic development.** Don't run from the _"AI boogeyman"_; learn how to leverage agents to automate the monotonous, tedious parts of the process: making stylistic tweaks, improving CI/CD, bolstering monitoring and observability, and so much more. This piece has been crucial for me in accelerating the development of this project as a solo developer, and it is, in general, one of the facets of development in which I see some of the most untapped sources of engineering capabilities. Agentic development and design represents the modern frontier of software engineering, and I would be remiss if I didn't focus on its incorporation into this project.
 
-Components live under `app/components/` in a flat-ish hierarchy that loosely follows atomic design. Each component is an `index.vue` inside its own folder:
+## Putting the Foundation in Place: Project Goals
+
+Alright, moving forward. I knew I needed to create something maintainable, that was future-proofed and iteration-optimized, something that was integratable with the vast web application resource ecosystem, something with my personal touch and ethos baked into the very foundation, and something that could support agentic development workflows. These were the "guardrails" of `jj-dev` that helped me shape the goals for this project.
+
+::goals-carousel
+::
+
+## The Stack
+
+::stack-blocks
+::
+
+As you can see here, the stack is a representation in and of itself of the project's goals: lightweight but robust, customizable but maintainable, and personal but extensible.
+
+## Rooted in Nature: The Design
+
+I wanted `jj-dev` to be something that imbued naturistic concepts and principles, not a tech-heavy digitally-washed splash of pixels. As such, an integral part of the design process was looking out(side) to nature to derive tokens and a design framework that reflected that:
+
+::design-inspiration
+::
+
+## Component Architecture: Atomic, But Loosely
+
+One of the biggest design pain-points for me for a UI application like this is defining the component organization pattern for the project. I settled on an atomic design-esque approach which helps me organize primitives for extensibility and reusability, as well as partition dedicated, feature-tied widgets that build on those primitives:
 
 ```
 components/
-├── brand/          ← logo-mark, wordmark
-├── containment/    ← bento-card, surfaces
-├── data/           ← status-badge, etc.
-├── feedback/       ← scroll-progress
-├── layout/         ← app-nav, app-footer
-├── primitives/     ← base-hero, base-parallax
-└── widgets/        ← page sections (compose primitives)
+├── brand/          ← global, branding (i.e. logos, wordmarks, etc.)
+├── containment/    ← containers and content organization (i.e. cards, surfaces)
+├── data/           ← dedicated data display (i.e. status badge, tables, etc.)
+├── feedback/       ← interactivity and responsiveness (i.e. scroll progress, alerts)
+├── layout/         ← layout assistance and organization (i.e. navigation, footer)
+├── primitives/     ← atomic primitive foundationals (i.e. heroes, parallax)
+└── widgets/        ← custom-tailored page sections that build on all of the above
 ```
 
-Auto-imports follow the full path: `widgets/home/hero-parallax/index.vue` becomes `<WidgetsHomeHeroParallax>`. The names get long, but at this point I've decided I prefer long-and-explicit to short-and-ambiguous. I never have to grep for where a component lives.
+## Intuitive CI/CD Orchestration
 
-## The About page is the site
+Full disclosure here: I do not claim to be a DevOps veteran or expert. However, I know that the best projects and software are supported by robust build tooling and pipelines. Part of this process was integrating a three-fold branch and deploy model:
 
-A surprising amount of design effort went into a single page: `/about`. It's where almost every home-page CTA points, so it earned the right to be the most ambitious piece of layout work in the project.
+::branch-table
+::
 
-Three things on that page I'm particularly happy with:
+This segregation allows me to cleanly distinguish feature deploys on a dedicated `feat/*` branch, stage them on the long-lived `staging` branch for live QA, and when ready, open a `staging → main` promotion PR automatically through GitHub Actions to push them to production.
 
-**A typewriter headline** that cycles through different self-descriptions — Engineer, Builder, Tinkerer, Innovationist, Designer, Skier, Sushi Enthusiast. No external dependency, just `setTimeout` and a ref. About fifty lines of code total.
+Some other facets of my CI/CD process:
 
-**A bento grid Background section** that breaks the standard linear-text layout. Cards of different sizes, a quote panel with a subtle 3D tilt on cursor hover, and a metrics tile pulling live data from the GitHub and Strava APIs. The tilt effect is a custom composable (`useCardTilt`) that maps cursor position to a CSS transform — about thirty lines of Vue, no library.
+- Git hooks supported by [Lefthook](https://lefthook.dev/) and [Commitlint](https://commitlint.js.org/) automate the necessary linting, testing, validation, and artifact generation steps of the pipeline.
+- Automated version control steps ensure changelog validation, release tagging, and versioning to mitigate version conflicts and ensure parity, consistency, and transparency.
+- [GitHub Actions](https://docs.github.com/en/actions) acts as a source of truth for CI/CD: seamless integration with code changes to the repo ensures that actions provide clean workflows for maintaining the project.
 
-**The live metrics card** itself fetches data server-side via `/api/metrics`, caches it for an hour in process, and renders two weekly sparklines (GitHub contributions and Strava miles) that mirror each other visually. It started as a contribution heatmap, but the heatmap was illegible on a warm earth-tone palette — every cell at low contribution levels blended into the border color. Sparklines won.
+## What's Next?
 
-## CI/CD that promotes itself
+To the reader: I thank you for your patience in sifting through my verbosity in explaining this project, and I hope this post can be of some value to you if you're thinking of starting your own, or looking at ways to improve. As I continue to expand `jj-dev`, I look forward on taking you along for the journey: the fun parts, the painful debugging, and everything in between.
 
-The branch and deploy model is the part I'm most surprised by how much I enjoy. Three permanent branches map to three environments:
+Have something you want me to dig into further on the next post? Let me know — [jens@jens-johnson.com](mailto:jens@jens-johnson.com?subject=jj-dev%20blog%20feedback).
 
-| Branch    | Environment | URL                         |
-| --------- | ----------- | --------------------------- |
-| `main`    | Production  | jens-johnson.com            |
-| `staging` | Pre-prod    | staging.jens-johnson.com    |
-| feature   | —           | Vercel preview URL (per PR) |
-
-Feature branches PR into `staging`. Once `staging` is ahead of `main`, a GitHub Action notices and automatically opens a `staging → main` promotion PR — with a body that lists every commit since the last release, grouped by conventional-commit type (Features / Fixes / Refactors / etc.). Merging that PR ships to prod.
-
-Most of the workflow looks like this:
-
-```yaml
-on:
-  push:
-    branches: [staging]
-
-jobs:
-  promote:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check if staging has content changes vs main
-        run: |
-          if git diff --quiet origin/main origin/staging; then
-            echo "Nothing to promote."
-          else
-            # ... build PR body grouped by conventional commit type
-            # ... open or update promotion PR via gh CLI
-          fi
-```
-
-Some of the rough edges I hit and patched along the way:
-
-- A naive commit count check would open empty promotion PRs after the post-merge sync (the merge commit itself made `staging` "1 commit ahead" of `main` with zero content diff). Switched to `git diff --quiet`.
-- The default `GITHUB_TOKEN` silently swallows downstream workflow triggers — required status checks like `Lint & Typecheck` never fired on the auto-opened PR. Fixed by switching to a fine-grained PAT.
-- `release-please` runs on every push to main and now auto-generates a `CHANGELOG.md` entry for each release, pulling structured data from the same conventional commits.
-
-The result is a workflow where I push to a feature branch, open a PR into staging, validate at staging.jens-johnson.com, and merge a button. The rest just happens.
-
-## What's next
-
-A short list of things I want to write about, in roughly this order:
-
-- **Theming with CSS-first Tailwind v4.** A closer look at how `@theme` interacts with `data-theme` overrides, and the surprisingly tidy escape hatches.
-- **The bento About page, in detail.** The grid, the tilt composable, the metrics API route, the sparkline math.
-- **The promotion workflow, dissected.** Conventional commits, release-please, the PAT dance, what I'd do differently if this were a real team.
-
-If any of those sound interesting before I get to them, the writing here lives at [github.com/jens-johnson/jj-dev/tree/main/content/blog](https://github.com/jens-johnson/jj-dev/tree/main/content/blog) — issues and PRs welcome.
+Til next time,
 
 — J

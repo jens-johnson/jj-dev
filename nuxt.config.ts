@@ -76,6 +76,14 @@ export default defineNuxtConfig({
   },
 
   /**
+   * Component auto-import configuration. Files in `app/components/content/` are registered without the directory
+   * prefix so they can override Nuxt Content / Nuxt UI's default prose components (ProseH2, ProseP, etc.) by name.
+   * Files there can also serve as MDC blocks (e.g. `::goals-carousel` → `GoalsCarousel.vue`).
+   * @see https://nuxt.com/docs/guide/directory-structure/components
+   */
+  components: [{ path: '~/components/content', pathPrefix: false }, '~/components'],
+
+  /**
    * Nuxt modules
    * @see https://nuxt.com/docs/4.x/api/nuxt-config#modules
    */
@@ -217,10 +225,10 @@ export default defineNuxtConfig({
     build: {
       /* Markdown settings */
       markdown: {
-        /* Markdown highlighting */
+        /* Code block syntax highlighting via Shiki. `vitesse-light` chosen for warm muted tones that read
+           cleanly on the day theme's cream surface. Revisit when we wire up multi-theme highlighting. */
         highlight: {
-          /* `github-dark` theme with `shiki` theme for code blocks */
-          theme: 'github-dark',
+          theme: 'vitesse-light',
         },
       },
     },
