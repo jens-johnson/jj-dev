@@ -7,18 +7,20 @@
  *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
  *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
  *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
  *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ███████████████████████████████████████████████ #pages/blog/index.vue ███████████████████████████████████████████████
  *
- * Blog index — chronological listing of published writing, queried from the `blog` Nuxt Content collection.
- * Drafts are filtered out; latest post is featured at the top with the rest as a vertical list.
+ * Blog index — chronological listing of published writing, queried from the `blog` Nuxt Content collection. Drafts
+ * are filtered out; supports `?tag=Foo` query param for tag filtering. Latest post features at the top with the
+ * rest as a vertical timeline.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+
+const route = useRoute();
 
 useSeoMeta({
   title: 'Writing — Jens Johnson',
@@ -30,12 +32,33 @@ useSeoMeta({
 
 /* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const { data: posts } = await useAsyncData('blog-index', () =>
+const { data: allPosts } = await useAsyncData('blog-index', () =>
   queryCollection('blog').where('draft', '=', false).order('publishedAt', 'DESC').all(),
 );
 
-const featured = computed(() => posts.value?.[0] ?? null);
-const rest = computed(() => (posts.value ?? []).slice(1));
+const activeTag = computed<string | null>(() => {
+  const t = route.query.tag;
+  return typeof t === 'string' && t.length > 0 ? t : null;
+});
+
+const filteredPosts = computed(() => {
+  if (!activeTag.value) return allPosts.value ?? [];
+  return (allPosts.value ?? []).filter((p) =>
+    (p.tags ?? []).some((t: string) => t.toLowerCase() === activeTag.value!.toLowerCase()),
+  );
+});
+
+const featured = computed(() => filteredPosts.value[0] ?? null);
+const rest = computed(() => filteredPosts.value.slice(1));
+
+/* All distinct tags across all posts, sorted alphabetically. */
+const allTags = computed(() => {
+  const set = new Set<string>();
+  for (const post of allPosts.value ?? []) {
+    for (const tag of post.tags ?? []) set.add(tag);
+  }
+  return Array.from(set).sort();
+});
 
 /* ─── Formatting helpers ──────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -45,6 +68,10 @@ function formatDate(iso: string): string {
     month: 'long',
     day: 'numeric',
   });
+}
+
+function tagHref(tag: string) {
+  return { path: '/blog', query: { tag } };
 }
 
 /* ─── Entrance animation ──────────────────────────────────────────────────────────────────────────────────────────── */
@@ -99,26 +126,73 @@ onMounted(() => {
           Long-form writing on building software, design systems, and the practice of engineering. Occasional rabbit
           holes from outside the keyboard.
         </p>
+
+        <!-- All tags pill row -->
+        <div v-if="allTags.length > 0" class="mt-8 flex flex-wrap items-center gap-2">
+          <NuxtLink
+            to="/blog"
+            class="text-caption rounded-full border px-3 py-1 font-mono tracking-widest uppercase transition-colors"
+            :class="
+              !activeTag
+                ? 'border-accent bg-accent text-stone-50'
+                : 'border-border bg-surface text-ink-muted hover:border-accent hover:text-accent'
+            "
+          >
+            All
+          </NuxtLink>
+          <NuxtLink
+            v-for="tag in allTags"
+            :key="tag"
+            :to="tagHref(tag)"
+            class="text-caption rounded-full border px-3 py-1 font-mono tracking-widest uppercase transition-colors"
+            :class="
+              activeTag === tag
+                ? 'border-accent bg-accent text-stone-50'
+                : 'border-border bg-surface text-ink-muted hover:border-accent hover:text-accent'
+            "
+          >
+            {{ tag }}
+          </NuxtLink>
+        </div>
       </div>
     </section>
 
     <!-- ─── Posts ─────────────────────────────────────────────────────────────── -->
     <section class="mx-auto max-w-6xl px-6 py-16">
+      <!-- Filter banner -->
+      <div v-if="activeTag" class="border-border bg-surface mb-10 flex items-center gap-3 rounded-xl border px-5 py-4">
+        <Icon name="lucide:filter" size="16" class="text-accent" />
+        <p class="font-body text-body-sm text-ink-muted">
+          Showing posts tagged
+          <span class="text-ink font-medium">{{ activeTag }}</span>
+        </p>
+        <NuxtLink
+          to="/blog"
+          class="text-caption text-accent ml-auto inline-flex items-center gap-1 font-mono tracking-widest uppercase hover:underline"
+        >
+          Clear <Icon name="lucide:x" size="11" />
+        </NuxtLink>
+      </div>
+
       <!-- Empty state -->
-      <div v-if="!posts || posts.length === 0" class="flex flex-col items-center py-24 text-center">
-        <p class="text-caption text-ink-subtle font-mono tracking-widest uppercase">No posts yet</p>
-        <p class="font-body text-body text-ink-muted mt-3 max-w-sm">First posts are on the way.</p>
+      <div v-if="filteredPosts.length === 0" class="flex flex-col items-center py-24 text-center">
+        <p class="text-caption text-ink-subtle font-mono tracking-widest uppercase">
+          {{ activeTag ? `No posts tagged ${activeTag}` : 'No posts yet' }}
+        </p>
+        <p class="font-body text-body text-ink-muted mt-3 max-w-sm">
+          {{ activeTag ? 'Try a different tag or clear the filter.' : 'First posts are on the way.' }}
+        </p>
       </div>
 
       <template v-else>
         <!-- ─── Featured (latest) ───────────────────────────────────────────── -->
-        <NuxtLink
+        <article
           v-if="featured"
-          :to="featured.path"
-          class="group border-border bg-surface hover:border-accent block rounded-2xl border p-8 transition-colors md:p-12"
+          class="border-border bg-surface hover:border-accent block rounded-2xl border p-8 transition-colors md:p-12"
         >
           <div class="mb-6 flex flex-wrap items-center gap-3">
             <span
+              v-if="!activeTag"
               class="bg-accent/10 text-caption text-accent rounded-full px-3 py-1 font-mono tracking-widest uppercase"
             >
               Latest
@@ -131,63 +205,77 @@ onMounted(() => {
             </span>
           </div>
 
-          <h2
-            class="font-display text-h3 text-ink group-hover:text-accent mb-4 leading-tight font-bold tracking-tight transition-colors"
-          >
-            {{ featured.title }}
-          </h2>
-          <p class="font-body text-body-lg text-ink-muted mb-6 max-w-3xl leading-relaxed">
-            {{ featured.description }}
-          </p>
+          <NuxtLink :to="featured.path" class="group block">
+            <h2
+              class="font-display text-h3 text-ink group-hover:text-accent mb-2 leading-tight font-bold tracking-tight transition-colors"
+            >
+              {{ featured.title }}
+            </h2>
+            <p
+              v-if="featured.subtitle"
+              class="font-display text-h5 text-ink-muted mb-4 leading-snug font-medium italic"
+            >
+              {{ featured.subtitle }}
+            </p>
+            <p class="font-body text-body-lg text-ink-muted mb-6 max-w-3xl leading-relaxed">
+              {{ featured.description }}
+            </p>
 
-          <div class="flex flex-wrap items-center gap-2">
-            <span
+            <p class="text-caption text-accent inline-flex items-center gap-1.5 font-mono tracking-widest uppercase">
+              Read post
+              <Icon name="lucide:arrow-right" size="13" class="transition-transform group-hover:translate-x-1" />
+            </p>
+          </NuxtLink>
+
+          <div class="mt-6 flex flex-wrap items-center gap-2">
+            <NuxtLink
               v-for="tag in featured.tags"
               :key="tag"
-              class="bg-bg text-caption text-ink-muted rounded-full px-3 py-1 font-mono"
+              :to="tagHref(tag)"
+              class="bg-bg text-caption text-ink-muted hover:bg-accent rounded-full px-3 py-1 font-mono transition-colors hover:text-stone-50"
             >
               {{ tag }}
-            </span>
+            </NuxtLink>
           </div>
-
-          <p class="text-caption text-accent mt-8 inline-flex items-center gap-1.5 font-mono tracking-widest uppercase">
-            Read post
-            <Icon name="lucide:arrow-right" size="13" class="transition-transform group-hover:translate-x-1" />
-          </p>
-        </NuxtLink>
+        </article>
 
         <!-- ─── Rest ────────────────────────────────────────────────────────── -->
         <div v-if="rest.length > 0" class="mt-16">
           <p class="text-caption text-ink-subtle mb-8 font-mono tracking-widest uppercase">More</p>
 
           <div class="space-y-0">
-            <NuxtLink
+            <article
               v-for="post in rest"
               :key="post.path"
-              :to="post.path"
-              class="group border-border grid gap-4 border-t py-8 transition-colors md:grid-cols-[160px_1fr] md:gap-8"
+              class="border-border grid gap-4 border-t py-8 md:grid-cols-[160px_1fr] md:gap-8"
             >
               <p class="text-caption text-ink-subtle font-mono">
                 {{ formatDate(post.publishedAt) }}
               </p>
               <div>
-                <h3 class="font-display text-h5 text-ink group-hover:text-accent mb-2 font-bold transition-colors">
-                  {{ post.title }}
-                </h3>
-                <p class="font-body text-body text-ink-muted mb-3 max-w-3xl">
-                  {{ post.description }}
-                </p>
+                <NuxtLink :to="post.path" class="group block">
+                  <h3 class="font-display text-h5 text-ink group-hover:text-accent mb-1 font-bold transition-colors">
+                    {{ post.title }}
+                  </h3>
+                  <p v-if="post.subtitle" class="font-body text-body-sm text-ink-muted mb-2 italic">
+                    {{ post.subtitle }}
+                  </p>
+                  <p class="font-body text-body text-ink-muted mb-3 max-w-3xl">
+                    {{ post.description }}
+                  </p>
+                </NuxtLink>
                 <div class="flex flex-wrap items-center gap-2">
-                  <span
+                  <NuxtLink
                     v-for="tag in post.tags"
                     :key="tag"
-                    class="bg-surface text-caption text-ink-muted rounded-full px-2.5 py-0.5 font-mono"
+                    :to="tagHref(tag)"
+                    class="bg-surface text-caption text-ink-muted hover:bg-accent rounded-full px-2.5 py-0.5 font-mono transition-colors hover:text-stone-50"
                   >
                     {{ tag }}
-                  </span>
+                  </NuxtLink>
                 </div>
               </div>
-            </NuxtLink>
+            </article>
           </div>
         </div>
       </template>
