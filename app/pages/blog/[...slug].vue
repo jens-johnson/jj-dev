@@ -43,6 +43,17 @@ useSeoMeta({
   ogImage: post.value.cover?.src,
 });
 
+/* ─── Table of contents ───────────────────────────────────────────────────────────────────────────────────────────── */
+
+/** Flat list of h2 headings extracted from the rendered body, used for the sidebar TOC. */
+const toc = computed<{ id: string; text: string }[]>(() => {
+  const links = post.value?.body?.toc?.links ?? [];
+  return links.map((link: { id: string; text: string }) => ({
+    id: link.id,
+    text: link.text,
+  }));
+});
+
 /* ─── Formatting helpers ──────────────────────────────────────────────────────────────────────────────────────────── */
 
 function formatDate(iso: string): string {
@@ -57,8 +68,9 @@ function formatDate(iso: string): string {
 <template>
   <article v-if="post" class="bg-bg min-h-screen">
     <!-- ─── Header ────────────────────────────────────────────────────────────── -->
-    <header class="border-border border-b">
-      <div class="mx-auto max-w-3xl px-6 pt-20 pb-12 md:pt-28">
+    <header class="border-border relative overflow-hidden border-b">
+      <WidgetsBlogHeaderAnimation />
+      <div class="relative mx-auto max-w-3xl px-6 pt-20 pb-12 md:pt-28">
         <!-- Back link -->
         <NuxtLink
           to="/blog"
@@ -79,32 +91,61 @@ function formatDate(iso: string): string {
         </div>
 
         <!-- Title -->
-        <h1 class="font-display text-h2 text-ink mb-6 leading-tight font-bold tracking-tight">
+        <h1 class="font-display text-h2 text-ink mb-3 leading-tight font-bold tracking-tight">
           {{ post.title }}
         </h1>
+
+        <!-- Subtitle -->
+        <p v-if="post.subtitle" class="font-display text-h5 text-ink-muted mb-6 leading-snug font-medium italic">
+          {{ post.subtitle }}
+        </p>
 
         <!-- Description -->
         <p class="font-body text-body-lg text-ink-muted mb-8 leading-relaxed">
           {{ post.description }}
         </p>
 
-        <!-- Tags -->
+        <!-- Tags (clickable → filtered blog index) -->
         <div class="flex flex-wrap items-center gap-2">
-          <span
+          <NuxtLink
             v-for="tag in post.tags"
             :key="tag"
-            class="bg-surface text-caption text-ink-muted rounded-full px-3 py-1 font-mono"
+            :to="{ path: '/blog', query: { tag } }"
+            class="bg-surface text-caption text-ink-muted hover:bg-accent rounded-full px-3 py-1 font-mono transition-colors hover:text-stone-50"
           >
             {{ tag }}
-          </span>
+          </NuxtLink>
         </div>
       </div>
     </header>
 
     <!-- ─── Body ──────────────────────────────────────────────────────────────── -->
-    <div class="mx-auto max-w-3xl px-6 py-16">
-      <div class="prose-jj">
-        <ContentRenderer :value="post" />
+    <div class="mx-auto max-w-6xl px-6 py-16">
+      <div class="lg:grid lg:grid-cols-[1fr_220px] lg:gap-16">
+        <!-- Main column: rendered markdown -->
+        <article class="prose-jj max-w-[68ch] min-w-0">
+          <ContentRenderer :value="post" />
+        </article>
+
+        <!-- TOC sidebar (desktop only) -->
+        <aside v-if="toc.length > 0" class="hidden lg:block">
+          <div class="sticky top-24">
+            <p class="text-caption text-ink-subtle mb-5 font-mono tracking-widest uppercase">In this piece</p>
+            <ol class="space-y-3">
+              <li v-for="(link, i) in toc" :key="link.id" class="flex gap-3">
+                <span class="text-caption text-ink-subtle/60 mt-0.5 shrink-0 font-mono leading-snug">
+                  {{ String(i + 1).padStart(2, '0') }}
+                </span>
+                <a
+                  :href="`#${link.id}`"
+                  class="font-body text-body-sm text-ink-muted hover:text-accent leading-snug transition-colors"
+                >
+                  {{ link.text }}
+                </a>
+              </li>
+            </ol>
+          </div>
+        </aside>
       </div>
     </div>
 
@@ -128,15 +169,49 @@ function formatDate(iso: string): string {
 
 /* Custom rather than @tailwindcss/typography to keep our earth-tone tokens and Syne/Plus Jakarta type system intact. */
 
+.prose-jj {
+  counter-reset: section;
+}
+
+/* ─── Headings ─────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+.prose-jj :deep(h2),
+.prose-jj :deep(h3),
+.prose-jj :deep(h4) {
+  position: relative;
+  color: var(--color-ink);
+  scroll-margin-top: 5rem;
+}
+
 .prose-jj :deep(h2) {
-  margin-top: 3rem;
-  margin-bottom: 1.25rem;
+  counter-increment: section;
+  margin-top: 4rem;
+  margin-bottom: 1.5rem;
+  padding-top: 2.5rem;
   font-family: var(--font-display);
   font-size: var(--text-h3);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
   letter-spacing: -0.01em;
-  color: var(--color-ink);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Auto-numbered section badge above each h2. First h2 keeps the number but loses the top border. */
+.prose-jj :deep(h2)::before {
+  content: counter(section, decimal-leading-zero);
+  display: block;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-accent);
+  letter-spacing: 0.2em;
+}
+
+.prose-jj :deep(h2:first-of-type) {
+  margin-top: 2rem;
+  padding-top: 0;
+  border-top: none;
 }
 
 .prose-jj :deep(h3) {
@@ -146,7 +221,6 @@ function formatDate(iso: string): string {
   font-size: var(--text-h4);
   font-weight: 700;
   line-height: 1.3;
-  color: var(--color-ink);
 }
 
 .prose-jj :deep(h4) {
@@ -155,7 +229,37 @@ function formatDate(iso: string): string {
   font-family: var(--font-display);
   font-size: var(--text-h5);
   font-weight: 700;
-  color: var(--color-ink);
+}
+
+/* Nuxt Content auto-injects an anchor link into each heading for deep-linking. Hide the visible `#` glyph and
+   position the link offscreen-style so it doesn't bleed into the heading text on hover. Hover reveals a subtle
+   muted `#` in the left margin instead. */
+.prose-jj :deep(h2 > a),
+.prose-jj :deep(h3 > a),
+.prose-jj :deep(h4 > a) {
+  position: absolute;
+  left: -1.25em;
+  top: 0;
+  font-size: 0.8em;
+  line-height: inherit;
+  color: var(--color-ink-subtle);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  font-weight: 400;
+}
+
+.prose-jj :deep(h2:hover > a),
+.prose-jj :deep(h3:hover > a),
+.prose-jj :deep(h4:hover > a) {
+  opacity: 0.6;
+}
+
+.prose-jj :deep(h2 > a:hover),
+.prose-jj :deep(h3 > a:hover),
+.prose-jj :deep(h4 > a:hover) {
+  opacity: 1;
+  color: var(--color-accent);
 }
 
 .prose-jj :deep(p) {
@@ -212,16 +316,41 @@ function formatDate(iso: string): string {
   margin-bottom: 0.5rem;
 }
 
+/* ─── Pull-quote (rendered blockquote) ───────────────────────────────────────────────────────────────────────────── */
+
 .prose-jj :deep(blockquote) {
-  margin: 2rem 0;
-  padding: 0.5rem 0 0.5rem 1.5rem;
+  position: relative;
+  margin: 2.5rem 0;
+  padding: 1.5rem 1.75rem 1.5rem 2rem;
+  background-color: color-mix(in oklch, var(--color-accent) 6%, var(--color-bg));
   border-left: 3px solid var(--color-accent);
+  border-radius: 0 12px 12px 0;
+  font-family: var(--font-display);
+  font-size: var(--text-h5);
   font-style: italic;
+  font-weight: 500;
+  line-height: 1.45;
   color: var(--color-ink);
+}
+
+.prose-jj :deep(blockquote)::before {
+  content: '"';
+  position: absolute;
+  top: -0.15em;
+  left: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 4rem;
+  line-height: 1;
+  color: var(--color-accent);
+  opacity: 0.25;
+  pointer-events: none;
 }
 
 .prose-jj :deep(blockquote p) {
   margin: 0;
+  font-size: inherit;
+  font-family: inherit;
+  color: inherit;
 }
 
 .prose-jj :deep(code) {
@@ -234,17 +363,60 @@ function formatDate(iso: string): string {
   color: var(--color-accent);
 }
 
-.prose-jj :deep(pre) {
+/* ─── Code blocks ───────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/* ProsePre wraps the <pre> in a `.prose-pre` div. Border + rounding live on the WRAPPER only; the inner <pre>
+   is transparent so there's no double-border effect. */
+
+.prose-jj :deep(.prose-pre) {
+  position: relative;
   margin: 1.75rem 0;
-  padding: 1.25rem 1.5rem;
   border-radius: 12px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.prose-jj :deep(.prose-pre pre),
+.prose-jj :deep(pre) {
+  position: relative;
+  margin: 0;
+  padding: 2.5rem 1.5rem 1.25rem;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
   overflow-x: auto;
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.6;
   color: var(--color-ink);
+}
+
+/* Bare <pre> blocks not wrapped by ProsePre (rare — fallback) keep their own border. */
+.prose-jj :deep(pre:not(.prose-pre pre)) {
+  margin: 1.75rem 0;
+  border-radius: 12px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+/* Language label in the top-left of every code block (from Nuxt Content's data-language attr). */
+.prose-jj :deep(.prose-pre pre[data-language])::before,
+.prose-jj :deep(pre[data-language]:not(.prose-pre pre))::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.6rem;
+  left: 0.9rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  background-color: color-mix(in oklch, var(--color-accent) 12%, var(--color-bg));
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+  pointer-events: none;
 }
 
 .prose-jj :deep(pre code) {
@@ -253,6 +425,41 @@ function formatDate(iso: string): string {
   border: none;
   color: inherit;
   font-size: inherit;
+}
+
+/* Copy-to-clipboard button (top-right of code block). Default placement clips against the rounded corner — pad it
+   in and give it a proper hit target. Hidden until the block is hovered to keep the prose calm. */
+.prose-jj :deep(.prose-pre button),
+.prose-jj :deep(pre + button),
+.prose-jj :deep(.prose-pre-copy) {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.4rem;
+  border-radius: 6px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-ink-muted);
+  opacity: 0;
+  transition:
+    opacity 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.prose-jj :deep(.prose-pre:hover button),
+.prose-jj :deep(pre:hover + button),
+.prose-jj :deep(.prose-pre:hover .prose-pre-copy) {
+  opacity: 1;
+}
+
+.prose-jj :deep(.prose-pre button:hover),
+.prose-jj :deep(pre + button:hover),
+.prose-jj :deep(.prose-pre-copy:hover) {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 .prose-jj :deep(hr) {

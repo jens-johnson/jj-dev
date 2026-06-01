@@ -299,10 +299,15 @@ function scrollToPanel(i: number) {
 
                     <!-- Title -->
                     <h3
-                      class="font-display text-h5 text-ink group-hover:text-accent mb-2 leading-tight font-bold transition-colors"
+                      class="font-display text-h5 text-ink group-hover:text-accent mb-1 leading-tight font-bold transition-colors"
                     >
                       {{ post.title }}
                     </h3>
+
+                    <!-- Subtitle -->
+                    <p v-if="post.subtitle" class="font-body text-body-sm text-ink-muted mb-2 leading-snug italic">
+                      {{ post.subtitle }}
+                    </p>
 
                     <!-- Description -->
                     <p v-if="post.description" class="font-body text-body-sm text-ink-muted mb-4 leading-relaxed">

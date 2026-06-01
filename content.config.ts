@@ -63,6 +63,12 @@ const baseSchema = z.object({
  */
 const blogSchema = baseSchema.extend({
   /**
+   * Optional subtitle — renders below the title on both the post detail page and listing cards.
+   * Use when the title sets the topic and the subtitle hints at the angle / question.
+   */
+  subtitle: z.string().optional(),
+
+  /**
    * The reading time estimate in minutes — auto-generated if omitted.
    */
   readingTime: z.number().optional(),
