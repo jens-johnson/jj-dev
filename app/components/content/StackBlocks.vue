@@ -39,7 +39,7 @@ const stack: StackLayer[] = [
     title: 'DX-Oriented Ecosystem',
     icon: 'lucide:terminal',
     tagline: 'Hooks, lint, scripts, release-please',
-    body: 'Git hooks, ESLint and Prettier, Direnv and shell wrappers, release-please, and more. Maintainability and ease-of-use are paramount — DX is the foundation everything else sits on.',
+    body: 'Git hooks, ESLint and Prettier, Direnv and shell wrappers, release-please, and more. Maintainability and ease-of-use are paramount: DX is the foundation everything else sits on.',
     links: [
       { label: 'Lefthook', href: 'https://lefthook.dev/' },
       { label: 'release-please', href: 'https://github.com/googleapis/release-please' },
@@ -58,7 +58,7 @@ const stack: StackLayer[] = [
     title: 'Nuxt 4',
     icon: 'lucide:box',
     tagline: 'File-routing, SSR/SSG, the right shape of opinionated',
-    body: 'My preferred fullstack framework as of late. File-based routing, auto-imports, simple SSR/SSG/hybrid setup, an excellent and growing community — these made the decision easy. No shade to React/Svelte folks; Nuxt has just been a comfortable groove for most of my web app work lately.',
+    body: 'My preferred fullstack framework as of late. File-based routing, auto-imports, simple SSR/SSG/hybrid setup, an excellent and growing community: these made the decision easy. No shade to React/Svelte folks; Nuxt has just been a comfortable groove for most of my web app work lately.',
     links: [{ label: 'Nuxt', href: 'https://nuxt.com/' }],
   },
   {
@@ -74,7 +74,7 @@ const stack: StackLayer[] = [
     title: 'Agentic Integration',
     icon: 'lucide:sparkles',
     tagline: 'Claude + Codex woven into the day-to-day',
-    body: "Skills, context, and memory across the development experience — visual design, testing, refactors, content. The goal: identify which components of this architecture can be automated and improved without sacrificing the personal opinionation and patterns I've laid out for myself. Still evolving across this and other projects.",
+    body: "Skills, context, and memory across the development experience: visual design, testing, refactors, content. The goal is to identify which components of this architecture can be automated and improved without sacrificing the personal opinionation and patterns I've laid out for myself. Still evolving across this and other projects.",
   },
 ];
 

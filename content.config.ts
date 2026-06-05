@@ -33,8 +33,8 @@ import { defineCollection, defineContentConfig, z } from '@nuxt/content';
 /* ─── Schemas ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
- * A schema representing fields shared by every markdown-based collection (blog, projects, lab). Extended
- * per-collection via `.extend()`.
+ * A schema representing fields shared by every markdown-based collection (blog, projects, lab, substrate).
+ * Extended per-collection via `.extend()`.
  * @internal
  * @constant
  */
@@ -164,6 +164,101 @@ const labSchema = baseSchema.extend({
 });
 
 /**
+ * The schema representing a single piece of homelab hardware — one node in the Substrate topology.
+ * Each device is its own markdown doc; the body holds free-form notes, learnings, and config snippets.
+ * Example path: `content/substrate/pve-01.md`
+ * @internal
+ * @constant
+ */
+const substrateSchema = baseSchema.extend({
+  /**
+   * Stable node id, referenced by other devices' `connections[].to`. Named `nodeId` (not `id`) because
+   * `id` is reserved by @nuxt/content as the document's internal primary key. e.g. `pve-01`.
+   */
+  nodeId: z.string(),
+
+  /**
+   * Device class — drives the node icon and reads as the device's "what it is". `internet` is the upstream
+   * WAN/ISP cloud that everything ultimately uplinks to.
+   */
+  kind: z
+    .enum([
+      'internet',
+      'gateway',
+      'firewall',
+      'router',
+      'switch',
+      'ap',
+      'server',
+      'hypervisor',
+      'nas',
+      'storage',
+      'pi',
+      'workstation',
+      'ups',
+      'iot',
+      'other',
+    ])
+    .default('other'),
+
+  /**
+   * Topology band — drives vertical placement, from `edge` (top, faces the internet) down to `power` (bottom).
+   */
+  layer: z.enum(['edge', 'network', 'compute', 'storage', 'service', 'client', 'power']).default('compute'),
+
+  /**
+   * Operational status — drives the node's status dot and inspector badge colour.
+   */
+  status: z.enum(['online', 'offline', 'planned', 'maintenance']).default('online'),
+
+  /**
+   * Manufacturer, e.g. `Protectli`, `Synology`, `Raspberry Pi`.
+   */
+  vendor: z.string().optional(),
+
+  /**
+   * Specific model, e.g. `VP2420`, `DS923+`.
+   */
+  model: z.string().optional(),
+
+  /**
+   * Key spec rows shown in the inspector panel, e.g. `{ label: 'CPU', value: 'i5-1235U' }`.
+   */
+  specs: z
+    .array(
+      z.object({
+        label: z.string(),
+        value: z.string(),
+      }),
+    )
+    .default([]),
+
+  /**
+   * Typical idle draw in watts — summed into the dashboard's total-power stat.
+   */
+  power: z.number().optional(),
+
+  /**
+   * Links to other devices, referenced by their `id`. `kind` styles the drawn edge: `uplink` (toward the
+   * internet/gateway), `network` (LAN), `data` (storage / replication traffic), `power` (UPS feed).
+   */
+  connections: z
+    .array(
+      z.object({
+        to: z.string(),
+        kind: z.enum(['uplink', 'network', 'data', 'power']).default('network'),
+        label: z.string().optional(),
+      }),
+    )
+    .default([]),
+
+  /**
+   * Sort weight within a layer — lower numbers sit further left in the topology row.
+   */
+  order: z.number().default(100),
+});
+
+/**
  * The schema representing resume content; a single structured YAML document, queried as data (not rendered as a page).
  * Path: `content/resume.yml`
  * @internal
@@ -233,6 +328,12 @@ export default defineContentConfig({
       type: 'page',
       source: 'lab/**/*.md',
       schema: labSchema,
+    }),
+
+    substrate: defineCollection({
+      type: 'page',
+      source: 'substrate/**/*.md',
+      schema: substrateSchema,
     }),
 
     resume: defineCollection({

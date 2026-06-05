@@ -14,7 +14,7 @@ Welcome to `jj-dev`, the self-coined moniker for a project of mine that has been
 
 This post represents the first in a series of explanatory deep dives I want to create to illustrate the process of creating this project. I hope that in documenting my process, showing how the foundational components of an application/technology come together from ideation to implementation, and explaining the design rationale, engineering patterns, and workflows that I have put into place not only serve to make `jj-dev` a self-documenting artifact, but also something that **you**, the reader can take in as inspiration and a resource should you choose to create your own website.
 
-Building software doesn't have to be an arid, leaden process, and I hope if the reader can take anything away from this project or this post, it's that it should be fun! I want this to be a platform for me to express myself, more akin to a metaphorical digital canvas and paintbrush than an exercise in drudgery and monotony. So, if you, the reader, have made it this far, first of all, congratulations, for bearing through my yapping. But more importantly, I look forward to dispelling the myth that technology and software development is some mythical, complex endeavor for introverts sitting behind a glowing screen in a dark room — it's a beautiful, manifold space where we can express ourselves, embrace creativity, and solve problems in a unique and fun way.
+Building software doesn't have to be an arid, leaden process, and I hope if the reader can take anything away from this project or this post, it's that it should be fun! I want this to be a platform for me to express myself, more akin to a metaphorical digital canvas and paintbrush than an exercise in drudgery and monotony. So, if you, the reader, have made it this far, first of all, congratulations, for bearing through my yapping. But more importantly, I look forward to dispelling the myth that technology and software development is some mythical, complex endeavor for introverts sitting behind a glowing screen in a dark room; it's a beautiful, manifold space where we can express ourselves, embrace creativity, and solve problems in a unique and fun way.
 
 ## A Passion Project, a Headache, and Many Iterations
 
@@ -43,7 +43,7 @@ My previous efforts on `jj-dev` taught me a few things:
 
 1. **Maintainability** is a key feature for this project: it should be lightweight enough to maintain / support after it has been scaffolded and created. I want my portfolio / personal site to be self-sustaining: once the bones are in place, upkeep and overhead should be minimal.
 2. **Don't reinvent the (digital) wheel**: The web application development space is one of the most wonderfully supported and maintained software engineering areas. There is a vast wealth of resources for projects like this, for all facets, from testing to accessibility. Learn to leverage and build upon the primitives rather than recreating them.
-3. **Personal touch is a key feature, not an afterthought.** I want `jj-dev` to be a representation of me, Jens Johnson, not a soul-less, corporate-y resume wrapper that reads like a LinkedIn page. Sure, I want to highlight my professional skills and accomplishments — those are important. But they are no less important than showing the other facets of me: my passion for environmental stewardship and nature, my musings and ramblings on technology and culture, my not-so-precise-and-technical baking skills (of which I am still honing). I hope this can serve to be a window into all things _me_, and that needed to be a foundational consideration when beginning this undertaking.
+3. **Personal touch is a key feature, not an afterthought.** I want `jj-dev` to be a representation of me, Jens Johnson, not a soul-less, corporate-y resume wrapper that reads like a LinkedIn page. Sure, I want to highlight my professional skills and accomplishments; those are important. But they are no less important than showing the other facets of me: my passion for environmental stewardship and nature, my musings and ramblings on technology and culture, my not-so-precise-and-technical baking skills (of which I am still honing). I hope this can serve to be a window into all things _me_, and that needed to be a foundational consideration when beginning this undertaking.
 
 In addition to these, a fourth, more novel finding:
 
@@ -104,8 +104,8 @@ Some other facets of my CI/CD process:
 
 To the reader: I thank you for your patience in sifting through my verbosity in explaining this project, and I hope this post can be of some value to you if you're thinking of starting your own, or looking at ways to improve. As I continue to expand `jj-dev`, I look forward on taking you along for the journey: the fun parts, the painful debugging, and everything in between.
 
-Have something you want me to dig into further on the next post? Let me know — [jens@jens-johnson.com](mailto:jens@jens-johnson.com?subject=jj-dev%20blog%20feedback).
+Have something you want me to dig into further on the next post? Let me know: [jens@jens-johnson.com](mailto:jens@jens-johnson.com?subject=jj-dev%20blog%20feedback).
 
 Til next time,
 
-— J
+J

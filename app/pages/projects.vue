@@ -20,14 +20,14 @@
  */
 
 useSeoMeta({
-  title: 'Projects — Jens Johnson',
+  title: 'Projects · Jens Johnson',
   robots: 'noindex',
 });
 </script>
 
 <template>
   <div class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-6 py-24 text-center">
-    <p class="text-caption text-accent mb-6 font-mono tracking-widest uppercase">02 — Projects</p>
+    <p class="text-caption text-accent mb-6 font-mono tracking-widest uppercase">02 · Projects</p>
     <h1
       class="font-display text-ink mb-6 leading-tight font-bold tracking-tight"
       style="font-size: clamp(2.5rem, 6vw, 4.5rem)"
@@ -35,7 +35,7 @@ useSeoMeta({
       Under construction.
     </h1>
     <p class="font-body text-body text-ink-muted mb-10 max-w-sm leading-relaxed">
-      Something good is coming. Projects, case studies, and open-source work — all being put together now.
+      Something good is coming. Projects, case studies, and open-source work, all being put together now.
     </p>
     <NuxtLink
       to="/"

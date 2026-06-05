@@ -2,7 +2,7 @@
 title: jj-dev
 shortTitle: jj-dev
 description: >
-  My personal portfolio and writing space — designed and built from scratch with
+  My personal portfolio and writing space, designed and built from scratch with
   Nuxt 4, Tailwind v4, and a three-theme design token system.
 publishedAt: '2025-10-15'
 status: active
@@ -20,7 +20,7 @@ cover:
   alt: The jj-dev homepage in Day theme showing the hero section
 ---
 
-A personal portfolio that doesn't feel like a portfolio — more like a place I'd actually want to spend time.
+A personal portfolio that doesn't feel like a portfolio; more like a place I'd actually want to spend time.
 
 ## What I built
 
@@ -28,4 +28,4 @@ jj-dev is a statically generated site with server-side rendering via Nitro, depl
 
 ## What I learned
 
-Tailwind v4's CSS-first approach is genuinely different from v3 — and better suited to design-token-heavy systems like this one.
+Tailwind v4's CSS-first approach is genuinely different from v3, and better suited to design-token-heavy systems like this one.

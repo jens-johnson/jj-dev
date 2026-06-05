@@ -23,10 +23,10 @@
 const route = useRoute();
 
 useSeoMeta({
-  title: 'Writing — Jens Johnson',
+  title: 'Writing · Jens Johnson',
   description:
     'Notes on craft, code, and the occasional rabbit hole. Long-form writing on building software, design systems, and the practice of engineering.',
-  ogTitle: 'Writing — Jens Johnson',
+  ogTitle: 'Writing · Jens Johnson',
   ogDescription: 'Notes on craft, code, and the occasional rabbit hole.',
 });
 
@@ -99,7 +99,7 @@ onMounted(() => {
             transition-delay: 0ms;
           "
         >
-          03 — Writing
+          03 · Writing
         </p>
         <h1
           class="font-display text-h1 text-ink leading-tight font-bold tracking-tight"
