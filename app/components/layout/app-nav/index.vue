@@ -90,7 +90,7 @@ watch(
       <NuxtLink
         to="/"
         class="text-ink hover:text-accent flex items-center gap-2.5 transition-colors"
-        aria-label="Jens Johnson — home"
+        aria-label="Jens Johnson, home"
       >
         <BrandLogoMark class="size-7 shrink-0" />
         <span class="font-display text-h5 font-bold tracking-tight">Jens Johnson</span>

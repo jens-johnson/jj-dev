@@ -10,7 +10,7 @@ interactive: true
 draft: true
 ---
 
-An experiment in using CSS custom properties as animation targets — before browsers widely supported `@property`, and before Tailwind v4 made the token layer a first-class concept.
+An experiment in using CSS custom properties as animation targets, before browsers widely supported `@property`, and before Tailwind v4 made the token layer a first-class concept.
 
 ## The trick
 

@@ -107,7 +107,7 @@ function barHeight(miles: number): string {
             />
           </div>
           <p class="text-ink-subtle/50 mt-2 font-mono text-[9px] italic">
-            * Public contributions only — excludes activity in enterprise GitHub organizations.
+            * Public contributions only; excludes activity in enterprise GitHub organizations.
           </p>
         </div>
       </div>

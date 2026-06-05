@@ -28,14 +28,14 @@ const goals = [
     num: '01',
     title: 'Bare Metal, No Template',
     icon: 'lucide:layers',
-    body: 'After several iterations and headaches adapting libraries and templates — Vuetify, PrimeBlocks, you name it — I decided to build this iteration from scratch. A design token set and component library with a Tailwind-native approach, building off concepts like Material UI. Personal, highly customized, from the very beginning.',
+    body: 'After several iterations and headaches adapting libraries and templates (Vuetify, PrimeBlocks, you name it), I decided to build this iteration from scratch. A design token set and component library with a Tailwind-native approach, building off concepts like Material UI. Personal, highly customized, from the very beginning.',
     visual: 'layers' as const,
   },
   {
     num: '02',
     title: 'Design Driven by Nature',
     icon: 'lucide:leaf',
-    body: 'A design rooted in natural concepts is an integral facet of my personal and professional ethos. Design tokens and theming based on an earthy, natural feel — instead of the "neutral grey + electric techno accent" aesthetic that has become the growing trend amongst portfolio websites.',
+    body: 'A design rooted in natural concepts is an integral facet of my personal and professional ethos. Design tokens and theming based on an earthy, natural feel, instead of the "neutral grey + electric techno accent" aesthetic that has become the growing trend amongst portfolio websites.',
     visual: 'leaf' as const,
   },
   {
