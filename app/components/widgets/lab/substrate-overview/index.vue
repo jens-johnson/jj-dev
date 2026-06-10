@@ -55,6 +55,8 @@ const STATUS: Record<Phase['status'], { label: string; dot: string; text: string
 </script>
 
 <template>
+  <WidgetsLabSubstrateLiveCard class="mb-8" />
+
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
     <!-- ─── Narrative + current focus ─────────────────────────────────────────── -->
     <div class="lg:col-span-7">

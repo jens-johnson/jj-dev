@@ -73,6 +73,8 @@ export default defineNuxtConfig({
     stravaClientId: process.env.STRAVA_CLIENT_ID,
     stravaClientSecret: process.env.STRAVA_CLIENT_SECRET,
     stravaRefreshToken: process.env.STRAVA_REFRESH_TOKEN,
+    // Bearer secret the homelab publisher sends to /api/substrate/ingest. Server-only.
+    substrateIngestSecret: process.env.SUBSTRATE_INGEST_SECRET,
   },
 
   /**

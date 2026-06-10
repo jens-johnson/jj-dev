@@ -156,6 +156,12 @@ onMounted(() => {
         </p>
       </header>
 
+      <!-- ─── Live status banner ────────────────────────────────────────────────── -->
+      <WidgetsLabSubstrateLiveBanner
+        class="mb-6 transition-all delay-75 duration-700"
+        :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
+      />
+
       <!-- ─── Stats strip ───────────────────────────────────────────────────────── -->
       <dl
         class="border-border bg-surface grid grid-cols-2 gap-px overflow-hidden rounded-2xl border sm:grid-cols-4"

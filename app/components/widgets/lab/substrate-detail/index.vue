@@ -60,6 +60,13 @@ const connLabel = (kind?: string) => CONN_LABEL[kind ?? 'network'] ?? 'Link';
 const vendorModel = computed(() =>
   props.device ? [props.device.vendor, props.device.model].filter(Boolean).join(' · ') : '',
 );
+
+/* ─── Live metrics (shown only for the live Proxmox host) ──────────────────────────────────────────────────────────── */
+
+const { data: liveData, state: liveState, updatedLabel: liveUpdated } = useSubstrateMetrics();
+const liveNode = computed(() =>
+  props.device?.kind === 'hypervisor' && liveState.value !== 'offline' ? (liveData.value?.node ?? null) : null,
+);
 </script>
 
 <template>
@@ -112,6 +119,30 @@ const vendorModel = computed(() =>
       <p v-if="device.description" class="font-body text-body-sm text-ink-muted leading-relaxed">
         {{ device.description }}
       </p>
+
+      <!-- Live metrics (host only) -->
+      <div v-if="liveNode" class="border-border bg-bg/40 rounded-xl border p-3">
+        <div class="mb-2 flex items-center justify-between">
+          <span
+            class="text-caption text-accent-secondary inline-flex items-center gap-1.5 font-mono tracking-widest uppercase"
+          >
+            <span class="bg-accent-secondary size-1.5 animate-pulse rounded-full motion-reduce:animate-none" />
+            Live
+          </span>
+          <span v-if="liveUpdated" class="text-caption text-ink-subtle font-mono">{{ liveUpdated }}</span>
+        </div>
+        <div class="flex flex-wrap gap-x-4 gap-y-1">
+          <span class="text-caption text-ink-muted font-mono">
+            CPU <span class="text-ink font-semibold">{{ liveNode.cpuPct }}%</span>
+          </span>
+          <span class="text-caption text-ink-muted font-mono">
+            RAM <span class="text-ink font-semibold">{{ liveNode.mem.usedPct }}%</span>
+          </span>
+          <span class="text-caption text-ink-muted font-mono">
+            up <span class="text-ink font-semibold">{{ formatUptime(liveNode.uptimeSec) }}</span>
+          </span>
+        </div>
+      </div>
 
       <!-- Specs -->
       <div v-if="device.specs?.length">
