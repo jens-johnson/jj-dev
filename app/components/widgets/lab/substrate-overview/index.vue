@@ -34,10 +34,10 @@ const phases: Phase[] = [
   },
   {
     title: 'Compute',
-    desc: 'Proxmox on the OptiPlex; VMs and containers for everything that follows.',
-    status: 'next',
+    desc: 'Proxmox VE running headless on the OptiPlex; VMs and containers for everything that follows.',
+    status: 'progress',
   },
-  { title: 'Services & media', desc: 'Jellyfin, Minecraft, Portainer, and the *arr stack.', status: 'planned' },
+  { title: 'Services & media', desc: 'Jellyfin, Minecraft, Portainer, and the *arr stack.', status: 'next' },
   { title: 'Storage & backup', desc: 'Dedicated storage with ZFS and a 3-2-1 backup routine.', status: 'planned' },
   {
     title: 'Automation & monitoring',
@@ -81,7 +81,8 @@ const STATUS: Record<Phase['status'], { label: string; dot: string; text: string
             Current focus
           </p>
           <p class="font-body text-body text-ink leading-relaxed">
-            Getting the network edge solid and prepping the OptiPlex for Proxmox.
+            Proxmox is live and headless; next up is containerizing the first services, starting with Jellyfin and a
+            Minecraft server.
           </p>
           <NuxtLink
             :to="{ query: { view: 'topology' } }"

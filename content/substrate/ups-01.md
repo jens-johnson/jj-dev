@@ -22,7 +22,7 @@ connections:
   - to: srv-01
     kind: power
     label: Battery
-  - to: bgw320
+  - to: gw-01
     kind: power
     label: Battery
   - to: fw-01
