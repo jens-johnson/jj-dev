@@ -143,7 +143,7 @@ function scrollToPanel(i: number) {
           <div class="grid h-full w-full grid-cols-1 lg:grid-cols-2">
             <!-- Left: bio — always visible (first panel) -->
             <div class="z-10 flex flex-col justify-center px-8 lg:px-16">
-              <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">01 — About</p>
+              <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">01 · About</p>
               <h2
                 class="font-display text-ink mb-6 leading-[1.05] font-bold tracking-tight"
                 style="font-size: clamp(2.5rem, 5vw, 4rem)"
@@ -194,7 +194,7 @@ function scrollToPanel(i: number) {
               }"
             >
               <div>
-                <p class="text-caption text-accent mb-2 font-mono tracking-widest uppercase">02 — Projects</p>
+                <p class="text-caption text-accent mb-2 font-mono tracking-widest uppercase">02 · Projects</p>
                 <h2 class="font-display text-ink leading-tight font-bold" style="font-size: clamp(2rem, 4vw, 3rem)">
                   Things I've built.
                 </h2>
@@ -250,12 +250,12 @@ function scrollToPanel(i: number) {
                 transition: 'opacity 0.5s ease, transform 0.5s ease',
               }"
             >
-              <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">03 — Writing</p>
+              <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">03 · Writing</p>
               <h2 class="font-display text-ink mb-6 leading-[1.05] font-bold" style="font-size: clamp(2rem, 4vw, 3rem)">
                 Notes on craft<br />and code.
               </h2>
               <p class="font-body text-body text-ink-muted mb-8 leading-relaxed">
-                I write about building software — the decisions, the tradeoffs, and the occasional rabbit hole.
+                I write about building software: the decisions, the tradeoffs, and the occasional rabbit hole.
               </p>
               <NuxtLink
                 to="/blog"
@@ -360,7 +360,7 @@ function scrollToPanel(i: number) {
               transition: 'opacity 0.6s ease, transform 0.6s ease',
             }"
           >
-            <p class="text-caption text-accent mb-6 font-mono tracking-widest uppercase">04 — Connect</p>
+            <p class="text-caption text-accent mb-6 font-mono tracking-widest uppercase">04 · Connect</p>
             <h2
               class="font-display text-ink mb-6 leading-[1.05] font-bold tracking-tight"
               style="font-size: clamp(2.5rem, 6vw, 5rem)"

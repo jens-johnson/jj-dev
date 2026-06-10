@@ -40,7 +40,7 @@ const cards: InspirationCard[] = [
   {
     theme: 'day',
     title: 'Day',
-    vibe: 'A mountain valley at noon — cream sky, earth, sage forest.',
+    vibe: 'A mountain valley at noon: cream sky, earth, sage forest.',
     image: {
       src: '/images/blog/building-jj-dev/inspiration/kalen-emsley-Bkci_8qcdvQ-unsplash.jpg',
       alt: 'Kluane mountain valley with snow-capped peaks and forested foreground',
@@ -56,7 +56,7 @@ const cards: InspirationCard[] = [
   {
     theme: 'sunset',
     title: 'Sunset',
-    vibe: 'A coastal road at golden hour — terra, ember, warm rose.',
+    vibe: 'A coastal road at golden hour: terra, ember, warm rose.',
     image: {
       src: '/images/blog/building-jj-dev/inspiration/iris-papillon-FuxRM_jOFHY-unsplash.jpg',
       alt: 'Big Sur coastline at sunset with winding road and warm golden light',
@@ -72,7 +72,7 @@ const cards: InspirationCard[] = [
   {
     theme: 'night',
     title: 'Night',
-    vibe: 'A city at twilight — deep blue, sage spark, ember on the horizon.',
+    vibe: 'A city at twilight: deep blue, sage spark, ember on the horizon.',
     image: {
       src: '/images/blog/building-jj-dev/inspiration/martin-fu-jmJ62_Zq1bo-unsplash.jpg',
       alt: 'City lights at twilight under a deep blue sky fading to orange at the horizon',
@@ -187,7 +187,7 @@ function preview(t: Theme) {
 
     <!-- Footnote / lineage explanation -->
     <p class="font-body text-body-sm text-ink-muted mt-6 leading-relaxed">
-      Each palette feeds the same set of semantic design tokens —
+      Each palette feeds the same set of semantic design tokens:
       <code class="text-caption text-accent font-mono">--color-bg</code>,
       <code class="text-caption text-accent font-mono">--color-accent</code>, etc. The themes themselves are nothing
       more than a single CSS attribute swap on <code class="text-caption text-accent font-mono">&lt;html&gt;</code>.

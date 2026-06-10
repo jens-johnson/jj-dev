@@ -36,7 +36,7 @@ if (!post.value) {
 }
 
 useSeoMeta({
-  title: `${post.value.title} — Jens Johnson`,
+  title: `${post.value.title} · Jens Johnson`,
   description: post.value.description,
   ogTitle: post.value.title,
   ogDescription: post.value.description,

@@ -20,7 +20,7 @@
  */
 
 useSeoMeta({
-  title: 'About — Jens Johnson',
+  title: 'About · Jens Johnson',
   description:
     'Full-stack software engineer based in San Diego, CA. I build data-rich applications, design systems, and tools that make a real difference.',
   ogTitle: 'About Jens Johnson',
@@ -131,7 +131,7 @@ const experience = [
     org: 'Gemological Institute of America',
     orgShort: 'GIA',
     location: 'Carlsbad, CA',
-    dates: 'Sep 2023 — Present',
+    dates: 'Sep 2023 to Present',
     current: true,
     highlights: [
       "Currently a lead engineer on the Product Engineering team, responsible for the design and implementation of software and technology products for both GIA's external-facing services and internal teams.",
@@ -144,7 +144,7 @@ const experience = [
     org: 'Amazon Web Services',
     orgShort: 'AWS',
     location: 'Denver, CO',
-    dates: 'Jul 2022 — Sep 2023',
+    dates: 'Jul 2022 to Sep 2023',
     current: false,
     highlights: [
       "Software engineer with Amazon's Data Center Engineering Organization (DCEO) on the InfraMap team, creating platform services that provide a consolidated, real-time view of the health and activities across AWS' 900+ data centers in 123 global availability zones.",
@@ -152,11 +152,11 @@ const experience = [
     ],
   },
   {
-    title: 'Software Engineer — Sport Science Platform',
+    title: 'Software Engineer · Sport Science Platform',
     org: 'Nike',
     orgShort: 'Nike',
     location: 'Beaverton, OR',
-    dates: 'Jun 2021 — Jul 2022',
+    dates: 'Jun 2021 to Jul 2022',
     current: false,
     highlights: [
       "Software engineer with Nike's Sport Science Platform (SSP), the technology organization powering the Nike Sport Research Lab (NSRL), responsible for innovations like Nike FlyKnit fabric, Vaporfly carbon-plated running technology, Nike Adapt self-lacing shoes, and more.",
@@ -165,11 +165,11 @@ const experience = [
     ],
   },
   {
-    title: 'Product Owner — Nike Music',
+    title: 'Product Owner · Nike Music',
     org: 'Nike',
     orgShort: 'Nike',
     location: 'Beaverton, OR',
-    dates: 'Aug 2020 — Jun 2021',
+    dates: 'Aug 2020 to Jun 2021',
     current: false,
     highlights: [
       'Product owner for Nike Music under the Nike Store Technology (NST) team, responsible for product management, evaluation, and growth strategies to support music and audiovisual (A/V) activations throughout the entire Nike brand experience, including promotions and marketing, corporate events, and Nike retail stores and infrastructure across the globe.',
@@ -178,11 +178,11 @@ const experience = [
     ],
   },
   {
-    title: 'Software Engineer — Product Data Hub',
+    title: 'Software Engineer · Product Data Hub',
     org: 'Nike',
     orgShort: 'Nike',
     location: 'Beaverton, OR',
-    dates: 'Aug 2019 — Aug 2020',
+    dates: 'Aug 2019 to Aug 2020',
     current: false,
     highlights: [
       "Software engineer on the Product Data Hub (PDH)/API 360 team within Nike's Enterprise Data and Analytics (EDA) organization, responsible for the development and maintenance of applications in the Nike Data Foundation (NDF) platform to deliver dimensional and transactional data products to Nike consumers, supporting functions across the company including e-commerce, marketing, and product design and development.",
@@ -333,7 +333,7 @@ onUnmounted(() => {
               I'm an engineer in the classical sense. I love understanding how things work, and designing, building, and
               (sometimes) breaking systems to solve problems creatively. But I also consider myself a product-focused,
               design-oriented solutionist: I love understanding how I can employ technological solutions to address
-              users' needs — from interface design to feedback integration. My passion in technology lies at the
+              users' needs, from interface design to feedback integration. My passion in technology lies at the
               intersection of engineering rigor and design focus, and I believe this is where the best products and
               solutions are created.
             </p>
@@ -367,7 +367,7 @@ onUnmounted(() => {
             <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">The Builder</p>
             <p class="font-body text-body text-ink-muted leading-relaxed">
               My professional career has provided me with the ability to develop and create solutions for a variety of
-              organizations and end-users — from designing sport research platforms at Nike to developing data center
+              organizations and end-users, from designing sport research platforms at Nike to developing data center
               observability, reliability, and sustainability tools for Amazon Web Services. I enjoy the entropy and
               complexity of full-stack development: orchestrating microservices, building omni-source data pipelines,
               and working closely with end-users to define seamless, accessible, and elegant interfaces.
@@ -378,7 +378,7 @@ onUnmounted(() => {
           <ContainmentBentoCard class="border-border bg-surface relative rounded-2xl border p-8 lg:col-span-8">
             <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">The Human</p>
             <p class="font-body text-body text-ink-muted leading-relaxed">
-              When I'm not behind a keyboard, my passions lie outdoors — hiking, trail running, going to the beach to
+              When I'm not behind a keyboard, my passions lie outdoors: hiking, trail running, going to the beach to
               catch a sunset on the southern California coast. You'll inevitably see some "non-tech" subject matter on
               this site, and I hope it gives you a chance to see all sides of me. Whether navigating terrain on a trail
               run or designing a new product, I believe nature and technology have a surprising amount of crossover.
