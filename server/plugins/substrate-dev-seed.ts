@@ -19,7 +19,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { SubstrateMetricsPayload } from '../utils/substrate-metrics';
+import type { SubstrateMetricsPayload, SubstrateMetricsSample } from '../utils/substrate-metrics';
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -37,7 +37,18 @@ function mockPayload(): SubstrateMetricsPayload {
     },
     guests: { vms: 2, cts: 5, running: 6 },
     storage: { usedPct: 22.5 },
+    internet: { reachable: true, latencyMs: Math.round(7 + Math.random() * 6) },
   };
+}
+
+/** A plausible ~15 min CPU/RAM history so the sparklines aren't empty on first paint in dev. */
+function mockHistory(points = 30, stepMs = 30_000): SubstrateMetricsSample[] {
+  const now = Date.now();
+  return Array.from({ length: points }, (_, i) => ({
+    t: now - (points - 1 - i) * stepMs,
+    cpu: round1(8 + Math.sin(i / 3) * 4 + Math.random() * 3),
+    mem: round1(36 + Math.sin(i / 6) * 5 + Math.random() * 2),
+  }));
 }
 
 export default defineNitroPlugin(() => {
@@ -48,6 +59,12 @@ export default defineNitroPlugin(() => {
     if (latest && Date.now() - latest.receivedAt < 100_000) return;
     await writeLatestMetrics(mockPayload());
   };
+  // Pre-fill the rolling history once so sparklines render right away; real pushes append from there.
+  const seedHistory = async () => {
+    if ((await readHistory()).length >= 8) return;
+    await setHistory(mockHistory());
+  };
+  void seedHistory();
   void seedIfStale();
   setInterval(() => void seedIfStale(), 20_000);
 });

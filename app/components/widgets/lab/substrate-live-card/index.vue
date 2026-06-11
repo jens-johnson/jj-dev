@@ -20,22 +20,29 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-const { data, state, updatedLabel } = useSubstrateMetrics();
+const { data, state, cpuSeries, memSeries, updatedLabel } = useSubstrateMetrics();
 const node = computed(() => data.value?.node ?? null);
 const guests = computed(() => data.value?.guests ?? null);
 const storage = computed(() => data.value?.storage ?? null);
 const vis = computed(() => METRIC_STATE[state.value]);
 const showMore = ref(false);
 
-const stats = computed(() => {
+interface Tile {
+  label: string;
+  value: string;
+  sub: string;
+  series?: number[];
+}
+
+const stats = computed<Tile[]>(() => {
   const n = node.value;
   const g = guests.value;
   if (!n) return [];
   return [
-    { label: 'CPU', value: `${n.cpuPct}%`, sub: '' },
-    { label: 'RAM', value: `${n.mem.usedPct}%`, sub: `${n.mem.totalGiB} GB` },
+    { label: 'CPU', value: `${n.cpuPct}%`, sub: '', series: cpuSeries.value },
+    { label: 'RAM', value: `${n.mem.usedPct}%`, sub: `${n.mem.totalGiB} GB`, series: memSeries.value },
     { label: 'Uptime', value: formatUptime(n.uptimeSec), sub: '' },
-    { label: 'Guests', value: g ? String(g.running) : '0', sub: g ? `of ${g.vms + g.cts}` : '' },
+    { label: 'Services', value: g ? String(g.running) : '0', sub: g ? `of ${g.vms + g.cts}` : '' },
   ];
 });
 </script>
@@ -66,6 +73,13 @@ const stats = computed(() => {
           <dt class="text-caption text-ink-subtle font-mono tracking-widest uppercase">{{ s.label }}</dt>
           <dd class="font-display text-h5 text-ink mt-0.5 leading-none font-bold">{{ s.value }}</dd>
           <dd v-if="s.sub" class="text-caption text-ink-subtle mt-0.5 font-mono">{{ s.sub }}</dd>
+          <DataSparkLine
+            v-if="s.series"
+            :points="s.series"
+            :width="72"
+            :height="14"
+            class="text-accent-secondary mt-1.5"
+          />
         </div>
       </dl>
 

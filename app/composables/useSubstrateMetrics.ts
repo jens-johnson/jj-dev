@@ -19,15 +19,32 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { SubstrateMetricsState, SubstrateMetricsView } from '~/types/substrate-metrics';
+import type { SubstrateHealth, SubstrateMetricsState, SubstrateMetricsView } from '~/types/substrate-metrics';
+
+interface StateVisual {
+  label: string;
+  dot: string;
+  text: string;
+  pulse: boolean;
+}
 
 /** Per-state visual treatment (Tailwind classes), shared by the banner / card / inspector. */
-export const METRIC_STATE: Record<SubstrateMetricsState, { label: string; dot: string; text: string; pulse: boolean }> =
-  {
-    live: { label: 'Live', dot: 'bg-accent-secondary', text: 'text-accent-secondary', pulse: true },
-    stale: { label: 'Stale', dot: 'bg-terra-400', text: 'text-terra-400', pulse: false },
-    offline: { label: 'Offline', dot: 'bg-ink-subtle', text: 'text-ink-subtle', pulse: false },
-  };
+export const METRIC_STATE: Record<SubstrateMetricsState, StateVisual> = {
+  live: { label: 'Live', dot: 'bg-accent-secondary', text: 'text-accent-secondary', pulse: true },
+  stale: { label: 'Stale', dot: 'bg-terra-400', text: 'text-terra-400', pulse: false },
+  offline: { label: 'Offline', dot: 'bg-ink-subtle', text: 'text-ink-subtle', pulse: false },
+};
+
+/** Visual treatment for the rolled-up fleet health, used by the aggregate status bar. */
+export const METRIC_HEALTH: Record<SubstrateHealth, StateVisual> = {
+  healthy: { label: 'Healthy', dot: 'bg-accent-secondary', text: 'text-accent-secondary', pulse: true },
+  degraded: { label: 'Degraded', dot: 'bg-terra-400', text: 'text-terra-400', pulse: true },
+  stale: { label: 'Stale', dot: 'bg-terra-400', text: 'text-terra-400', pulse: false },
+  offline: { label: 'Offline', dot: 'bg-ink-subtle', text: 'text-ink-subtle', pulse: false },
+};
+
+/** A node is "hot" (degraded) when any pressure gauge crosses its threshold. */
+const HOT_PCT = 92;
 
 /** Seconds to a compact human uptime, e.g. "9d 14h". */
 export function formatUptime(sec: number): string {
@@ -64,6 +81,28 @@ export function useSubstrateMetrics() {
 
   const state = computed<SubstrateMetricsState>(() => data.value?.state ?? 'offline');
 
+  const internet = computed(() => data.value?.internet ?? null);
+  const history = computed(() => data.value?.history ?? []);
+  const cpuSeries = computed(() => history.value.map((h) => h.cpu));
+  const memSeries = computed(() => history.value.map((h) => h.mem));
+
+  /** Count of nodes actively reporting telemetry (one hypervisor today; generalises as more nodes push). */
+  const reportingCount = computed(() => (state.value !== 'offline' && data.value?.node ? 1 : 0));
+
+  /** Rolled-up health: freshness first, then threshold pressure on the live node. */
+  const health = computed<SubstrateHealth>(() => {
+    if (state.value === 'offline') return 'offline';
+    if (state.value === 'stale') return 'stale';
+    const n = data.value?.node;
+    if (!n) return 'stale';
+    const hot =
+      n.cpuPct >= HOT_PCT ||
+      n.mem.usedPct >= HOT_PCT ||
+      (data.value?.storage?.usedPct ?? 0) >= HOT_PCT ||
+      (n.swap?.usedPct ?? 0) >= 50;
+    return hot ? 'degraded' : 'healthy';
+  });
+
   /** Server age plus client seconds since the last fetch. */
   const ageSec = computed<number | null>(() => {
     const base = data.value?.ageSec ?? null;
@@ -80,5 +119,18 @@ export function useSubstrateMetrics() {
     return `${Math.floor(a / 3_600)}h ago`;
   });
 
-  return { data, state, ageSec, updatedLabel, refresh, status };
+  return {
+    data,
+    state,
+    health,
+    internet,
+    history,
+    cpuSeries,
+    memSeries,
+    reportingCount,
+    ageSec,
+    updatedLabel,
+    refresh,
+    status,
+  };
 }

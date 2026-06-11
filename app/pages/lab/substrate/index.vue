@@ -82,21 +82,6 @@ const hasNotes = computed(() => {
   return Array.isArray(value) && value.length > 0;
 });
 
-/* ─── Derived stats ───────────────────────────────────────────────────────────────────────────────────────────────── */
-
-const stats = computed(() => {
-  const l = list.value;
-  return [
-    { label: 'Nodes', value: String(l.length) },
-    { label: 'Online', value: String(l.filter((d) => d.status === 'online').length) },
-    { label: 'Planned', value: String(l.filter((d) => d.status === 'planned').length) },
-    {
-      label: 'Idle draw',
-      value: `~${l.filter((d) => d.status === 'online').reduce((sum, d) => sum + (d.power ?? 0), 0)} W`,
-    },
-  ];
-});
-
 /* ─── Legends ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 const statusLegend = [
@@ -114,7 +99,7 @@ const linkLegend = [
 ];
 
 /** Planned services shown on the Services tab placeholder. */
-const plannedServices = ['Jellyfin', 'Minecraft', 'Portainer', 'Pi-hole', '*arr stack'];
+const plannedServices = ['Minecraft', 'Portainer', 'Pi-hole'];
 
 /* ─── Entrance ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -150,28 +135,24 @@ onMounted(() => {
           class="font-body text-body-lg text-ink-muted mt-5 max-w-2xl leading-relaxed transition-all delay-100 duration-700"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
         >
-          Welcome to Substrate, the project for my HomeLab, an evolving space where I'm dipping my toes into the
-          self-hosted ecosystem. Explore below to learn more about the hardware and network technology, services I'm
-          running, and more.
+          Welcome to Substrate: the project for my HomeLab, an evolving space where I'm dipping my toes into the
+          self-hosted ecosystem. Join me in my journey learning more about hardware, networking, deploying services, and
+          more, breaking some CPU pins but learning a lot along the way.
         </p>
       </header>
 
-      <!-- ─── Live status banner ────────────────────────────────────────────────── -->
-      <WidgetsLabSubstrateLiveBanner
+      <!-- ─── Aggregate live status bar ─────────────────────────────────────────── -->
+      <WidgetsLabSubstrateStatusBar
         class="mb-6 transition-all delay-75 duration-700"
         :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
       />
 
-      <!-- ─── Stats strip ───────────────────────────────────────────────────────── -->
-      <dl
-        class="border-border bg-surface grid grid-cols-2 gap-px overflow-hidden rounded-2xl border sm:grid-cols-4"
+      <!-- ─── Fleet (counts + expandable per-device telemetry) ──────────────────── -->
+      <WidgetsLabSubstrateFleet
+        :devices="list"
+        class="transition-all duration-700"
         :class="revealed ? 'opacity-100' : 'opacity-0'"
-      >
-        <div v-for="s in stats" :key="s.label" class="bg-surface flex flex-col gap-1 px-5 py-4">
-          <dt class="text-caption text-ink-subtle font-mono tracking-widest uppercase">{{ s.label }}</dt>
-          <dd class="font-display text-h4 text-ink leading-none font-bold">{{ s.value }}</dd>
-        </div>
-      </dl>
+      />
 
       <!-- ─── Tabs + panels ─────────────────────────────────────────────────────── -->
       <div
@@ -261,9 +242,9 @@ onMounted(() => {
             >
               <Icon name="lucide:server-cog" size="22" />
             </span>
-            <h3 class="font-display text-h5 text-ink font-bold">Services are coming</h3>
+            <h3 class="font-display text-h5 text-ink font-bold">Services coming soon</h3>
             <p class="font-body text-body-sm text-ink-muted mt-2 max-w-md leading-relaxed">
-              Once Proxmox is running on the OptiPlex, this tab will map the services I'm self-hosting with live status.
+              I'm standing up the first containers now; this tab will map them with live status shortly.
             </p>
             <ul class="mt-6 flex flex-wrap justify-center gap-2" role="list">
               <li

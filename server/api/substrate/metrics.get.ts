@@ -22,9 +22,18 @@
 export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Cache-Control', 'public, max-age=5, s-maxage=15');
 
-  const stored = await readLatestMetrics();
+  const [stored, history] = await Promise.all([readLatestMetrics(), readHistory()]);
   if (!stored) {
-    return { state: 'offline' as const, ageSec: null, ts: null, node: null, guests: null, storage: null };
+    return {
+      state: 'offline' as const,
+      ageSec: null,
+      ts: null,
+      node: null,
+      guests: null,
+      storage: null,
+      internet: null,
+      history,
+    };
   }
 
   const { state, ageSec } = metricsState(stored.receivedAt);
@@ -35,5 +44,7 @@ export default defineEventHandler(async (event) => {
     node: stored.node,
     guests: stored.guests,
     storage: stored.storage ?? null,
+    internet: stored.internet ?? null,
+    history,
   };
 });

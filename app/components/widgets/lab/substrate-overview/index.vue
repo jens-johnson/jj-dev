@@ -37,11 +37,15 @@ const phases: Phase[] = [
     desc: 'Proxmox VE running headless on the OptiPlex; VMs and containers for everything that follows.',
     status: 'progress',
   },
-  { title: 'Services & media', desc: 'Jellyfin, Minecraft, Portainer, and the *arr stack.', status: 'next' },
+  {
+    title: 'Services',
+    desc: 'Minecraft, Portainer, Pi-hole, and the containers that make the lab useful.',
+    status: 'next',
+  },
   { title: 'Storage & backup', desc: 'Dedicated storage with ZFS and a 3-2-1 backup routine.', status: 'planned' },
   {
-    title: 'Automation & monitoring',
-    desc: 'Live health metrics, dashboards, and infrastructure as code.',
+    title: 'Failover & redundancy',
+    desc: 'Clustering, redundant power and network, and graceful failover as the lab grows.',
     status: 'future',
   },
 ];
@@ -55,22 +59,18 @@ const STATUS: Record<Phase['status'], { label: string; dot: string; text: string
 </script>
 
 <template>
-  <WidgetsLabSubstrateLiveCard class="mb-8" />
-
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
     <!-- ─── Narrative + current focus ─────────────────────────────────────────── -->
     <div class="lg:col-span-7">
       <p class="text-accent mb-4 font-mono text-[11px] tracking-widest uppercase">The brief</p>
 
       <div class="font-body text-body-lg text-ink-muted space-y-5 leading-relaxed">
+        <p>Welcome to Substrate, my hands-on project and classroom for self-hosting.</p>
         <p>
-          Substrate is my hands-on classroom for self-hosting. After years building software on top of someone else's
-          infrastructure, I wanted to understand the layers underneath; the network, the metal, the services, and the
-          glue that ties them together.
-        </p>
-        <p>
-          It starts small: a fiber line, one mini server, and a lot to figure out. This page grows with the lab,
-          documenting the hardware, the wiring, the services I run, and the lessons I pick up along the way.
+          After years building software on top of someone else's infrastructure, I wanted to understand the layers
+          underneath; the network, the metal, the services, and the glue that ties everything together. This page acts
+          as a live status dashboard for the project, tracks some of the services and features I'm working on, and shows
+          the process of orchestrating my own little mini "JWS" (Jens Web Services).
         </p>
       </div>
 
@@ -83,7 +83,7 @@ const STATUS: Record<Phase['status'], { label: string; dot: string; text: string
             Current focus
           </p>
           <p class="font-body text-body text-ink leading-relaxed">
-            Proxmox is live and headless; next up is containerizing the first services, starting with Jellyfin and a
+            Proxmox is live and headless; next up is containerizing the first services, starting with Pi-hole and a
             Minecraft server.
           </p>
           <NuxtLink

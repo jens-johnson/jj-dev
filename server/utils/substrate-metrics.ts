@@ -37,11 +37,19 @@ export interface SubstrateMetricsPayload {
   };
   guests: { vms: number; cts: number; running: number };
   storage?: { usedPct: number };
+  internet?: { reachable: boolean; latencyMs?: number };
 }
 
 /** Stored record adds the server's receive time, the source of truth for staleness. */
 export interface StoredSubstrateMetrics extends SubstrateMetricsPayload {
   receivedAt: number;
+}
+
+/** One compact rolling-history point, kept just for the sparklines. */
+export interface SubstrateMetricsSample {
+  t: number;
+  cpu: number;
+  mem: number;
 }
 
 export type SubstrateMetricsState = 'live' | 'stale' | 'offline';
@@ -87,19 +95,45 @@ export function validateMetricsPayload(input: unknown): { ok: true; value: Subst
   if (isObj(node.swap) && isPct(node.swap.usedPct)) value.node.swap = { usedPct: node.swap.usedPct };
   if (isObj(input.storage) && isPct(input.storage.usedPct)) value.storage = { usedPct: input.storage.usedPct };
 
+  const net = input.internet;
+  if (isObj(net) && typeof net.reachable === 'boolean') {
+    value.internet = { reachable: net.reachable };
+    if (isNum(net.latencyMs) && net.latencyMs >= 0 && net.latencyMs <= 60_000) {
+      value.internet.latencyMs = Math.round(net.latencyMs);
+    }
+  }
+
   return { ok: true, value };
 }
 
 /* ─── Storage (Nitro useStorage: memory in dev; point the `substrate` mount at Upstash for prod in Phase B) ────────── */
 
 const KEY = 'metrics:latest';
+const HISTORY_KEY = 'metrics:history';
+const HISTORY_MAX = 60; // ~30 min at a 30s push cadence — enough for a live sparkline, cheap to store.
 
+/** Persist the latest snapshot and append a compact point to the rolling history (for the sparklines). */
 export async function writeLatestMetrics(p: SubstrateMetricsPayload): Promise<void> {
-  await useStorage('substrate').setItem(KEY, { ...p, receivedAt: Date.now() } satisfies StoredSubstrateMetrics);
+  const store = useStorage('substrate');
+  const receivedAt = Date.now();
+  await store.setItem(KEY, { ...p, receivedAt } satisfies StoredSubstrateMetrics);
+
+  const prev = (await store.getItem<SubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
+  const next = [...prev, { t: receivedAt, cpu: p.node.cpuPct, mem: p.node.mem.usedPct }].slice(-HISTORY_MAX);
+  await store.setItem(HISTORY_KEY, next);
 }
 
 export async function readLatestMetrics(): Promise<StoredSubstrateMetrics | null> {
   return (await useStorage('substrate').getItem<StoredSubstrateMetrics>(KEY)) ?? null;
+}
+
+export async function readHistory(): Promise<SubstrateMetricsSample[]> {
+  return (await useStorage('substrate').getItem<SubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
+}
+
+/** Replace the rolling history outright. Used by the dev seed to pre-populate the sparklines. */
+export async function setHistory(samples: SubstrateMetricsSample[]): Promise<void> {
+  await useStorage('substrate').setItem(HISTORY_KEY, samples.slice(-HISTORY_MAX));
 }
 
 /* ─── Staleness ───────────────────────────────────────────────────────────────────────────────────────────────────── */
