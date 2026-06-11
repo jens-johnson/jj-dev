@@ -23,7 +23,8 @@
  *   PVE_HOST=https://<pve-host>:8006 PVE_NODE=pve PVE_TOKEN='<user>@pam!<token-id>=<uuid>' \
  *   INGEST_URL=https://<site>/api/substrate/ingest INGEST_SECRET=<secret> node scripts/substrate-publisher.mjs
  *
- *   Optional: INTERVAL_S (push cadence, default 60) · PING_HOST (latency target, default 1.1.1.1).
+ *   Optional: INTERVAL_S (cadence, default 60) · PING_HOST (latency target, default 1.1.1.1) · BYPASS_TOKEN
+ *   (Vercel Protection Bypass secret, only needed to reach a protected preview/staging deployment).
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
@@ -42,6 +43,7 @@ const {
   INGEST_SECRET,
   INTERVAL_S = '60',
   PING_HOST = '1.1.1.1',
+  BYPASS_TOKEN = '',
 } = process.env;
 
 for (const [k, v] of Object.entries({ PVE_HOST, PVE_NODE, PVE_TOKEN, INGEST_URL, INGEST_SECRET }))
@@ -98,11 +100,10 @@ async function push() {
     ...(s.rootfs?.total ? { storage: { usedPct: r1((s.rootfs.used / s.rootfs.total) * 100) } } : {}),
     internet: { reachable: ping !== null, ...(ping !== null ? { latencyMs: ping } : {}) },
   };
-  const res = await fetch(INGEST_URL, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${INGEST_SECRET}` },
-    body: JSON.stringify(payload),
-  });
+  const headers = { 'content-type': 'application/json', authorization: `Bearer ${INGEST_SECRET}` };
+  // Pass through a protected Vercel preview/staging deploy (Protection Bypass for Automation). No-op when unset.
+  if (BYPASS_TOKEN) headers['x-vercel-protection-bypass'] = BYPASS_TOKEN;
+  const res = await fetch(INGEST_URL, { method: 'POST', headers, body: JSON.stringify(payload) });
   console.log(
     new Date().toISOString(),
     `cpu=${payload.node.cpuPct}% mem=${payload.node.mem.usedPct}% net=${ping ?? 'x'}ms ->`,
