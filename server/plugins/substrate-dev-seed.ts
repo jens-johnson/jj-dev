@@ -42,6 +42,12 @@ function mockPayload(): SubstrateMetricsPayload {
 
 export default defineNitroPlugin(() => {
   if (!import.meta.dev) return;
-  void writeLatestMetrics(mockPayload());
-  setInterval(() => void writeLatestMetrics(mockPayload()), 20_000);
+  // Seed mock data, but back off as soon as a real push arrives so a local publisher can take over.
+  const seedIfStale = async () => {
+    const latest = await readLatestMetrics();
+    if (latest && Date.now() - latest.receivedAt < 100_000) return;
+    await writeLatestMetrics(mockPayload());
+  };
+  void seedIfStale();
+  setInterval(() => void seedIfStale(), 20_000);
 });
