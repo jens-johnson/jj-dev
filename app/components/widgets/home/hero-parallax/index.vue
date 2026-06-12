@@ -165,7 +165,7 @@ onMounted(() => {
           :style="{ opacity: revealed ? '1' : '0', transform: revealed ? 'translateY(0)' : 'translateY(12px)' }"
         >
           <NuxtLink
-            to="/work"
+            to="/projects"
             class="bg-accent font-body text-body-sm inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-stone-50 transition-opacity hover:opacity-90"
           >
             View my work

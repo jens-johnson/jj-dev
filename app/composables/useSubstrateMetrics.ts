@@ -59,6 +59,9 @@ export function formatUptime(sec: number): string {
 export function useSubstrateMetrics() {
   const { data, refresh, status } = useFetch<SubstrateMetricsView>('/api/substrate/metrics', {
     key: 'substrate-metrics',
+    // Live data: always fetch fresh on the client. The page is prerendered to static HTML, so there is no useful
+    // server value to bake in — fetching client-side keeps the metrics current without a stale snapshot in the markup.
+    server: false,
   });
 
   // Client-side clock so the "updated Ns ago" label keeps counting between 30s polls.

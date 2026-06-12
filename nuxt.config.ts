@@ -237,6 +237,23 @@ export default defineNuxtConfig({
   },
 
   /**
+   * Nitro server config.
+   *
+   * Prerender the content-driven routes to static HTML at build time. @nuxt/content v3 queries a SQLite database at
+   * request time, and that native SQLite is not available inside Vercel's serverless functions — so server-rendered
+   * content comes back empty in production (blog, projects, lab, substrate all 404 / render blank). Baking the pages
+   * at build sidesteps the runtime database entirely. Live data stays dynamic: the substrate metrics and the about
+   * page's Strava card are fetched client-side, so static pages still hydrate with fresh data.
+   * @see https://content.nuxt.com/docs/getting-started/installation
+   */
+  nitro: {
+    prerender: {
+      crawlLinks: true,
+      routes: ['/', '/about', '/blog', '/projects', '/lab', '/lab/substrate', '/uses'],
+    },
+  },
+
+  /**
    * Site metadata used by @nuxtjs/sitemap, @nuxtjs/robots, and nuxt-schema-org
    * @see https://nuxtseo.com/site-config/getting-started/introduction
    */
