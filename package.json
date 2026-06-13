@@ -59,11 +59,13 @@
     ]
   },
   "dependencies": {
+    "@upstash/redis": "^1.38.0",
     "@vueuse/core": "^14.3.0",
     "better-sqlite3": "^12.8.0",
     "lodash": "^4.18.1",
     "nuxt": "^4.4.6",
     "nuxt-auth-utils": "^0.5.29",
+    "unstorage": "1.17.5",
     "vue": "^3.5.34",
     "vue-router": "^5.0.6"
   },

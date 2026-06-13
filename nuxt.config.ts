@@ -73,6 +73,8 @@ export default defineNuxtConfig({
     stravaClientId: process.env.STRAVA_CLIENT_ID,
     stravaClientSecret: process.env.STRAVA_CLIENT_SECRET,
     stravaRefreshToken: process.env.STRAVA_REFRESH_TOKEN,
+    // Bearer secret the homelab publisher sends to /api/substrate/ingest. Server-only.
+    substrateIngestSecret: process.env.SUBSTRATE_INGEST_SECRET,
 
     /**
      * Email granted admin-level access once authenticated. Server-only — never exposed to
@@ -254,6 +256,23 @@ export default defineNuxtConfig({
           theme: 'vitesse-light',
         },
       },
+    },
+  },
+
+  /**
+   * Nitro server config.
+   *
+   * Prerender the content-driven routes to static HTML at build time. @nuxt/content v3 queries a SQLite database at
+   * request time, and that native SQLite is not available inside Vercel's serverless functions — so server-rendered
+   * content comes back empty in production (blog, projects, lab, substrate all 404 / render blank). Baking the pages
+   * at build sidesteps the runtime database entirely. Live data stays dynamic: the substrate metrics and the about
+   * page's Strava card are fetched client-side, so static pages still hydrate with fresh data.
+   * @see https://content.nuxt.com/docs/getting-started/installation
+   */
+  nitro: {
+    prerender: {
+      crawlLinks: true,
+      routes: ['/', '/about', '/blog', '/projects', '/lab', '/lab/substrate', '/uses'],
     },
   },
 
