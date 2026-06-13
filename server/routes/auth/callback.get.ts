@@ -40,6 +40,11 @@ interface GoogleUser {
 
 export default defineOAuthGoogleEventHandler({
   config: {
+    /* Read the bare Vercel env vars at request time so they resolve at runtime in every
+       environment, rather than being baked into the build via runtimeConfig. Falls through to
+       nuxt-auth-utils' own NUXT_OAUTH_GOOGLE_* resolution if these are unset. */
+    clientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
     /* Basic profile + email. `openid` is implied; nuxt-auth-utils derives redirectURL from the request origin. */
     scope: ['email', 'profile'],
   },

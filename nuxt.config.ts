@@ -82,19 +82,13 @@ export default defineNuxtConfig({
     adminEmail: process.env.ADMIN_EMAIL || 'christopher.jens.johnson@gmail.com',
 
     /**
-     * OAuth provider credentials read by nuxt-auth-utils. We map the bare Vercel env var
-     * names (GOOGLE_OAUTH_*) onto the `oauth.google` keys the module expects, mirroring the
-     * Strava pattern above. `redirectURL` is intentionally left unset so it derives from the
-     * incoming request origin — this lets the same code serve both the prod and staging
-     * callback URLs registered with Google.
-     * @see https://github.com/atinux/nuxt-auth-utils#configuration
+     * Google OAuth credentials are intentionally NOT mapped here. Mapping them into
+     * runtimeConfig bakes the secret values into the build output and only works when the env
+     * var is present in the building environment's scope. Instead, the callback handler reads
+     * the bare GOOGLE_OAUTH_* vars from `process.env` at request time — they resolve at runtime
+     * in every Vercel environment (preview/staging/prod), mirroring the Strava route's fallback.
+     * @see server/routes/auth/callback.get.ts
      */
-    oauth: {
-      google: {
-        clientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-      },
-    },
   },
 
   /**
