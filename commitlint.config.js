@@ -53,6 +53,7 @@ export default {
       [
         'app',
         'assets',
+        'auth',
         'blog',
         'ci',
         'components',
