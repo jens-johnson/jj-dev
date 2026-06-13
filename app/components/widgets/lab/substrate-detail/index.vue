@@ -60,6 +60,16 @@ const connLabel = (kind?: string) => CONN_LABEL[kind ?? 'network'] ?? 'Link';
 const vendorModel = computed(() =>
   props.device ? [props.device.vendor, props.device.model].filter(Boolean).join(' · ') : '',
 );
+
+/* ─── Live metrics (shown only for the live Proxmox host) ──────────────────────────────────────────────────────────── */
+
+const { data: liveData, state: liveState, updatedLabel: liveUpdated } = useSubstrateMetrics();
+const liveNode = computed(() =>
+  props.device?.kind === 'hypervisor' && liveState.value !== 'offline' ? (liveData.value?.node ?? null) : null,
+);
+const liveInternet = computed(() =>
+  props.device?.kind === 'internet' && liveState.value !== 'offline' ? (liveData.value?.internet ?? null) : null,
+);
 </script>
 
 <template>
@@ -113,6 +123,54 @@ const vendorModel = computed(() =>
         {{ device.description }}
       </p>
 
+      <!-- Live metrics (host only) -->
+      <div v-if="liveNode" class="border-border bg-bg/40 rounded-xl border p-3">
+        <div class="mb-2 flex items-center justify-between">
+          <span
+            class="text-caption text-accent-secondary inline-flex items-center gap-1.5 font-mono tracking-widest uppercase"
+          >
+            <span class="bg-accent-secondary size-1.5 animate-pulse rounded-full motion-reduce:animate-none" />
+            Live
+          </span>
+          <span v-if="liveUpdated" class="text-caption text-ink-subtle font-mono">{{ liveUpdated }}</span>
+        </div>
+        <div class="flex flex-wrap gap-x-4 gap-y-1">
+          <span class="text-caption text-ink-muted font-mono">
+            CPU <span class="text-ink font-semibold">{{ liveNode.cpuPct }}%</span>
+          </span>
+          <span class="text-caption text-ink-muted font-mono">
+            RAM <span class="text-ink font-semibold">{{ liveNode.mem.usedPct }}%</span>
+          </span>
+          <span class="text-caption text-ink-muted font-mono">
+            up <span class="text-ink font-semibold">{{ formatUptime(liveNode.uptimeSec) }}</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Live internet (the WAN node only) -->
+      <div v-if="liveInternet" class="border-border bg-bg/40 rounded-xl border p-3">
+        <div class="mb-2 flex items-center justify-between">
+          <span
+            class="text-caption text-accent-secondary inline-flex items-center gap-1.5 font-mono tracking-widest uppercase"
+          >
+            <span class="bg-accent-secondary size-1.5 animate-pulse rounded-full motion-reduce:animate-none" />
+            Live
+          </span>
+          <span v-if="liveUpdated" class="text-caption text-ink-subtle font-mono">{{ liveUpdated }}</span>
+        </div>
+        <div class="flex flex-wrap gap-x-4 gap-y-1">
+          <span class="text-caption text-ink-muted font-mono">
+            Reachable
+            <span class="font-semibold" :class="liveInternet.reachable ? 'text-accent-secondary' : 'text-terra-600'">
+              {{ liveInternet.reachable ? 'yes' : 'no' }}
+            </span>
+          </span>
+          <span v-if="liveInternet.latencyMs !== undefined" class="text-caption text-ink-muted font-mono">
+            ping <span class="text-ink font-semibold">{{ liveInternet.latencyMs }}ms</span>
+          </span>
+        </div>
+      </div>
+
       <!-- Specs -->
       <div v-if="device.specs?.length">
         <p class="text-ink-subtle mb-2 font-mono text-[10px] tracking-widest uppercase">Specs</p>
@@ -144,18 +202,6 @@ const vendorModel = computed(() =>
             </span>
           </li>
         </ul>
-      </div>
-
-      <!-- Meta: power + tags -->
-      <div
-        v-if="device.power != null || device.tags?.length"
-        class="border-border flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t pt-4"
-      >
-        <span v-if="device.power != null" class="text-caption text-ink-muted inline-flex items-center gap-1 font-mono">
-          <Icon name="lucide:zap" size="12" class="text-ink-subtle" />
-          ~{{ device.power }} W idle
-        </span>
-        <span v-for="t in device.tags" :key="t" class="text-caption text-ink-subtle font-mono"> #{{ t }} </span>
       </div>
 
       <!-- Open the full per-device page -->
