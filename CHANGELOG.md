@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.3.0](https://github.com/jens-johnson/jj-dev/compare/jj-dev-v0.2.0...jj-dev-v0.3.0) (2026-06-13)
+
+
+### ✨ Features
+
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([488af97](https://github.com/jens-johnson/jj-dev/commit/488af97448603840ff4c61ff27f3e9bc34379c92))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([488af97](https://github.com/jens-johnson/jj-dev/commit/488af97448603840ff4c61ff27f3e9bc34379c92))
+* **lab:** promote substrate live-metrics feed to production ([#72](https://github.com/jens-johnson/jj-dev/issues/72)) ([488af97](https://github.com/jens-johnson/jj-dev/commit/488af97448603840ff4c61ff27f3e9bc34379c92))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([488af97](https://github.com/jens-johnson/jj-dev/commit/488af97448603840ff4c61ff27f3e9bc34379c92))
+
+
+### 🐛 Bug Fixes
+
+* **ci:** don't open promotion PR for sync-only merge commits ([488af97](https://github.com/jens-johnson/jj-dev/commit/488af97448603840ff4c61ff27f3e9bc34379c92))
+
+
+### 💅 Styles
+
+* **blog:** fix object-curly-newline lint error in post detail page ([488af97](https://github.com/jens-johnson/jj-dev/commit/488af97448603840ff4c61ff27f3e9bc34379c92))
+
 ## [0.2.0](https://github.com/jens-johnson/jj-dev/compare/jj-dev-v0.1.0...jj-dev-v0.2.0) (2026-06-13)
 
 
