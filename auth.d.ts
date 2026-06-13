@@ -11,83 +11,37 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████████████████████████ commitlint.config.js ██████████████████████████████████████████████████
+ * █████████████████████████████████████████████████████ auth.d.ts █████████████████████████████████████████████████████
  *
- * The commitlint configuration for this project.
- *
- * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
- *
- * Read developer docs for how to set up linting. Runs as an git commit hook while running `npm commit` and enforces
- * conventional commit specification on commit messages, i.e.:
- *
- *  ```
- *  Format: <type>(<scope>): <subject>
- *  Example: feat(nav): add theme toggle to header
- *  ```
+ * Module augmentation for nuxt-auth-utils — types the user profile and session data sealed into the session cookie.
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • https://conventionalcommits.org
- * • https://commitlint.js.org
+ * • https://github.com/atinux/nuxt-auth-utils#typescript
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-/**
- * The commitlint configuration for this project
- * @public
- * @default
- * @constant
- * @type {import('@commitlint/types').UserConfig}
- */
-export default {
-  /* Extend the traditional commitlint config */
-  extends: ['@commitlint/config-conventional'],
+declare module '#auth-utils' {
+  /** The authenticated Google user, as persisted in the session cookie. */
+  interface User {
+    /** Google account email (verified). */
+    email: string;
+    /** Display name from the Google profile. */
+    name: string;
+    /** Avatar URL from the Google profile, if present. */
+    picture?: string;
+    /** Stable Google subject identifier (OIDC `sub`). */
+    sub: string;
+  }
 
-  /* Config rules */
-  rules: {
-    /*  Allow scopes matching our main areas of the codebase */
-    'scope-enum': [
-      2,
-      'always',
-      [
-        'app',
-        'assets',
-        'auth',
-        'blog',
-        'ci',
-        'components',
-        'composables',
-        'config',
-        'content',
-        'deps',
-        'design',
-        'docs',
-        'eslint',
-        'lab',
-        'layouts',
-        'pages',
-        'projects',
-        'public',
-        'release',
-        'server',
-        'seo',
-        'styles',
-        'tailwind',
-        'tests',
-        'types',
-        'uses',
-        'work',
-      ],
-    ],
+  /** Top-level session payload, stored alongside `user`. */
+  interface UserSession {
+    /** True when the signed-in email is on the admin allow-list — gates admin-only features. */
+    isAdmin: boolean;
+    /** Unix epoch (ms) at which the session was established. */
+    loggedInAt: number;
+  }
+}
 
-    /* Ensure scopes are kebab-cased */
-    'scope-case': [2, 'always', 'kebab-case'],
-
-    /* Ensure subjects are lower-cased */
-    'subject-case': [2, 'always', 'lower-case'],
-
-    /* Limit body lines to 100 chars */
-    'body-max-line-length': [1, 'always', 100],
-  },
-};
+export {};
