@@ -50,6 +50,13 @@ const hasNotes = computed(() => {
 const CONN_LABEL: Record<string, string> = { uplink: 'Uplink', network: 'Network', data: 'Data', power: 'Power' };
 const connLabel = (kind?: string) => CONN_LABEL[kind ?? 'network'] ?? 'Link';
 
+/* ─── Live internet (WAN node only) ───────────────────────────────────────────────────────────────────────────────── */
+
+const { data: liveData, state: liveState, updatedLabel: liveUpdated } = useSubstrateMetrics();
+const liveInternet = computed(() =>
+  device.value?.kind === 'internet' && liveState.value !== 'offline' ? (liveData.value?.internet ?? null) : null,
+);
+
 useSeoMeta({
   title: () => `${device.value?.title ?? 'Device'} · Substrate`,
   description: () => device.value?.description ?? 'A device in the Substrate homelab.',
@@ -138,13 +145,41 @@ useSeoMeta({
         </div>
       </div>
 
-      <!-- Meta -->
-      <div v-if="device.power != null || device.tags?.length" class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <span v-if="device.power != null" class="text-caption text-ink-muted inline-flex items-center gap-1 font-mono">
-          <Icon name="lucide:zap" size="12" class="text-ink-subtle" />
-          ~{{ device.power }} W idle
-        </span>
-        <span v-for="t in device.tags" :key="t" class="text-caption text-ink-subtle font-mono">#{{ t }}</span>
+      <!-- Live metrics (host only) -->
+      <WidgetsLabSubstrateLiveCard v-if="device.kind === 'hypervisor'" class="mt-8" />
+
+      <!-- Live internet (WAN only) -->
+      <div v-if="liveInternet" class="border-border bg-surface mt-8 rounded-2xl border p-5">
+        <div class="mb-3 flex items-center justify-between gap-3">
+          <span class="inline-flex items-center gap-2">
+            <span class="relative flex size-2">
+              <span
+                class="bg-accent-secondary absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:hidden"
+              />
+              <span class="bg-accent-secondary relative inline-flex size-2 rounded-full" />
+            </span>
+            <span class="text-caption text-accent-secondary font-mono tracking-widest uppercase">Live</span>
+            <span class="text-caption text-ink-subtle font-mono">internet edge</span>
+          </span>
+          <span v-if="liveUpdated" class="text-caption text-ink-subtle shrink-0 font-mono">
+            updated {{ liveUpdated }}
+          </span>
+        </div>
+        <dl class="grid grid-cols-2 gap-3">
+          <div class="border-border bg-bg/40 rounded-xl border px-3 py-2.5">
+            <dt class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Reachable</dt>
+            <dd
+              class="font-display text-h5 mt-0.5 leading-none font-bold"
+              :class="liveInternet.reachable ? 'text-accent-secondary' : 'text-terra-600'"
+            >
+              {{ liveInternet.reachable ? 'Yes' : 'No' }}
+            </dd>
+          </div>
+          <div v-if="liveInternet.latencyMs !== undefined" class="border-border bg-bg/40 rounded-xl border px-3 py-2.5">
+            <dt class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Ping</dt>
+            <dd class="font-display text-h5 text-ink mt-0.5 leading-none font-bold">{{ liveInternet.latencyMs }} ms</dd>
+          </div>
+        </dl>
       </div>
 
       <!-- Body / runbook -->
