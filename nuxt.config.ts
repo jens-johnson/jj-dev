@@ -75,6 +75,22 @@ export default defineNuxtConfig({
     stravaRefreshToken: process.env.STRAVA_REFRESH_TOKEN,
     // Bearer secret the homelab publisher sends to /api/substrate/ingest. Server-only.
     substrateIngestSecret: process.env.SUBSTRATE_INGEST_SECRET,
+
+    /**
+     * Email granted admin-level access once authenticated. Server-only — never exposed to
+     * the client. The OAuth callback compares the Google account email against this value.
+     * @see server/utils/auth.ts
+     */
+    adminEmail: process.env.ADMIN_EMAIL || 'christopher.jens.johnson@gmail.com',
+
+    /**
+     * Google OAuth credentials are intentionally NOT mapped here. Mapping them into
+     * runtimeConfig bakes the secret values into the build output and only works when the env
+     * var is present in the building environment's scope. Instead, the callback handler reads
+     * the bare GOOGLE_OAUTH_* vars from `process.env` at request time — they resolve at runtime
+     * in every Vercel environment (preview/staging/prod), mirroring the Strava route's fallback.
+     * @see server/routes/auth/callback.get.ts
+     */
   },
 
   /**
@@ -126,6 +142,13 @@ export default defineNuxtConfig({
      * @see https://ui.nuxt.com/
      */
     '@nuxt/ui',
+
+    /**
+     * Session + OAuth helpers (Google OIDC login). Provides `useUserSession()` on the client
+     * and `setUserSession` / `requireUserSession` + `defineOAuth*EventHandler` on the server.
+     * @see https://github.com/atinux/nuxt-auth-utils
+     */
+    'nuxt-auth-utils',
 
     /**
      * `robots.txt` configuration for Nuxt

@@ -127,6 +127,9 @@ watch(
           <Icon :name="themeIcon" size="16" />
         </button>
 
+        <!-- Auth (Sign in / account menu) -->
+        <LayoutAuthButton />
+
         <!-- Hamburger (mobile only) -->
         <button
           type="button"
