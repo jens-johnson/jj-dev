@@ -73,6 +73,28 @@ export default defineNuxtConfig({
     stravaClientId: process.env.STRAVA_CLIENT_ID,
     stravaClientSecret: process.env.STRAVA_CLIENT_SECRET,
     stravaRefreshToken: process.env.STRAVA_REFRESH_TOKEN,
+
+    /**
+     * Email granted admin-level access once authenticated. Server-only — never exposed to
+     * the client. The OAuth callback compares the Google account email against this value.
+     * @see server/utils/auth.ts
+     */
+    adminEmail: process.env.ADMIN_EMAIL || 'christopher.jens.johnson@gmail.com',
+
+    /**
+     * OAuth provider credentials read by nuxt-auth-utils. We map the bare Vercel env var
+     * names (GOOGLE_OAUTH_*) onto the `oauth.google` keys the module expects, mirroring the
+     * Strava pattern above. `redirectURL` is intentionally left unset so it derives from the
+     * incoming request origin — this lets the same code serve both the prod and staging
+     * callback URLs registered with Google.
+     * @see https://github.com/atinux/nuxt-auth-utils#configuration
+     */
+    oauth: {
+      google: {
+        clientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+      },
+    },
   },
 
   /**
@@ -124,6 +146,13 @@ export default defineNuxtConfig({
      * @see https://ui.nuxt.com/
      */
     '@nuxt/ui',
+
+    /**
+     * Session + OAuth helpers (Google OIDC login). Provides `useUserSession()` on the client
+     * and `setUserSession` / `requireUserSession` + `defineOAuth*EventHandler` on the server.
+     * @see https://github.com/atinux/nuxt-auth-utils
+     */
+    'nuxt-auth-utils',
 
     /**
      * `robots.txt` configuration for Nuxt
