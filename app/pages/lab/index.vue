@@ -23,8 +23,6 @@
 useSeoMeta({
   title: 'Lab · Jens Johnson',
   description: 'Experiments, demos, and the homelab; things I build to learn. Home of Substrate, my homelab project.',
-  // Work-in-progress section; flip to index once it has settled.
-  robots: 'noindex',
 });
 
 /** Devices feed the hub card's system-health indicator. No live metrics yet, so this reflects declared status. */
