@@ -31,9 +31,12 @@
 
 /* eslint-disable no-console -- this is a CLI script; stdout/stderr is its interface. */
 
+import https from 'node:https';
 import net from 'node:net';
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Proxmox self-signed cert on the LAN
+// Disable TLS cert validation ONLY for the Proxmox LAN call (self-signed cert), scoped via a dedicated agent so the
+// outbound POST to the ingest route still validates its certificate normally.
+const pveAgent = new https.Agent({ rejectUnauthorized: false });
 
 const {
   PVE_HOST,
@@ -54,11 +57,32 @@ for (const [k, v] of Object.entries({ PVE_HOST, PVE_NODE, PVE_TOKEN, INGEST_URL,
 
 const r1 = (n) => Math.round(n * 10) / 10;
 
-const pve = async (p) => {
-  const res = await fetch(`${PVE_HOST}/api2/json${p}`, { headers: { Authorization: `PVEAPIToken=${PVE_TOKEN}` } });
-  if (!res.ok) throw new Error(`PVE ${p} -> ${res.status}`);
-  return (await res.json()).data;
-};
+const pve = (p) =>
+  new Promise((resolve, reject) => {
+    const req = https.request(
+      `${PVE_HOST}/api2/json${p}`,
+      { agent: pveAgent, headers: { Authorization: `PVEAPIToken=${PVE_TOKEN}` } },
+      (res) => {
+        if (res.statusCode !== 200) {
+          res.resume();
+          reject(new Error(`PVE ${p} -> ${res.statusCode}`));
+          return;
+        }
+        let body = '';
+        res.setEncoding('utf8');
+        res.on('data', (c) => (body += c));
+        res.on('end', () => {
+          try {
+            resolve(JSON.parse(body).data);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      },
+    );
+    req.on('error', reject);
+    req.end();
+  });
 
 // TCP-connect round-trip to a public anycast host — a ping-like latency without raw ICMP sockets. null on failure.
 const tcpPing = (host, port = 443, timeoutMs = 3000) =>
