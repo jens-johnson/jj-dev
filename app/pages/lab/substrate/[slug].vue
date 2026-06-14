@@ -60,8 +60,6 @@ const liveInternet = computed(() =>
 useSeoMeta({
   title: () => `${device.value?.title ?? 'Device'} · Substrate`,
   description: () => device.value?.description ?? 'A device in the Substrate homelab.',
-  // Work-in-progress section — flip to index once it has settled.
-  robots: 'noindex',
 });
 </script>
 

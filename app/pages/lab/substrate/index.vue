@@ -24,8 +24,6 @@
 useSeoMeta({
   title: 'Substrate · Jens Johnson',
   description: 'The layer everything runs on; a living, documented map of my homelab hardware and how it is wired.',
-  // Mockup / work-in-progress; flip to index once the real hardware is in.
-  robots: 'noindex',
 });
 
 /* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
