@@ -42,29 +42,84 @@ interface GoogleUser {
 }
 
 /**
- * Resolve the absolute OAuth redirect URI Google must call back to.
+ * Origin (scheme + host, no trailing slash) for the current deployment, derived from Vercel's
+ * system environment variables.
  *
- * nuxt-auth-utils otherwise derives this from h3's `getRequestURL()`, which reads the bare `Host`
- * header and ignores `x-forwarded-host`. Behind Vercel's proxy the serverless function never sees
- * the public host, so h3 falls back to `http://localhost` — yielding `http://localhost/auth/callback`,
- * which isn't in Google's authorized list and trips `Error 400: redirect_uri_mismatch` in every
- * deployed environment. We rebuild the origin from the `x-forwarded-*` headers Vercel sets so the URI
- * matches the registered prod/staging callbacks. Locally those headers are absent, so we return
- * `undefined` and let nuxt-auth-utils derive it from `Host` (`http://localhost:3000/auth/callback`).
+ * These resolve at *runtime* in the function — unlike the request headers nuxt-auth-utils relies on.
+ * On Vercel's Fluid runtime the h3 event sees neither a real `Host` nor `x-forwarded-*` (the proxy
+ * headers don't reach it), so `getRequestURL()` collapses to `http://localhost` and Google rejects
+ * the resulting `http://localhost/auth/callback` with `Error 400: redirect_uri_mismatch`. Reading
+ * `process.env` sidesteps that entirely. Returns undefined off Vercel (local dev).
+ *
+ * • Production → `https://<VERCEL_PROJECT_PRODUCTION_URL>` (jens-johnson.com)
+ * • staging    → `https://staging.jens-johnson.com` (its assigned custom preview domain)
  */
-function resolveRedirectURL(event: H3Event): string | undefined {
-  const forwardedHost = getRequestHeader(event, 'x-forwarded-host');
-  if (!forwardedHost) return undefined;
-
-  const host = forwardedHost.split(',')[0]!.trim();
-  const proto = getRequestHeader(event, 'x-forwarded-proto')?.split(',')[0]?.trim() || 'https';
-  return `${proto}://${host}/auth/callback`;
+function vercelOrigin(): string | undefined {
+  const env = process.env.VERCEL_ENV;
+  if (env === 'production' && process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  // No env var exposes the staging branch's custom domain, so map it explicitly. Other preview
+  // branches fall through — their *.vercel.app URLs aren't registered with Google anyway.
+  if (env === 'preview' && process.env.VERCEL_GIT_COMMIT_REF === 'staging') {
+    return 'https://staging.jens-johnson.com';
+  }
+  return undefined;
 }
 
-/* Build the handler per request so `redirectURL` can be resolved from the live request headers —
+/**
+ * Resolve the absolute OAuth redirect URI Google must call back to — matching one of the URIs
+ * registered in the Google OIDC client (prod / staging / localhost). Priority:
+ *
+ * 1. `NUXT_OAUTH_GOOGLE_REDIRECT_URL` — explicit per-environment override, if set in Vercel.
+ * 2. Vercel system env (`vercelOrigin`) — reliable at runtime; fixes prod + staging.
+ * 3. `x-forwarded-host` — for proxies that do surface it (belt-and-suspenders).
+ * 4. `undefined` — local dev; nuxt-auth-utils derives it from `Host` (`http://localhost:3000/...`).
+ */
+function resolveRedirectURL(event: H3Event): string | undefined {
+  if (process.env.NUXT_OAUTH_GOOGLE_REDIRECT_URL) {
+    return process.env.NUXT_OAUTH_GOOGLE_REDIRECT_URL;
+  }
+
+  const origin = vercelOrigin();
+  if (origin) return `${origin}/auth/callback`;
+
+  const forwardedHost = getRequestHeader(event, 'x-forwarded-host')?.split(',')[0]?.trim();
+  if (forwardedHost) {
+    const proto = getRequestHeader(event, 'x-forwarded-proto')?.split(',')[0]?.trim() || 'https';
+    return `${proto}://${forwardedHost}/auth/callback`;
+  }
+
+  return undefined;
+}
+
+/* Build the handler per request so `redirectURL` can be resolved from the live request/runtime —
    defineOAuthGoogleEventHandler reads `config.redirectURL` before falling back to its own derivation. */
-export default defineEventHandler((event) =>
-  defineOAuthGoogleEventHandler({
+export default defineEventHandler((event) => {
+  /* TEMP diagnostic — `/auth/callback?__diag=1` echoes what the resolver sees (no secrets). Gated to
+     non-production so it can never surface on jens-johnson.com. Remove once sign-in is verified. */
+  if (getQuery(event).__diag && process.env.VERCEL_ENV !== 'production') {
+    return {
+      resolvedRedirectURL: resolveRedirectURL(event),
+      getRequestURL: getRequestURL(event).href,
+      headers: {
+        host: getRequestHeader(event, 'host') ?? null,
+        'x-forwarded-host': getRequestHeader(event, 'x-forwarded-host') ?? null,
+        'x-forwarded-proto': getRequestHeader(event, 'x-forwarded-proto') ?? null,
+      },
+      env: {
+        VERCEL: process.env.VERCEL ?? null,
+        VERCEL_ENV: process.env.VERCEL_ENV ?? null,
+        VERCEL_GIT_COMMIT_REF: process.env.VERCEL_GIT_COMMIT_REF ?? null,
+        VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL ?? null,
+        VERCEL_BRANCH_URL: process.env.VERCEL_BRANCH_URL ?? null,
+        VERCEL_URL: process.env.VERCEL_URL ?? null,
+        NUXT_OAUTH_GOOGLE_REDIRECT_URL: process.env.NUXT_OAUTH_GOOGLE_REDIRECT_URL ?? null,
+      },
+    };
+  }
+
+  return defineOAuthGoogleEventHandler({
     config: {
       /* Read the bare Vercel env vars at request time so they resolve at runtime in every
          environment, rather than being baked into the build via runtimeConfig. Falls through to
@@ -101,5 +156,5 @@ export default defineEventHandler((event) =>
       console.error('[auth] Google OAuth error:', error);
       return sendRedirect(event, '/?auth=error');
     },
-  })(event),
-);
+  })(event);
+});
