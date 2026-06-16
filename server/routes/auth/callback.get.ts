@@ -96,29 +96,6 @@ function resolveRedirectURL(event: H3Event): string | undefined {
 /* Build the handler per request so `redirectURL` can be resolved from the live request/runtime —
    defineOAuthGoogleEventHandler reads `config.redirectURL` before falling back to its own derivation. */
 export default defineEventHandler((event) => {
-  /* TEMP diagnostic — `/auth/callback?__diag=1` echoes what the resolver sees (no secrets). Gated to
-     non-production so it can never surface on jens-johnson.com. Remove once sign-in is verified. */
-  if (getQuery(event).__diag && process.env.VERCEL_ENV !== 'production') {
-    return {
-      resolvedRedirectURL: resolveRedirectURL(event),
-      getRequestURL: getRequestURL(event).href,
-      headers: {
-        host: getRequestHeader(event, 'host') ?? null,
-        'x-forwarded-host': getRequestHeader(event, 'x-forwarded-host') ?? null,
-        'x-forwarded-proto': getRequestHeader(event, 'x-forwarded-proto') ?? null,
-      },
-      env: {
-        VERCEL: process.env.VERCEL ?? null,
-        VERCEL_ENV: process.env.VERCEL_ENV ?? null,
-        VERCEL_GIT_COMMIT_REF: process.env.VERCEL_GIT_COMMIT_REF ?? null,
-        VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL ?? null,
-        VERCEL_BRANCH_URL: process.env.VERCEL_BRANCH_URL ?? null,
-        VERCEL_URL: process.env.VERCEL_URL ?? null,
-        NUXT_OAUTH_GOOGLE_REDIRECT_URL: process.env.NUXT_OAUTH_GOOGLE_REDIRECT_URL ?? null,
-      },
-    };
-  }
-
   /* Google can redirect back here with `?error=…` instead of a `code` — denied consent, an OAuth
      app still in "Testing" mode, a blocked grant, etc. nuxt-auth-utils' handler only checks for
      `code`, so a no-code callback silently re-enters the flow → an endless consent⇄account-chooser
