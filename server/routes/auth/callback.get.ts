@@ -119,6 +119,16 @@ export default defineEventHandler((event) => {
     };
   }
 
+  /* Google can redirect back here with `?error=…` instead of a `code` — denied consent, an OAuth
+     app still in "Testing" mode, a blocked grant, etc. nuxt-auth-utils' handler only checks for
+     `code`, so a no-code callback silently re-enters the flow → an endless consent⇄account-chooser
+     loop that never returns to the app. Surface the error and stop, rather than restarting. */
+  const { error: oauthError, error_description: oauthErrorDescription } = getQuery(event);
+  if (oauthError) {
+    console.error('[auth] Google returned an error to the callback:', oauthError, oauthErrorDescription ?? '');
+    return sendRedirect(event, `/?auth=error&reason=${encodeURIComponent(String(oauthError))}`);
+  }
+
   return defineOAuthGoogleEventHandler({
     config: {
       /* Read the bare Vercel env vars at request time so they resolve at runtime in every
@@ -126,8 +136,8 @@ export default defineEventHandler((event) => {
          nuxt-auth-utils' own NUXT_OAUTH_GOOGLE_* resolution if these are unset. */
       clientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
       clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-      /* Basic profile + email. `openid` is implied. */
-      scope: ['email', 'profile'],
+      /* Request a proper OIDC grant: `openid` yields an id_token alongside the email/profile claims. */
+      scope: ['openid', 'email', 'profile'],
       /* Pin the callback to the real public origin behind Vercel's proxy (see resolveRedirectURL). */
       redirectURL: resolveRedirectURL(event),
     },
