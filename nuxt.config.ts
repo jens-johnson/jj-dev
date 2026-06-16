@@ -273,6 +273,18 @@ export default defineNuxtConfig({
     prerender: {
       crawlLinks: true,
       routes: ['/', '/about', '/blog', '/projects', '/lab', '/lab/substrate', '/uses'],
+
+      /**
+       * Never prerender the auth routes. With `crawlLinks` on, the prerenderer follows the nav's
+       * `<a href="/auth/callback">` sign-in link and freezes the handler's *no-code* response — a
+       * redirect to Google's authorize URL — into a static file. Vercel then serves that cached
+       * static file for the *real* callback too (`?code=…`), so the OAuth handler never runs, the
+       * code is never exchanged, and the flow loops forever between Google's consent and
+       * account-chooser screens. Ignoring `/auth` keeps the route dynamic (a per-request function)
+       * so the token exchange and `setUserSession` actually execute.
+       * @see server/routes/auth/callback.get.ts
+       */
+      ignore: ['/auth'],
     },
   },
 
