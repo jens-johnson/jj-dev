@@ -9,7 +9,7 @@ summary: Cross-platform Minecraft, self-hosted on the homelab with a live BlueMa
 host: srv-01
 address: jenscraft.world
 stack:
-  - PaperMC 1.21
+  - PaperMC 26.1.2
   - GeyserMC
   - Floodgate
   - BlueMap
@@ -108,7 +108,7 @@ The world is also browsable as a live 3D map at `map.jenscraft.world` via the Bl
 
 ## Architecture
 
-The server runs as a dedicated **Proxmox LXC** on `srv-01`, isolated from the rest of the lab, on PaperMC (a performance-tuned Spigot fork) with Java 21.
+The server runs as a dedicated **Proxmox LXC** on `srv-01`, isolated from the rest of the lab, on PaperMC (a performance-tuned Spigot fork) with Java 25.
 
 The interesting part is exposure. Substrate's hard rule is that **nothing in the lab is publicly reachable** — the lab only ever connects _outward_. A public game server seems to break that, so Jenscraft keeps the rule by fronting the world with a small public relay:
 
