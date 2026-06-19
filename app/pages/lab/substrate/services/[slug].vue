@@ -48,6 +48,12 @@ const hostTitle = computed(() => {
 
 const isPlanned = computed(() => service.value?.status === 'planned');
 
+/* ─── Live metrics ────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Jenscraft is the only service wired to a live publisher feed today; other service pages stay inert (no fetch) and
+// fall back to the metrics widget's "awaiting feed" state.
+const { live: liveMetrics } = useJenscraftMetrics(slug.value === 'jenscraft');
+
 /* ─── Links ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 const LINK_META: Record<string, { label: string; icon: string }> = {
@@ -186,6 +192,7 @@ useSeoMeta({
       <WidgetsLabServiceMetrics
         v-if="service.metrics?.length"
         :tiles="service.metrics"
+        :live="liveMetrics"
         :label="serviceKindLabel(service.kind).toLowerCase()"
         class="mt-8"
       />
