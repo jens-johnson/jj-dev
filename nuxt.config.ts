@@ -75,6 +75,8 @@ export default defineNuxtConfig({
     stravaRefreshToken: process.env.STRAVA_REFRESH_TOKEN,
     // Bearer secret the homelab publisher sends to /api/substrate/ingest. Server-only.
     substrateIngestSecret: process.env.SUBSTRATE_INGEST_SECRET,
+    // Bearer secret the jenscraft LXC publisher sends to /api/services/jenscraft/ingest. Server-only.
+    jenscraftIngestSecret: process.env.JENSCRAFT_INGEST_SECRET,
 
     /**
      * Email granted admin-level access once authenticated. Server-only — never exposed to
