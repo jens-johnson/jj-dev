@@ -28,10 +28,10 @@
 export interface JenscraftMetricsPayload {
   v: number;
   ts: string;
-  players: { online: number; max: number; java: number; bedrock: number };
-  tps: number;
-  mspt: number;
-  uptimeSec: number;
+  players?: { online: number; max: number; java: number; bedrock: number };
+  tps?: number;
+  mspt?: number;
+  uptimeSec?: number;
   world?: { exploredPct: number };
   mobs?: { defeated: number };
 }
@@ -48,6 +48,30 @@ const isPct = (x: unknown): x is number => isNum(x) && x >= 0 && x <= 100;
 const isCount = (x: unknown): x is number => isNum(x) && Number.isInteger(x) && x >= 0 && x <= 100_000;
 const isBigCount = (x: unknown): x is number => isNum(x) && Number.isInteger(x) && x >= 0 && x <= 1_000_000_000;
 const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
+const inRange = (x: unknown, lo: number, hi: number): x is number => isNum(x) && x >= lo && x <= hi;
+
+/** Validate the optional players block; returns the clean object, or null if it's present but malformed. */
+function cleanPlayers(p: unknown): { online: number; max: number; java: number; bedrock: number } | null {
+  if (!isObj(p) || !isCount(p.online) || !isCount(p.max) || !isCount(p.java) || !isCount(p.bedrock)) return null;
+  return { online: p.online, max: p.max, java: p.java, bedrock: p.bedrock };
+}
+
+/** Validate + round the optional spark/uptime numbers onto `value`. Returns false if any present field is out of range. */
+function applyNumbers(input: Record<string, unknown>, value: JenscraftMetricsPayload): boolean {
+  if (input.tps !== undefined) {
+    if (!inRange(input.tps, 0, 20)) return false; // Paper caps TPS at 20
+    value.tps = Math.round(input.tps * 100) / 100;
+  }
+  if (input.mspt !== undefined) {
+    if (!inRange(input.mspt, 0, 60_000)) return false;
+    value.mspt = Math.round(input.mspt * 100) / 100;
+  }
+  if (input.uptimeSec !== undefined) {
+    if (!inRange(input.uptimeSec, 0, Number.MAX_SAFE_INTEGER)) return false;
+    value.uptimeSec = Math.round(input.uptimeSec);
+  }
+  return true;
+}
 
 /**
  * Validate an untrusted body into a clean `JenscraftMetricsPayload`. Returns `{ ok: false }` on any shape/range
@@ -57,25 +81,16 @@ const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object
 export function validateJenscraftPayload(input: unknown): { ok: true; value: JenscraftMetricsPayload } | { ok: false } {
   if (!isObj(input) || !isNum(input.v) || typeof input.ts !== 'string' || input.ts.length > 40) return { ok: false };
 
-  const players = input.players;
-  if (!isObj(players)) return { ok: false };
-  if (!isCount(players.online) || !isCount(players.max) || !isCount(players.java) || !isCount(players.bedrock)) {
-    return { ok: false };
+  const value: JenscraftMetricsPayload = { v: input.v, ts: input.ts };
+
+  // Every metric is optional — the publisher sends whatever it could gather, so a cold start or a missing spark
+  // reading just shows "—" on that one tile instead of dropping the whole snapshot.
+  if (input.players !== undefined) {
+    const players = cleanPlayers(input.players);
+    if (!players) return { ok: false };
+    value.players = players;
   }
-
-  // Paper caps TPS at 20; MSPT is non-negative wall-clock per tick.
-  if (!isNum(input.tps) || input.tps < 0 || input.tps > 20) return { ok: false };
-  if (!isNum(input.mspt) || input.mspt < 0 || input.mspt > 60_000) return { ok: false };
-  if (!isNum(input.uptimeSec) || input.uptimeSec < 0) return { ok: false };
-
-  const value: JenscraftMetricsPayload = {
-    v: input.v,
-    ts: input.ts,
-    players: { online: players.online, max: players.max, java: players.java, bedrock: players.bedrock },
-    tps: Math.round(input.tps * 100) / 100,
-    mspt: Math.round(input.mspt * 100) / 100,
-    uptimeSec: Math.round(input.uptimeSec),
-  };
+  if (!applyNumbers(input, value)) return { ok: false };
 
   if (isObj(input.world) && isPct(input.world.exploredPct)) {
     value.world = { exploredPct: Math.round(input.world.exploredPct * 10) / 10 };
