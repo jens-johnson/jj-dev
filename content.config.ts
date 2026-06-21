@@ -259,6 +259,111 @@ const substrateSchema = baseSchema.extend({
 });
 
 /**
+ * The schema representing a deployed homelab service — one entry in the Substrate "Services" layer. Where the
+ * `substrate` collection documents the hardware, this documents what *runs* on it. The body holds the long-form
+ * write-up (architecture, setup, decisions); frontmatter drives the card, the detail header, and the metrics tiles.
+ * Example path: `content/services/jenscraft.md`
+ * @internal
+ * @constant
+ */
+const servicesSchema = baseSchema.extend({
+  /**
+   * Stable service id, used in routes and as the live-metrics key. Named `serviceId` (not `id`) because `id` is
+   * reserved by @nuxt/content as the document's internal primary key. e.g. `jenscraft`.
+   */
+  serviceId: z.string(),
+
+  /**
+   * Service class — drives the card icon and reads as the service's "what it is".
+   */
+  kind: z
+    .enum(['game-server', 'media', 'monitoring', 'network', 'automation', 'storage', 'web', 'other'])
+    .default('other'),
+
+  /**
+   * Operational status — drives the status dot and badge colour. `planned` covers a service that is documented but
+   * not yet stood up (Jenscraft today).
+   */
+  status: z.enum(['online', 'offline', 'planned', 'maintenance', 'degraded']).default('planned'),
+
+  /**
+   * Optional explicit Lucide icon name, overriding the per-kind default.
+   */
+  icon: z.string().optional(),
+
+  /**
+   * Short tagline shown on the service card (falls back to `description`).
+   */
+  summary: z.string().optional(),
+
+  /**
+   * `nodeId` of the substrate device this service runs on (e.g. `srv-01`), linking a service back to its hardware.
+   */
+  host: z.string().optional(),
+
+  /**
+   * Player/visitor-facing connect address, e.g. `jenscraft.world`.
+   */
+  address: z.string().optional(),
+
+  /**
+   * Primary technologies / stack powering the service.
+   */
+  stack: z.array(z.string()).default([]),
+
+  /**
+   * Outbound links shown on the detail page. `map` is the public BlueMap (or similar) web view.
+   */
+  links: z
+    .object({
+      live: z.string().url().optional(),
+      map: z.string().url().optional(),
+      github: z.string().url().optional(),
+      docs: z.string().url().optional(),
+    })
+    .optional(),
+
+  /**
+   * Installed plugins / add-ons. `side` marks whether it runs on the server or is a client-side recommendation;
+   * `category` groups the list in the UI.
+   */
+  plugins: z
+    .array(
+      z.object({
+        name: z.string(),
+        side: z.enum(['server', 'client']).default('server'),
+        category: z
+          .enum(['crossplay', 'map', 'performance', 'quality-of-life', 'moderation', 'other'])
+          .default('other'),
+        purpose: z.string(),
+        url: z.string().url().optional(),
+      }),
+    )
+    .default([]),
+
+  /**
+   * Declared dashboard tiles — the metrics this service plans to surface. The live feed fills the values once the
+   * service's metrics publisher reports in; until then the dashboard renders each tile as "awaiting feed".
+   */
+  metrics: z
+    .array(
+      z.object({
+        key: z.string(),
+        label: z.string(),
+        icon: z.string().optional(),
+        unit: z.string().optional(),
+        hint: z.string().optional(),
+      }),
+    )
+    .default([]),
+
+  /**
+   * Sort weight on the Services grid — lower numbers appear first.
+   */
+  order: z.number().default(100),
+});
+
+/**
  * The schema representing resume content; a single structured YAML document, queried as data (not rendered as a page).
  * Path: `content/resume.yml`
  * @internal
@@ -334,6 +439,12 @@ export default defineContentConfig({
       type: 'page',
       source: 'substrate/**/*.md',
       schema: substrateSchema,
+    }),
+
+    services: defineCollection({
+      type: 'page',
+      source: 'services/**/*.md',
+      schema: servicesSchema,
     }),
 
     resume: defineCollection({
