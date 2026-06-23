@@ -286,7 +286,7 @@ export default defineNuxtConfig({
        * so the token exchange and `setUserSession` actually execute.
        * @see server/routes/auth/callback.get.ts
        */
-      ignore: ['/auth'],
+      ignore: ['/auth', '/lab/vertifix'],
     },
   },
 
