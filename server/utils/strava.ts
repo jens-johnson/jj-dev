@@ -44,6 +44,9 @@ export interface StravaActivity {
   description?: string;
 }
 
+/** The minimal activity fields {@link uploadTcx} needs — a full `StravaActivity` satisfies it too. */
+export type UploadActivity = Pick<StravaActivity, 'id' | 'name' | 'description'>;
+
 /** A single Strava data stream payload (`time`, `distance`, `heartrate`, `cadence`, …). */
 export interface StravaStream {
   data: number[];
@@ -185,7 +188,7 @@ export async function activityExists(id: number): Promise<boolean> {
 /* ─── Upload & replace ────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /** Uploads a corrected TCX as a new activity. Returns the upload handle to poll. */
-export async function uploadTcx(tcx: string, activity: StravaActivity): Promise<StravaUpload> {
+export async function uploadTcx(tcx: string, activity: UploadActivity): Promise<StravaUpload> {
   const token = await stravaAccessToken();
   const form = new FormData();
   form.append('file', new Blob([tcx], { type: 'application/vnd.garmin.tcx+xml' }), 'activity.tcx');
