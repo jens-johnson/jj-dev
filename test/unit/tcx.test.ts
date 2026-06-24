@@ -77,4 +77,12 @@ describe('buildTcx', () => {
     expect(tcx).toContain('<Activity Sport="Running">');
     expect(tcx.endsWith('</TrainingCenterDatabase>')).toBe(true);
   });
+
+  // Strava only honours uploaded altitude when the device name signals a barometric altimeter.
+  // Dropping "barometer" makes Strava recompute elevation to 0 for a no-GPS treadmill run.
+  it('names the device with "barometer" so Strava honours the injected elevation', () => {
+    const tcx = buildTcx(activity, { time: { data: [0, 100] } }, 500);
+
+    expect(tcx).toMatch(/<Name>[^<]*barometer[^<]*<\/Name>/i);
+  });
 });

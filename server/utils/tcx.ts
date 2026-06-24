@@ -134,7 +134,12 @@ export function buildTcx(activity: TcxSourceActivity, streams: TcxStreams, eleva
     '</Lap>',
     `<Notes>${escapeXml(activity.description ?? '')}</Notes>`,
     '<Creator xsi:type="Device_t">',
-    '<Name>Vertifix</Name>',
+    // ⚠️ DO NOT remove "barometer" from this name. Strava only honours uploaded <AltitudeMeters>
+    // when it believes the recording device has a barometric altimeter — the literal word
+    // "barometer" in the device name is how that is signalled. Without it, Strava recomputes
+    // elevation from GPS (which a treadmill run has none of) and the activity lands at 0 ft.
+    // Proven against the working prototype: identical TCX, only the device name differed.
+    '<Name>Vertifix with barometer</Name>',
     '<UnitId>0</UnitId>',
     '<ProductID>0</ProductID>',
     '<Version><VersionMajor>1</VersionMajor><VersionMinor>0</VersionMinor>' +
