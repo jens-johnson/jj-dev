@@ -236,6 +236,12 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
           </label>
         </div>
 
+        <p v-if="!item.capturedAt" class="font-body text-body-sm text-ink-muted flex items-start gap-2">
+          <Icon name="lucide:info" size="15" class="text-accent mt-0.5 shrink-0" />
+          No timestamp in this photo's metadata (often stripped from exported or screenshotted copies) — set the date
+          above to search for the run.
+        </p>
+
         <button
           type="button"
           class="border-border text-body-sm text-ink-muted hover:border-accent hover:text-accent flex w-fit items-center gap-2 rounded-full border px-4 py-1.5 font-medium transition-colors disabled:opacity-40"
