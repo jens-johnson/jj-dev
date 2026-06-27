@@ -19,7 +19,8 @@
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
  * Linked from the nav login button. The route path matches the /auth/callback redirect URIs registered with Google for
- * both prod and staging, so the callback URL derives correctly from the request origin in each environment.
+ * both prod and staging; the callback origin is resolved from the request's forwarded host so it matches in every
+ * environment (see resolveRedirectURL).
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -28,6 +29,8 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+
+import type { H3Event } from 'h3';
 
 /** Subset of the Google OIDC userinfo payload we consume. */
 interface GoogleUser {
@@ -38,39 +41,107 @@ interface GoogleUser {
   picture?: string;
 }
 
-export default defineOAuthGoogleEventHandler({
-  config: {
-    /* Read the bare Vercel env vars at request time so they resolve at runtime in every
-       environment, rather than being baked into the build via runtimeConfig. Falls through to
-       nuxt-auth-utils' own NUXT_OAUTH_GOOGLE_* resolution if these are unset. */
-    clientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-    /* Basic profile + email. `openid` is implied; nuxt-auth-utils derives redirectURL from the request origin. */
-    scope: ['email', 'profile'],
-  },
+/**
+ * Origin (scheme + host, no trailing slash) for the current deployment, derived from Vercel's
+ * system environment variables.
+ *
+ * These resolve at *runtime* in the function — unlike the request headers nuxt-auth-utils relies on.
+ * On Vercel's Fluid runtime the h3 event sees neither a real `Host` nor `x-forwarded-*` (the proxy
+ * headers don't reach it), so `getRequestURL()` collapses to `http://localhost` and Google rejects
+ * the resulting `http://localhost/auth/callback` with `Error 400: redirect_uri_mismatch`. Reading
+ * `process.env` sidesteps that entirely. Returns undefined off Vercel (local dev).
+ *
+ * • Production → `https://<VERCEL_PROJECT_PRODUCTION_URL>` (jens-johnson.com)
+ * • staging    → `https://staging.jens-johnson.com` (its assigned custom preview domain)
+ */
+function vercelOrigin(): string | undefined {
+  const env = process.env.VERCEL_ENV;
+  if (env === 'production' && process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  // No env var exposes the staging branch's custom domain, so map it explicitly. Other preview
+  // branches fall through — their *.vercel.app URLs aren't registered with Google anyway.
+  if (env === 'preview' && process.env.VERCEL_GIT_COMMIT_REF === 'staging') {
+    return 'https://staging.jens-johnson.com';
+  }
+  return undefined;
+}
 
-  /** Exchange succeeded — persist a trimmed profile and the resolved admin flag into the session. */
-  async onSuccess(event, { user }) {
-    const profile = user as GoogleUser;
+/**
+ * Resolve the absolute OAuth redirect URI Google must call back to — matching one of the URIs
+ * registered in the Google OIDC client (prod / staging / localhost). Priority:
+ *
+ * 1. `NUXT_OAUTH_GOOGLE_REDIRECT_URL` — explicit per-environment override, if set in Vercel.
+ * 2. Vercel system env (`vercelOrigin`) — reliable at runtime; fixes prod + staging.
+ * 3. `x-forwarded-host` — for proxies that do surface it (belt-and-suspenders).
+ * 4. `undefined` — local dev; nuxt-auth-utils derives it from `Host` (`http://localhost:3000/...`).
+ */
+function resolveRedirectURL(event: H3Event): string | undefined {
+  if (process.env.NUXT_OAUTH_GOOGLE_REDIRECT_URL) {
+    return process.env.NUXT_OAUTH_GOOGLE_REDIRECT_URL;
+  }
 
-    await setUserSession(event, {
-      user: {
-        email: profile.email,
-        name: profile.name,
-        picture: profile.picture,
-        sub: profile.sub,
-      },
-      // Only an allow-listed, Google-verified email earns admin access.
-      isAdmin: profile.email_verified !== false && isAdminEmail(profile.email),
-      loggedInAt: Date.now(),
-    });
+  const origin = vercelOrigin();
+  if (origin) return `${origin}/auth/callback`;
 
-    return sendRedirect(event, '/');
-  },
+  const forwardedHost = getRequestHeader(event, 'x-forwarded-host')?.split(',')[0]?.trim();
+  if (forwardedHost) {
+    const proto = getRequestHeader(event, 'x-forwarded-proto')?.split(',')[0]?.trim() || 'https';
+    return `${proto}://${forwardedHost}/auth/callback`;
+  }
 
-  /** Exchange failed (user denied consent, bad config, etc.) — log and bounce home with a flag. */
-  onError(event, error) {
-    console.error('[auth] Google OAuth error:', error);
-    return sendRedirect(event, '/?auth=error');
-  },
+  return undefined;
+}
+
+/* Build the handler per request so `redirectURL` can be resolved from the live request/runtime —
+   defineOAuthGoogleEventHandler reads `config.redirectURL` before falling back to its own derivation. */
+export default defineEventHandler((event) => {
+  /* Google can redirect back here with `?error=…` instead of a `code` — denied consent, an OAuth
+     app still in "Testing" mode, a blocked grant, etc. nuxt-auth-utils' handler only checks for
+     `code`, so a no-code callback silently re-enters the flow → an endless consent⇄account-chooser
+     loop that never returns to the app. Surface the error and stop, rather than restarting. */
+  const { error: oauthError, error_description: oauthErrorDescription } = getQuery(event);
+  if (oauthError) {
+    console.error('[auth] Google returned an error to the callback:', oauthError, oauthErrorDescription ?? '');
+    return sendRedirect(event, `/?auth=error&reason=${encodeURIComponent(String(oauthError))}`);
+  }
+
+  return defineOAuthGoogleEventHandler({
+    config: {
+      /* Read the bare Vercel env vars at request time so they resolve at runtime in every
+         environment, rather than being baked into the build via runtimeConfig. Falls through to
+         nuxt-auth-utils' own NUXT_OAUTH_GOOGLE_* resolution if these are unset. */
+      clientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+      /* Request a proper OIDC grant: `openid` yields an id_token alongside the email/profile claims. */
+      scope: ['openid', 'email', 'profile'],
+      /* Pin the callback to the real public origin behind Vercel's proxy (see resolveRedirectURL). */
+      redirectURL: resolveRedirectURL(event),
+    },
+
+    /** Exchange succeeded — persist a trimmed profile and the resolved admin flag into the session. */
+    async onSuccess(event, { user }) {
+      const profile = user as GoogleUser;
+
+      await setUserSession(event, {
+        user: {
+          email: profile.email,
+          name: profile.name,
+          picture: profile.picture,
+          sub: profile.sub,
+        },
+        // Only an allow-listed, Google-verified email earns admin access.
+        isAdmin: profile.email_verified !== false && isAdminEmail(profile.email),
+        loggedInAt: Date.now(),
+      });
+
+      return sendRedirect(event, '/');
+    },
+
+    /** Exchange failed (user denied consent, bad config, etc.) — log and bounce home with a flag. */
+    onError(event, error) {
+      console.error('[auth] Google OAuth error:', error);
+      return sendRedirect(event, '/?auth=error');
+    },
+  })(event);
 });

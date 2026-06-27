@@ -24,8 +24,6 @@
 useSeoMeta({
   title: 'Substrate · Jens Johnson',
   description: 'The layer everything runs on; a living, documented map of my homelab hardware and how it is wired.',
-  // Mockup / work-in-progress; flip to index once the real hardware is in.
-  robots: 'noindex',
 });
 
 /* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -37,6 +35,12 @@ const { data: devices } = await useAsyncData('substrate-devices', () =>
 /** Clean, fully-populated devices for the topology + inspector. */
 const list = computed(() => normalizeDevices(devices.value ?? []));
 
+/** Services running on the substrate, for the Services tab. */
+const { data: serviceDocs } = await useAsyncData('substrate-services', () =>
+  queryCollection('services').where('draft', '=', false).all(),
+);
+const services = computed(() => normalizeServices(serviceDocs.value ?? []));
+
 /* ─── Tabs (query-param driven) ───────────────────────────────────────────────────────────────────────────────────── */
 
 const route = useRoute();
@@ -45,7 +49,7 @@ const router = useRouter();
 const TABS: ReadonlyArray<{ key: string; label: string; soon?: boolean }> = [
   { key: 'overview', label: 'Overview' },
   { key: 'topology', label: 'Topology' },
-  { key: 'services', label: 'Services', soon: true },
+  { key: 'services', label: 'Services' },
 ];
 
 const activeView = computed(() => {
@@ -97,9 +101,6 @@ const linkLegend = [
   { label: 'Data', cls: 'bg-accent-secondary' },
   { label: 'Power', cls: 'bg-ink-subtle/50' },
 ];
-
-/** Planned services shown on the Services tab placeholder. */
-const plannedServices = ['Minecraft', 'Portainer', 'Pi-hole'];
 
 /* ─── Entrance ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -232,30 +233,9 @@ onMounted(() => {
           </div>
         </section>
 
-        <!-- Services panel (coming soon) -->
+        <!-- Services panel -->
         <section v-show="activeView === 'services'" role="tabpanel" aria-label="Services">
-          <div
-            class="border-border bg-surface/40 flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed p-10 text-center"
-          >
-            <span
-              class="bg-bg text-ink-subtle border-border mb-5 flex size-12 items-center justify-center rounded-full border"
-            >
-              <Icon name="lucide:server-cog" size="22" />
-            </span>
-            <h3 class="font-display text-h5 text-ink font-bold">Services coming soon</h3>
-            <p class="font-body text-body-sm text-ink-muted mt-2 max-w-md leading-relaxed">
-              I'm standing up the first containers now; this tab will map them with live status shortly.
-            </p>
-            <ul class="mt-6 flex flex-wrap justify-center gap-2" role="list">
-              <li
-                v-for="svc in plannedServices"
-                :key="svc"
-                class="border-border text-caption text-ink-subtle rounded-full border border-dashed px-3 py-1 font-mono"
-              >
-                {{ svc }}
-              </li>
-            </ul>
-          </div>
+          <WidgetsLabServicesOverview :services="services" />
         </section>
       </div>
     </div>

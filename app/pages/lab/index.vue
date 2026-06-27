@@ -23,8 +23,6 @@
 useSeoMeta({
   title: 'Lab · Jens Johnson',
   description: 'Experiments, demos, and the homelab; things I build to learn. Home of Substrate, my homelab project.',
-  // Work-in-progress section; flip to index once it has settled.
-  robots: 'noindex',
 });
 
 /** Devices feed the hub card's system-health indicator. No live metrics yet, so this reflects declared status. */
@@ -39,6 +37,10 @@ const health = computed(() => {
   if (d.some((x) => x.status === 'offline')) return { label: 'Degraded', dot: 'bg-terra-600', pulse: true };
   return { label: 'Operational', dot: 'bg-accent-secondary', pulse: true };
 });
+
+const { session } = useUserSession();
+/** The Vertifix tool is internal; its card only reveals once an admin session resolves client-side. */
+const isAdmin = computed(() => session.value?.isAdmin === true);
 
 const revealed = ref(false);
 onMounted(() => {
@@ -122,6 +124,38 @@ onMounted(() => {
               <Icon name="lucide:arrow-right" size="15" class="transition-transform group-hover:translate-x-0.5" />
             </span>
           </div>
+        </NuxtLink>
+
+        <!-- Admin: Vertifix (internal tool, revealed client-side for the admin session) -->
+        <NuxtLink
+          v-if="isAdmin"
+          to="/lab/vertifix"
+          class="group border-accent/30 bg-accent/5 hover:border-accent relative flex flex-col justify-between rounded-2xl border p-7 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+        >
+          <div>
+            <div class="mb-5 flex items-center gap-3">
+              <span class="bg-accent/10 text-accent flex size-11 items-center justify-center rounded-xl">
+                <Icon name="lucide:mountain-snow" size="22" />
+              </span>
+              <span
+                class="border-accent/30 bg-accent/10 text-caption text-accent inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono font-medium"
+              >
+                <Icon name="lucide:shield-check" size="11" />
+                Admin
+              </span>
+            </div>
+            <h2 class="font-display text-h4 text-ink font-bold tracking-tight">Vertifix</h2>
+            <p class="font-body text-body-sm text-ink-muted mt-3 leading-relaxed">
+              Restore elevation gain on Strava treadmill runs from a photo of the console. Internal tool, my account
+              only.
+            </p>
+          </div>
+          <span
+            class="text-body-sm text-ink group-hover:text-accent mt-6 inline-flex items-center gap-1.5 font-semibold transition-colors"
+          >
+            Open tool
+            <Icon name="lucide:arrow-right" size="15" class="transition-transform group-hover:translate-x-0.5" />
+          </span>
         </NuxtLink>
 
         <!-- Teaser: more experiments -->

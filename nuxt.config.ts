@@ -75,6 +75,8 @@ export default defineNuxtConfig({
     stravaRefreshToken: process.env.STRAVA_REFRESH_TOKEN,
     // Bearer secret the homelab publisher sends to /api/substrate/ingest. Server-only.
     substrateIngestSecret: process.env.SUBSTRATE_INGEST_SECRET,
+    // Bearer secret the jenscraft LXC publisher sends to /api/services/jenscraft/ingest. Server-only.
+    jenscraftIngestSecret: process.env.JENSCRAFT_INGEST_SECRET,
 
     /**
      * Email granted admin-level access once authenticated. Server-only — never exposed to
@@ -273,6 +275,18 @@ export default defineNuxtConfig({
     prerender: {
       crawlLinks: true,
       routes: ['/', '/about', '/blog', '/projects', '/lab', '/lab/substrate', '/uses'],
+
+      /**
+       * Never prerender the auth routes. With `crawlLinks` on, the prerenderer follows the nav's
+       * `<a href="/auth/callback">` sign-in link and freezes the handler's *no-code* response — a
+       * redirect to Google's authorize URL — into a static file. Vercel then serves that cached
+       * static file for the *real* callback too (`?code=…`), so the OAuth handler never runs, the
+       * code is never exchanged, and the flow loops forever between Google's consent and
+       * account-chooser screens. Ignoring `/auth` keeps the route dynamic (a per-request function)
+       * so the token exchange and `setUserSession` actually execute.
+       * @see server/routes/auth/callback.get.ts
+       */
+      ignore: ['/auth', '/lab/vertifix'],
     },
   },
 
