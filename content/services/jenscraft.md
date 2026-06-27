@@ -4,7 +4,7 @@ description: A cross-platform (Java + Bedrock) Minecraft server, self-hosted on 
 publishedAt: '2026-06-16'
 serviceId: jenscraft
 kind: game-server
-status: planned
+status: online
 summary: Cross-platform Minecraft, self-hosted on the homelab with a live BlueMap world view.
 host: srv-01
 address: jenscraft.world
