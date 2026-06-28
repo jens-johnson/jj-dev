@@ -147,3 +147,29 @@ export function normalizeService(d: RawServiceDoc): HomelabService {
 export function normalizeServices(docs: RawServiceDoc[]): HomelabService[] {
   return docs.map(normalizeService).sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
 }
+
+/** One run of body text — `href` set when it points at a Substrate device page (rendered monospace by callers). */
+export interface TextSegment {
+  text: string;
+  href?: string;
+}
+
+/** Matches Substrate device ids like `srv-01`, `fw-01`, `gw-01` (case-insensitive) so prose can link them to their node page. */
+const DEVICE_ID_RE = /\b((?:srv|fw|gw|sw|ap|ups|nas|pi)-\d+)\b/gi;
+
+/**
+ * Split a plain string into plain + linked segments, turning any Substrate device id (e.g. `srv-01`) into a link to
+ * that device's page. Lets a frontmatter string (no markdown) still render wiki-style device links + monospace.
+ */
+export function splitDeviceMentions(text: string): TextSegment[] {
+  const segments: TextSegment[] = [];
+  let last = 0;
+  for (const m of text.matchAll(DEVICE_ID_RE)) {
+    const start = m.index ?? 0;
+    if (start > last) segments.push({ text: text.slice(last, start) });
+    segments.push({ text: m[0], href: `/lab/substrate/${m[0].toLowerCase()}` });
+    last = start + m[0].length;
+  }
+  if (last < text.length) segments.push({ text: text.slice(last) });
+  return segments;
+}

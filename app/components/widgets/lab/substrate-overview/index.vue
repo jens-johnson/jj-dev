@@ -40,9 +40,9 @@ const phases: Phase[] = [
   {
     title: 'Services',
     desc: 'Minecraft, Portainer, Pi-hole, and the containers that make the lab useful.',
-    status: 'next',
+    status: 'progress',
   },
-  { title: 'Storage & backup', desc: 'Dedicated storage with ZFS and a 3-2-1 backup routine.', status: 'planned' },
+  { title: 'Storage & backup', desc: 'Dedicated storage with ZFS and a 3-2-1 backup routine.', status: 'next' },
   {
     title: 'Failover & redundancy',
     desc: 'Clustering, redundant power and network, and graceful failover as the lab grows.',
@@ -51,8 +51,14 @@ const phases: Phase[] = [
 ];
 
 const STATUS: Record<Phase['status'], { label: string; dot: string; text: string; tint: string }> = {
-  progress: { label: 'In progress', dot: 'bg-accent', text: 'text-accent', tint: 'bg-accent/10' },
-  next: { label: 'Up next', dot: 'bg-accent-secondary', text: 'text-accent-secondary', tint: 'bg-accent-secondary/10' },
+  // In progress reads as the green/success state; Up next keeps the bronze accent so the two stay distinct.
+  progress: {
+    label: 'In progress',
+    dot: 'bg-accent-secondary',
+    text: 'text-accent-secondary',
+    tint: 'bg-accent-secondary/10',
+  },
+  next: { label: 'Up next', dot: 'bg-accent', text: 'text-accent', tint: 'bg-accent/10' },
   planned: { label: 'Planned', dot: 'bg-ink-subtle', text: 'text-ink-subtle', tint: 'bg-ink-subtle/10' },
   future: { label: 'Future', dot: 'bg-ink-subtle', text: 'text-ink-subtle', tint: 'bg-ink-subtle/10' },
 };
@@ -83,8 +89,15 @@ const STATUS: Record<Phase['status'], { label: string; dot: string; text: string
             Current focus
           </p>
           <p class="font-body text-body text-ink leading-relaxed">
-            Proxmox is live and headless; next up is containerizing the first services, starting with Pi-hole and a
-            Minecraft server.
+            Substrate is running on live, headless
+            <a
+              href="https://www.proxmox.com/en/proxmox-virtual-environment/overview"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-accent underline decoration-dotted underline-offset-2 transition-colors hover:opacity-80"
+            >
+              Proxmox</a
+            >, service layer is being implemented and updated.
           </p>
           <NuxtLink
             :to="{ query: { view: 'topology' } }"
@@ -109,9 +122,9 @@ const STATUS: Record<Phase['status'], { label: string; dot: string; text: string
               class="bg-bg z-10 flex size-7 shrink-0 items-center justify-center rounded-full border font-mono text-[11px] font-semibold"
               :class="
                 p.status === 'progress'
-                  ? 'border-accent text-accent'
+                  ? 'border-accent-secondary text-accent-secondary'
                   : p.status === 'next'
-                    ? 'border-accent-secondary text-accent-secondary'
+                    ? 'border-accent text-accent'
                     : 'border-border text-ink-subtle'
               "
             >

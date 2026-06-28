@@ -1,11 +1,11 @@
 ---
 title: Metrics Publisher
-description: The push-based telemetry agent that streams live Proxmox host health from srv-01 to the Substrate dashboard.
+description: The metrics agent that streams live telemetry from the Optiplex (srv-01) to this dashboard.
 publishedAt: '2026-06-22'
 serviceId: metrics-publisher
 kind: monitoring
 status: online
-summary: Keeps the Substrate dashboard live — host CPU, RAM, load, uptime, and reachability, pushed out on a short interval.
+summary: A telemetry capturing service for the homelab, emitting metrics like host CPU, RAM, load, uptime, and more for this Substrate dashboard.
 host: srv-01
 stack:
   - systemd
@@ -16,7 +16,7 @@ tags: [monitoring, telemetry, push]
 metrics: []
 ---
 
-The Metrics Publisher is the small agent behind the **Healthy · N nodes reporting** bar at the top of this page. It runs on `srv-01`, reads the Proxmox host's health locally on a short interval, and **pushes** a public-safe snapshot out to the jj-dev ingest endpoint.
+**Metrics publisher** is a small, standalone service provisioned as a [Proxmox LXC](https://pve.proxmox.com/wiki/Linux_Container) on [`srv-01`](/lab/substrate/srv-01) which publishes health telemetry to this dashboard on a 1-minute interval.
 
 ## What it reports
 
@@ -28,6 +28,6 @@ The Metrics Publisher is the small agent behind the **Healthy · N nodes reporti
 
 ## How it works
 
-Same rule as everything on Substrate: **the lab only ever dials out.** The publisher opens an outbound HTTPS connection to the ingest route with a bearer token and POSTs counts and percentages only — never hostnames, IPs, or anything identifying. No inbound port is ever opened on the home network. The site reads the latest snapshot publicly and renders it as `live`, `stale`, or `offline`.
+Metrics publisher runs a [`cron`](https://man7.org/linux/man-pages/man5/crontab.5.html) job, capturing local health telemetry from [`srv-01`](/lab/substrate/srv-01) on an interval timer and posting it to an ingestion endpoint on this site. This service is security-forward, only exposing outbound traffic and masking sensitive data (i.e. IP addresses, host names, etc.). Telemetry is upserted using [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted).
 
 > Operational detail (the unit, the payload contract) lives in the private Substrate ops space — never in this repo.

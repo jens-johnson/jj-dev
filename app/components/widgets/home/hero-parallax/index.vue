@@ -45,7 +45,7 @@ onMounted(() => {
 
         <!-- ── Orb A — top right ──────────────────────────────────────────── -->
         <div
-          class="pointer-events-none absolute -top-24 -right-24 z-[10] h-[640px] w-[640px] rounded-full will-change-transform"
+          class="orb orb-a pointer-events-none absolute -top-24 -right-24 z-[10] h-[640px] w-[640px] rounded-full will-change-transform"
           :style="{
             background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 65%)',
             opacity: 0.18,
@@ -56,7 +56,7 @@ onMounted(() => {
 
         <!-- ── Orb B — bottom left ────────────────────────────────────────── -->
         <div
-          class="pointer-events-none absolute -bottom-16 -left-24 z-[10] h-[520px] w-[520px] rounded-full will-change-transform"
+          class="orb orb-b pointer-events-none absolute -bottom-16 -left-24 z-[10] h-[520px] w-[520px] rounded-full will-change-transform"
           :style="{
             background: 'radial-gradient(circle, var(--color-accent-secondary) 0%, transparent 65%)',
             opacity: 0.14,
@@ -67,7 +67,7 @@ onMounted(() => {
 
         <!-- ── Orb C — mid drift ──────────────────────────────────────────── -->
         <div
-          class="pointer-events-none absolute top-[30%] left-[40%] z-[10] h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full will-change-transform"
+          class="orb orb-c pointer-events-none absolute top-[30%] left-[40%] z-[10] h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full will-change-transform"
           :style="{
             background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 65%)',
             opacity: 0.1,
@@ -168,7 +168,7 @@ onMounted(() => {
             to="/projects"
             class="bg-accent font-body text-body-sm inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-stone-50 transition-opacity hover:opacity-90"
           >
-            View my work
+            My work
             <Icon name="lucide:arrow-right" size="14" />
           </NuxtLink>
           <NuxtLink
@@ -197,3 +197,69 @@ onMounted(() => {
     </PrimitivesBaseHero>
   </PrimitivesBaseParallax>
 </template>
+
+<style scoped>
+/*
+ * Ambient orb life — slow, independent `scale`/`translate`/opacity drift so the backdrop breathes. These animate the
+ * CSS `scale`/`translate` properties (not `transform`), so they compose with the inline parallax transform instead of
+ * overriding it. Gated behind prefers-reduced-motion: no-preference so it's fully static for motion-sensitive users.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .orb-a {
+    animation: orb-drift-a 17s ease-in-out infinite;
+  }
+
+  .orb-b {
+    animation: orb-drift-b 21s ease-in-out infinite;
+  }
+
+  .orb-c {
+    animation: orb-drift-c 25s ease-in-out infinite;
+  }
+}
+
+@keyframes orb-drift-a {
+  0%,
+  100% {
+    scale: 1;
+    translate: 0 0;
+    opacity: 0.16;
+  }
+
+  50% {
+    scale: 1.18;
+    translate: -26px 22px;
+    opacity: 0.26;
+  }
+}
+
+@keyframes orb-drift-b {
+  0%,
+  100% {
+    scale: 1.05;
+    translate: 0 0;
+    opacity: 0.12;
+  }
+
+  50% {
+    scale: 0.9;
+    translate: 30px -18px;
+    opacity: 0.2;
+  }
+}
+
+@keyframes orb-drift-c {
+  0%,
+  100% {
+    scale: 0.95;
+    translate: 0 0;
+    opacity: 0.08;
+  }
+
+  50% {
+    scale: 1.2;
+    translate: -20px -24px;
+    opacity: 0.16;
+  }
+}
+</style>
