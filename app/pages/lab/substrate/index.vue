@@ -136,9 +136,10 @@ onMounted(() => {
           class="font-body text-body-lg text-ink-muted mt-5 max-w-2xl leading-relaxed transition-all delay-100 duration-700"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
         >
-          Welcome to Substrate: the project for my HomeLab, an evolving space where I'm dipping my toes into the
-          self-hosted ecosystem. Join me in my journey learning more about hardware, networking, deploying services, and
-          more, breaking some CPU pins but learning a lot along the way.
+          Welcome to Substrate, an evolving space where I'm dipping my toes into the self-hosted ecosystem, learning
+          more about hardware, networking, service provisioning, and more, maybe breaking some CPU pins along the way.
+          If you're interested in the home lab space, let's connect! I'd love to learn more about this expensive but
+          exciting hobby.
         </p>
       </header>
 
