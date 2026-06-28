@@ -29,5 +29,3 @@ metrics: []
 ## How it works
 
 Metrics publisher runs a [`cron`](https://man7.org/linux/man-pages/man5/crontab.5.html) job, capturing local health telemetry from [`srv-01`](/lab/substrate/srv-01) on an interval timer and posting it to an ingestion endpoint on this site. This service is security-forward, only exposing outbound traffic and masking sensitive data (i.e. IP addresses, host names, etc.). Telemetry is upserted using [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted).
-
-> Operational detail (the unit, the payload contract) lives in the private Substrate ops space — never in this repo.
