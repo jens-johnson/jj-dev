@@ -160,5 +160,3 @@ Jenscraft runs as a dedicated [Proxmox LXC](https://pve.proxmox.com/wiki/Linux_C
 ## Live metrics
 
 The metrics dashboard on this page uses a similar Substrate telemetry pattern to the [Metrics Publisher](/lab/substrate/services/metrics-publisher) service: a small publisher inside the Jenscraft LXC reads server health (player count + TPS / tick-time from [Spark](https://spark.lucko.me/), world-render coverage from BlueMap, and lifetime stats from the world save) and **pushes** a public-safe snapshot out to this site. Until that publisher reports in, the tiles read as _awaiting feed_.
-
-> Operational detail (provisioning runbook, the relay setup, the metrics contract, and plugin tuning) lives in the private Substrate ops space in Notion — never in this repo.
