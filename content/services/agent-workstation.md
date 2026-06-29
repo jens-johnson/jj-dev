@@ -6,7 +6,7 @@ serviceId: agent-workstation
 kind: automation
 status: online
 icon: lucide:bot
-summary: A sandboxed remote workspace for AI coding agents — an isolated, egress-only Proxmox LXC running Claude Code.
+summary: A sandboxed remote workspace for agentic coding flows — an isolated, egress-only Proxmox LXC for running Claude Code, Codex, and the like.
 host: srv-01
 stack:
   - Proxmox LXC
