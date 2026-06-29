@@ -1,5 +1,110 @@
 # Changelog
 
+## [0.4.0](https://github.com/jens-johnson/jj-dev/compare/jj-dev-v0.3.0...jj-dev-v0.4.0) (2026-06-29)
+
+
+### ✨ Features
+
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([138a67a](https://github.com/jens-johnson/jj-dev/commit/138a67a78c77ebf286f0dcc9499a2ed59409c65e))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([980aaa6](https://github.com/jens-johnson/jj-dev/commit/980aaa68bc47d070e434fa005041cba757a0c9e6))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([340667c](https://github.com/jens-johnson/jj-dev/commit/340667c253f746d48bdcb10b9c77ff453ecbfaa1))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([ef2464d](https://github.com/jens-johnson/jj-dev/commit/ef2464dc0fcaf67455c17fb770e2db6c488af410))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([9b0073d](https://github.com/jens-johnson/jj-dev/commit/9b0073db9fe7d9c6e7cff4b3c06a7d2fec44c529))
+* **about:** swap github heatmap for weekly sparkline + fix metrics data bugs ([53839ae](https://github.com/jens-johnson/jj-dev/commit/53839aef7afe003b1c904c8cba1e651055a7a108))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([138a67a](https://github.com/jens-johnson/jj-dev/commit/138a67a78c77ebf286f0dcc9499a2ed59409c65e))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([980aaa6](https://github.com/jens-johnson/jj-dev/commit/980aaa68bc47d070e434fa005041cba757a0c9e6))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([340667c](https://github.com/jens-johnson/jj-dev/commit/340667c253f746d48bdcb10b9c77ff453ecbfaa1))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([ef2464d](https://github.com/jens-johnson/jj-dev/commit/ef2464dc0fcaf67455c17fb770e2db6c488af410))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([9b0073d](https://github.com/jens-johnson/jj-dev/commit/9b0073db9fe7d9c6e7cff4b3c06a7d2fec44c529))
+* **app:** add google auth layer with nav login button ([#67](https://github.com/jens-johnson/jj-dev/issues/67)) ([53839ae](https://github.com/jens-johnson/jj-dev/commit/53839aef7afe003b1c904c8cba1e651055a7a108))
+* **lab:** add reusable strava server client for vertifix ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **lab:** add reusable strava server client for vertifix ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **lab:** add reusable strava server client for vertifix ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **lab:** add reusable strava server client for vertifix ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **lab:** add reusable strava server client for vertifix ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **lab:** add reusable strava server client for vertifix ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **lab:** add reusable strava server client for vertifix ([138a67a](https://github.com/jens-johnson/jj-dev/commit/138a67a78c77ebf286f0dcc9499a2ed59409c65e))
+* **lab:** add vertifix tcx builder with corrected elevation injection ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **lab:** add vertifix tcx builder with corrected elevation injection ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **lab:** add vertifix tcx builder with corrected elevation injection ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **lab:** add vertifix tcx builder with corrected elevation injection ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **lab:** add vertifix tcx builder with corrected elevation injection ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **lab:** add vertifix tcx builder with corrected elevation injection ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **lab:** add vertifix tcx builder with corrected elevation injection ([138a67a](https://github.com/jens-johnson/jj-dev/commit/138a67a78c77ebf286f0dcc9499a2ed59409c65e))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([138a67a](https://github.com/jens-johnson/jj-dev/commit/138a67a78c77ebf286f0dcc9499a2ed59409c65e))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([980aaa6](https://github.com/jens-johnson/jj-dev/commit/980aaa68bc47d070e434fa005041cba757a0c9e6))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([340667c](https://github.com/jens-johnson/jj-dev/commit/340667c253f746d48bdcb10b9c77ff453ecbfaa1))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([ef2464d](https://github.com/jens-johnson/jj-dev/commit/ef2464dc0fcaf67455c17fb770e2db6c488af410))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([9b0073d](https://github.com/jens-johnson/jj-dev/commit/9b0073db9fe7d9c6e7cff4b3c06a7d2fec44c529))
+* **lab:** refresh substrate for proxmox-live and scrub public recon details ([53839ae](https://github.com/jens-johnson/jj-dev/commit/53839aef7afe003b1c904c8cba1e651055a7a108))
+
+
+### 🐛 Bug Fixes
+
+* **ci:** don't open promotion PR for sync-only merge commits ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **ci:** don't open promotion PR for sync-only merge commits ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **ci:** don't open promotion PR for sync-only merge commits ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **ci:** don't open promotion PR for sync-only merge commits ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **ci:** don't open promotion PR for sync-only merge commits ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **ci:** don't open promotion PR for sync-only merge commits ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **ci:** don't open promotion PR for sync-only merge commits ([138a67a](https://github.com/jens-johnson/jj-dev/commit/138a67a78c77ebf286f0dcc9499a2ed59409c65e))
+* **ci:** don't open promotion PR for sync-only merge commits ([980aaa6](https://github.com/jens-johnson/jj-dev/commit/980aaa68bc47d070e434fa005041cba757a0c9e6))
+* **ci:** don't open promotion PR for sync-only merge commits ([340667c](https://github.com/jens-johnson/jj-dev/commit/340667c253f746d48bdcb10b9c77ff453ecbfaa1))
+* **ci:** don't open promotion PR for sync-only merge commits ([ef2464d](https://github.com/jens-johnson/jj-dev/commit/ef2464dc0fcaf67455c17fb770e2db6c488af410))
+* **ci:** don't open promotion PR for sync-only merge commits ([9b0073d](https://github.com/jens-johnson/jj-dev/commit/9b0073db9fe7d9c6e7cff4b3c06a7d2fec44c529))
+* **ci:** don't open promotion PR for sync-only merge commits ([53839ae](https://github.com/jens-johnson/jj-dev/commit/53839aef7afe003b1c904c8cba1e651055a7a108))
+* **lab:** hint to enter the date when a photo has no exif ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **lab:** hint to enter the date when a photo has no exif ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **lab:** hint to enter the date when a photo has no exif ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **lab:** keep barometer in tcx device name so strava honors elevation ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **lab:** keep barometer in tcx device name so strava honors elevation ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **lab:** keep barometer in tcx device name so strava honors elevation ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+
+
+### 💅 Styles
+
+* **blog:** fix object-curly-newline lint error in post detail page ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **blog:** fix object-curly-newline lint error in post detail page ([c2c4555](https://github.com/jens-johnson/jj-dev/commit/c2c4555ef840133d6bf657a623c38fc31197ddce))
+* **blog:** fix object-curly-newline lint error in post detail page ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **blog:** fix object-curly-newline lint error in post detail page ([027c30a](https://github.com/jens-johnson/jj-dev/commit/027c30a7632be8d080591c5da5b459e2a2a3ee99))
+* **blog:** fix object-curly-newline lint error in post detail page ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **blog:** fix object-curly-newline lint error in post detail page ([0727332](https://github.com/jens-johnson/jj-dev/commit/07273327089f1a7b4197a221bcb9f8021efaa6fa))
+* **blog:** fix object-curly-newline lint error in post detail page ([138a67a](https://github.com/jens-johnson/jj-dev/commit/138a67a78c77ebf286f0dcc9499a2ed59409c65e))
+* **blog:** fix object-curly-newline lint error in post detail page ([980aaa6](https://github.com/jens-johnson/jj-dev/commit/980aaa68bc47d070e434fa005041cba757a0c9e6))
+* **blog:** fix object-curly-newline lint error in post detail page ([340667c](https://github.com/jens-johnson/jj-dev/commit/340667c253f746d48bdcb10b9c77ff453ecbfaa1))
+* **blog:** fix object-curly-newline lint error in post detail page ([ef2464d](https://github.com/jens-johnson/jj-dev/commit/ef2464dc0fcaf67455c17fb770e2db6c488af410))
+* **blog:** fix object-curly-newline lint error in post detail page ([9b0073d](https://github.com/jens-johnson/jj-dev/commit/9b0073db9fe7d9c6e7cff4b3c06a7d2fec44c529))
+* **blog:** fix object-curly-newline lint error in post detail page ([53839ae](https://github.com/jens-johnson/jj-dev/commit/53839aef7afe003b1c904c8cba1e651055a7a108))
+
+
+### 👷 CI
+
+* **deps:** bump actions/checkout from 6 to 7 ([#90](https://github.com/jens-johnson/jj-dev/issues/90)) ([44d507e](https://github.com/jens-johnson/jj-dev/commit/44d507e3e8de0de2903c791cbf98376dc2af026c))
+
+
+### 🔧 Chores
+
+* **deps-dev:** bump @commitlint/config-conventional ([5609c06](https://github.com/jens-johnson/jj-dev/commit/5609c0625f3e0445a93f58acb362235e9e76bacb))
+* **deps-dev:** bump @commitlint/config-conventional from 19.8.1 to 21.0.2 ([#59](https://github.com/jens-johnson/jj-dev/issues/59)) ([5609c06](https://github.com/jens-johnson/jj-dev/commit/5609c0625f3e0445a93f58acb362235e9e76bacb))
+
 ## [0.3.0](https://github.com/jens-johnson/jj-dev/compare/jj-dev-v0.2.0...jj-dev-v0.3.0) (2026-06-13)
 
 
