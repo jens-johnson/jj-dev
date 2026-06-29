@@ -66,13 +66,13 @@ onMounted(() => {
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
           style="font-size: clamp(2.5rem, 6vw, 4.5rem)"
         >
-          Things I build to learn.
+          My (digital) workshop
         </h1>
         <p
           class="font-body text-body-lg text-ink-muted mt-5 max-w-2xl leading-relaxed transition-all delay-100 duration-700"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
         >
-          Experiments, demos, and the homelab; a workshop for ideas that don't fit anywhere else.
+          Experiments, demos, tinkerings, and everything in between.
         </p>
       </header>
 
@@ -120,7 +120,7 @@ onMounted(() => {
             <span
               class="text-body-sm text-ink group-hover:text-accent inline-flex items-center gap-1.5 font-semibold transition-colors"
             >
-              Explore the setup
+              Explore
               <Icon name="lucide:arrow-right" size="15" class="transition-transform group-hover:translate-x-0.5" />
             </span>
           </div>
@@ -168,7 +168,7 @@ onMounted(() => {
             </span>
             <h2 class="font-display text-h4 text-ink mt-5 font-bold tracking-tight">More brewing</h2>
             <p class="font-body text-body-sm text-ink-muted mt-3 leading-relaxed">
-              Generative sketches, interaction demos, and bits of creative code; landing here as I make them.
+              More features always cooking. Check back soon.
             </p>
           </div>
           <span class="text-caption text-ink-subtle mt-6 font-mono tracking-widest uppercase">Coming soon</span>

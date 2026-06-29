@@ -123,8 +123,8 @@ onMounted(() => {
             transition-delay: 200ms;
           "
         >
-          Long-form writing on building software, design systems, and the practice of engineering. Occasional rabbit
-          holes from outside the keyboard.
+          My blog: a place for ramblings about technology, baking, and 100+ other things you may or may not want to hear
+          about.
         </p>
 
         <!-- All tags pill row -->

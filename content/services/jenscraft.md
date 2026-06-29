@@ -1,18 +1,17 @@
 ---
 title: Jenscraft
-description: A cross-platform (Java + Bedrock) Minecraft server, self-hosted on the Substrate homelab.
+description: A cross-platform (Java + Bedrock) Minecraft server, self-hosted on Substrate.
 publishedAt: '2026-06-16'
 serviceId: jenscraft
 kind: game-server
 status: online
-summary: Cross-platform Minecraft, self-hosted on the homelab with a live BlueMap world view.
+summary: My personal Minecraft server, built with Paper and Java and enhanced via plugins and utilities like Geyser, BlueMap, and Multiverse Core.
 host: srv-01
 address: jenscraft.world
 stack:
-  - PaperMC 26.1.2
+  - PaperMC
   - GeyserMC
   - Floodgate
-  - BlueMap
   - Proxmox LXC
   - Tailscale
 order: 10
@@ -35,10 +34,20 @@ plugins:
     category: map
     purpose: Renders the live 3D web map served at map.jenscraft.world.
     url: https://bluemap.bluecolored.de/
-  - name: spark
+  - name: Multiverse-Core
+    side: server
+    category: quality-of-life
+    purpose: Runs multiple worlds (survival + creative) side by side on one server.
+    url: https://modrinth.com/plugin/multiverse-core
+  - name: Multiverse-Inventories
+    side: server
+    category: quality-of-life
+    purpose: Keeps a separate inventory per world so survival and creative stay isolated.
+    url: https://modrinth.com/plugin/multiverse-inventories
+  - name: Spark
     side: server
     category: performance
-    purpose: Profiler + health monitor; source for the live TPS / tick-time metrics.
+    purpose: Profiler + health monitor; used to feed telemetry to this dashboard.
     url: https://spark.lucko.me/
   - name: Chunky
     side: server
@@ -50,16 +59,49 @@ plugins:
     category: quality-of-life
     purpose: Lets clients on newer Minecraft versions connect without a server upgrade.
     url: https://viaversion.com/
+  - name: ViaBackwards
+    side: server
+    category: quality-of-life
+    purpose: Extends ViaVersion so older clients can connect too.
+    url: https://github.com/ViaVersion/ViaBackwards
+  - name: EssentialsX
+    side: server
+    category: quality-of-life
+    purpose: Core everyday commands; homes, warps, kits, and server utilities.
+    url: https://essentialsx.net/
+  - name: WorldEdit
+    side: server
+    category: other
+    purpose: In-game world editing for large-scale builds and terrain fixes.
+    url: https://enginehub.org/worldedit
   - name: LuckPerms
     side: server
     category: moderation
     purpose: Permissions + group management for ops, trusted players, and guests.
     url: https://luckperms.net/
-  - name: CoreProtect
+  - name: GriefPrevention
     side: server
     category: moderation
-    purpose: Block-level audit log with one-command grief rollback.
-    url: https://www.spigotmc.org/resources/coreprotect.8631/
+    purpose: Land claims that protect player builds from grief.
+    url: https://www.spigotmc.org/resources/griefprevention.1884/
+  - name: Prism
+    side: server
+    category: moderation
+    purpose: Block-level audit log with grief rollback.
+    url: https://prism.addons.network/
+  - name: AxGraves
+    side: server
+    category: quality-of-life
+    purpose: Drops a recoverable gravestone on death instead of scattering items.
+    url: https://www.spigotmc.org/resources/axgraves.119689/
+  - name: OnePlayerSleep
+    side: server
+    category: quality-of-life
+    purpose: One player sleeping skips the night for everyone.
+  - name: QuickWaystones
+    side: server
+    category: quality-of-life
+    purpose: Player-placed waystones for quick fast-travel around the world.
   - name: 'Sodium + Iris'
     side: client
     category: performance
@@ -95,31 +137,26 @@ metrics:
     hint: Lifetime hostile mobs slain, summed from world stats.
 ---
 
-Jenscraft is my personal Minecraft server — the first **service** to land on Substrate. Version 1 ran on an AWS Lightsail VPS; this is the rebuild as a first-class homelab citizen, running on `srv-01` and documented end-to-end.
+Welcome to **Jenscraft**, my personal Minecraft server, and the first interactive service provisioned on [Substrate](/lab/substrate).
+
+## Background
+
+I created Jenscraft initially at the beginning of 2026, as a personal Minecraft server that I hosted on [AWS Lightsail](https://docs.aws.amazon.com/lightsail/). When I started getting into home labbing and created Substrate, I figured this was the perfect project to stand up as its first standalone service, save some money on AWS bills, and minimize latency for local play at home.
 
 ## What it is
 
-A vanilla-plus survival world that's playable from **both** editions of the game at the same address:
-
-- **Java Edition** for desktop play.
-- **Bedrock Edition** for Xbox, mobile, and console — bridged in with GeyserMC + Floodgate, so console players join without needing a paid Java account.
-
-The world is also browsable as a live 3D map at `map.jenscraft.world` via the BlueMap plugin.
+A private vanilla [Java](https://dev.java/) Minecraft server running on [PaperMC](https://docs.papermc.io/), hoisted for crossplay compatibility with [Geyser](https://geysermc.org/) and [Floodgate](https://geysermc.org/wiki/floodgate/). [Multiverse Core](https://modrinth.com/plugin/multiverse-core) is enabled to support multiple worlds (i.e. survival and creative).
 
 ## Architecture
 
-The server runs as a dedicated **Proxmox LXC** on `srv-01`, isolated from the rest of the lab, on PaperMC (a performance-tuned Spigot fork) with Java 25.
+Jenscraft runs as a dedicated [Proxmox LXC](https://pve.proxmox.com/wiki/Linux_Container) on [`srv-01`](/lab/substrate/srv-01), isolated from other services. One of my security principles for Substrate is egress-only when it comes to networking. Jenscraft upholds this by:
 
-The interesting part is exposure. Substrate's hard rule is that **nothing in the lab is publicly reachable** — the lab only ever connects _outward_. A public game server seems to break that, so Jenscraft keeps the rule by fronting the world with a small public relay:
+- Using a public VPS as a small relay for traffic.
+- The VPS holds the public Jenscraft IP and `jenscraft.world` DNS (both registered via [AWS Route 53](https://docs.aws.amazon.com/route53/)).
+- The VPS forwards Java (TCP) and Bedrock (UDP) traffic over a [Tailscale](https://tailscale.com/kb/) tunnel back to the LXC, without exposing inbound ports on Substrate's network.
 
-- A cheap public VPS holds the public IP and `jenscraft.world` DNS.
-- The relay forwards Java (TCP) and Bedrock (UDP) traffic over a **Tailscale** tunnel back to the LXC.
-- The lab dials _out_ to the tunnel; no inbound ports are opened on the home network.
-
-`map.jenscraft.world` is reverse-proxied through the same relay to the BlueMap web server. Access is kept invite-only via a whitelist plus Floodgate account linking.
+[`map.jenscraft.world`](https://map.jenscraft.world), a live map of the world enabled with [BlueMap](https://bluemap.bluecolored.de/), is reverse-proxied through the same relay to the BlueMap web server. Access is kept invite-only via a whitelist plus Floodgate account linking.
 
 ## Live metrics
 
-The dashboard below mirrors the Substrate telemetry pattern: a small publisher inside the LXC reads server health (player count + TPS/tick-time from spark, world-render coverage from BlueMap, and lifetime stats from the world save) and **pushes** a public-safe snapshot out to this site. Until that publisher reports in, the tiles read as _awaiting feed_.
-
-> Operational detail (provisioning runbook, the relay setup, the metrics contract, and plugin tuning) lives in the private Substrate ops space in Notion — never in this repo.
+The metrics dashboard on this page uses a similar Substrate telemetry pattern to the [Metrics Publisher](/lab/substrate/services/metrics-publisher) service: a small publisher inside the Jenscraft LXC reads server health (player count + TPS / tick-time from [Spark](https://spark.lucko.me/), world-render coverage from BlueMap, and lifetime stats from the world save) and **pushes** a public-safe snapshot out to this site. Until that publisher reports in, the tiles read as _awaiting feed_.
