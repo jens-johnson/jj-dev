@@ -19,20 +19,16 @@ tags: [ai, agents, automation, dev]
 metrics: []
 ---
 
-**Agent Workstation** is a dedicated, isolated environment whose whole purpose is to give AI coding agents a safe place to work on my projects — kept well away from my laptop and the rest of the homelab.
+I created **Agent Workstation** as a dedicated, isolated service on [`srv-01`](/lab/substrate/srv-01) to provide an environment where I can run sandboxed agentic flows.
 
 ## What it is
 
-A purpose-built developer sandbox running [Claude Code](https://www.anthropic.com/claude-code) as a standalone service on [`srv-01`](/lab/substrate/srv-01). I connect to it privately, hand an agent a repository, and it clones, edits, builds, and opens pull requests — all on hardware I own.
+A purpose-built developer sandbox with [Claude Code](https://www.anthropic.com/claude-code) / Codex / etc. capabilities, functioning as a standalone service on [`srv-01`](/lab/substrate/srv-01). Supports SSH connection via [Tailscale](https://tailscale.com/kb/) tunneling.
 
 ## Architecture
 
-Agent Workstation runs as an unprivileged [Proxmox LXC](https://pve.proxmox.com/wiki/Linux_Container) on [`srv-01`](/lab/substrate/srv-01), isolated from the other services on Substrate. It upholds the same egress-only security principle as the rest of the fleet:
-
-- Reached privately over a [Tailscale](https://tailscale.com/kb/) tunnel — never exposed to the public internet, with key-only access.
-- A host firewall keeps the box from reaching the rest of the home network, leaving only outbound access to the internet and the source forges it needs.
-- Credentials live only on the box and are scoped to the work an agent is trusted to do.
+Agent Workstation runs as an unprivileged [Proxmox LXC](https://pve.proxmox.com/wiki/Linux_Container) on [`srv-01`](/lab/substrate/srv-01), isolated from the other services on Substrate. It upholds Substrate's egress-only netsec principle by limiting exposure to a [Tailscale](https://tailscale.com/kb/) tunnel, remains firewalled from other Substrate services, and scopes credentials for specific agents.
 
 ## How it works
 
-The container ships a ready dev toolchain — [Node.js](https://nodejs.org/), [pnpm](https://pnpm.io/), and a headless browser for UI checks — so an agent can run a full lint → typecheck → build → pull-request loop unattended. A clean baseline snapshot turns any messy session into a one-command rollback.
+The LXC container ships a ready dev toolchain, including [Node.js](https://nodejs.org/), [pnpm](https://pnpm.io/), and a headless browser for UI checks, providing agents with the capability to locally instrument and validate changes for repositories. Baseline snapshots provide rollback capability and disaster recovery.
