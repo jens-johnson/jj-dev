@@ -104,6 +104,17 @@ export default defineNuxtConfig({
   components: [{ path: '~/components/content', pathPrefix: false }, '~/components'],
 
   /**
+   * Auto-import scan directories. Composables and utils follow the barrel-directory convention
+   * (`use-x/{index,composable,types}.ts`, `utils/<group>/<name>/{index,...}.ts`), so the default top-level-only
+   * scan misses them. The recursive globs register every nested implementation file; barrel `index.ts` files use
+   * `export *`, which unimport ignores, so symbols are registered exactly once (from their defining module).
+   * @see https://nuxt.com/docs/api/nuxt-config#imports
+   */
+  imports: {
+    dirs: ['composables/**', 'utils/**'],
+  },
+
+  /**
    * Nuxt modules
    * @see https://nuxt.com/docs/4.x/api/nuxt-config#modules
    */

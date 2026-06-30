@@ -11,45 +11,77 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████████████ server/api/lab/vertifix/prepare.post.ts ██████████████████████████████████████
+ * ████████████████████████████████████ #utils/substrate/substrate-visuals/types.ts ████████████████████████████████████
  *
- * Admin-only endpoint: builds the corrected-elevation TCX for the chosen activity and returns it to the
- * browser (stateless / client-held) with a summary and the Strava activity URL for the manual-delete step.
+ * Type definitions for the Substrate hardware visual lookups.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { IVertifixPrepareRequest, IVertifixPrepareResult } from '#shared/vertifix';
 
-const FEET_PER_METRE = 3.28084;
+/**
+ * An interface representing the Tailwind class bundle for a status: dot fill, text colour, and a faint tinted background
+ * @interface
+ */
+export interface IStatusVisual {
+  /* The human-readable status label */
+  label: string;
 
-export default defineEventHandler(async (event): Promise<IVertifixPrepareResult> => {
-  await requireAdmin(event);
+  /* The Tailwind background class for the status dot */
+  dot: string;
 
-  const body = await readBody<Partial<IVertifixPrepareRequest>>(event);
-  const activityId = Number(body?.activityId);
-  const elevationFeet = Number(body?.elevationFeet);
-  if (!Number.isFinite(activityId) || !Number.isFinite(elevationFeet) || elevationFeet < 0) {
-    throw createError({
-      statusCode: 422,
-      statusMessage: 'A numeric `activityId` and non-negative `elevationFeet` are required.',
-    });
-  }
+  /* The Tailwind text-colour class */
+  text: string;
 
-  const [activity, streams] = await Promise.all([getActivity(activityId), getStreams(activityId)]);
-  const tcx = buildTcx(activity, streams, elevationFeet);
+  /* The Tailwind tinted-background class */
+  tint: string;
+}
 
-  return {
-    activityId,
-    tcx,
-    stravaUrl: `https://www.strava.com/activities/${activityId}`,
-    summary: {
-      name: activity.name,
-      description: activity.description ?? '',
-      startDate: activity.start_date,
-      distanceMeters: activity.distance,
-      movingTimeSeconds: activity.moving_time,
-      currentElevationFeet: Math.round(activity.total_elevation_gain * FEET_PER_METRE),
-      targetElevationFeet: Math.round(elevationFeet),
-    },
-  };
-});
+/**
+ * An interface representing the loose shape of a substrate doc straight from `queryCollection`; every field optional,
+ * mirroring how @nuxt/content widens schema columns to `T | undefined`. Normalised into a concrete device by the
+ * helpers in this module
+ * @interface
+ */
+export interface IRawSubstrateDoc {
+  /* The stable node id */
+  nodeId?: string;
+
+  /* The device title */
+  title?: string;
+
+  /* The device description */
+  description?: string;
+
+  /* The device kind */
+  kind?: string;
+
+  /* The topology layer */
+  layer?: string;
+
+  /* The operational status */
+  status?: string;
+
+  /* The hardware vendor */
+  vendor?: string;
+
+  /* The specific model */
+  model?: string;
+
+  /* The idle power draw in watts */
+  power?: number;
+
+  /* The labelled spec rows */
+  specs?: Array<{ label?: string; value?: string }>;
+
+  /* The edges to other devices */
+  connections?: Array<{ to?: string; kind?: string; label?: string }>;
+
+  /* The free-form tags */
+  tags?: string[];
+
+  /* The sort weight */
+  order?: number;
+
+  /* The content route */
+  path?: string;
+}

@@ -11,45 +11,34 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████████████ server/api/lab/vertifix/prepare.post.ts ██████████████████████████████████████
+ * ██████████████████████████████████ #composables/use-substrate-metrics/constants.ts ██████████████████████████████████
  *
- * Admin-only endpoint: builds the corrected-elevation TCX for the chosen activity and returns it to the
- * browser (stateless / client-held) with a summary and the Strava activity URL for the manual-delete step.
+ * Per-state visual treatments (Tailwind class bundles) for the substrate metrics banner, card, and inspector.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { IVertifixPrepareRequest, IVertifixPrepareResult } from '#shared/vertifix';
 
-const FEET_PER_METRE = 3.28084;
+import type { TSubstrateHealth, TSubstrateMetricsState } from '~/types/substrate-metrics';
 
-export default defineEventHandler(async (event): Promise<IVertifixPrepareResult> => {
-  await requireAdmin(event);
+import type { IStateVisual } from './types';
 
-  const body = await readBody<Partial<IVertifixPrepareRequest>>(event);
-  const activityId = Number(body?.activityId);
-  const elevationFeet = Number(body?.elevationFeet);
-  if (!Number.isFinite(activityId) || !Number.isFinite(elevationFeet) || elevationFeet < 0) {
-    throw createError({
-      statusCode: 422,
-      statusMessage: 'A numeric `activityId` and non-negative `elevationFeet` are required.',
-    });
-  }
+/**
+ * The per-state visual treatment (Tailwind classes), shared by the banner, card, and inspector
+ * @constant
+ */
+export const METRIC_STATE: Record<TSubstrateMetricsState, IStateVisual> = {
+  live: { label: 'Live', dot: 'bg-accent-secondary', text: 'text-accent-secondary', pulse: true },
+  stale: { label: 'Stale', dot: 'bg-terra-400', text: 'text-terra-400', pulse: false },
+  offline: { label: 'Offline', dot: 'bg-ink-subtle', text: 'text-ink-subtle', pulse: false },
+};
 
-  const [activity, streams] = await Promise.all([getActivity(activityId), getStreams(activityId)]);
-  const tcx = buildTcx(activity, streams, elevationFeet);
-
-  return {
-    activityId,
-    tcx,
-    stravaUrl: `https://www.strava.com/activities/${activityId}`,
-    summary: {
-      name: activity.name,
-      description: activity.description ?? '',
-      startDate: activity.start_date,
-      distanceMeters: activity.distance,
-      movingTimeSeconds: activity.moving_time,
-      currentElevationFeet: Math.round(activity.total_elevation_gain * FEET_PER_METRE),
-      targetElevationFeet: Math.round(elevationFeet),
-    },
-  };
-});
+/**
+ * The visual treatment for the rolled-up fleet health, used by the aggregate status bar
+ * @constant
+ */
+export const METRIC_HEALTH: Record<TSubstrateHealth, IStateVisual> = {
+  healthy: { label: 'Healthy', dot: 'bg-accent-secondary', text: 'text-accent-secondary', pulse: true },
+  degraded: { label: 'Degraded', dot: 'bg-terra-400', text: 'text-terra-400', pulse: true },
+  stale: { label: 'Stale', dot: 'bg-terra-400', text: 'text-terra-400', pulse: false },
+  offline: { label: 'Offline', dot: 'bg-ink-subtle', text: 'text-ink-subtle', pulse: false },
+};

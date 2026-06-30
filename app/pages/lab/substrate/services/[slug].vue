@@ -20,7 +20,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ServicePlugin } from '~/types/services';
+import type { IServicePlugin } from '~/types/services';
 
 const route = useRoute();
 const slug = computed(() => String(route.params.slug ?? ''));
@@ -90,12 +90,12 @@ function toggleCategory(category: string) {
   activeCategory.value = activeCategory.value === category ? null : category;
 }
 
-const visiblePlugins = computed<ServicePlugin[]>(() =>
+const visiblePlugins = computed<IServicePlugin[]>(() =>
   (service.value?.plugins ?? []).filter((p) => !activeCategory.value || p.category === activeCategory.value),
 );
 
-const serverPlugins = computed<ServicePlugin[]>(() => visiblePlugins.value.filter((p) => p.side === 'server'));
-const clientPlugins = computed<ServicePlugin[]>(() => visiblePlugins.value.filter((p) => p.side === 'client'));
+const serverPlugins = computed<IServicePlugin[]>(() => visiblePlugins.value.filter((p) => p.side === 'server'));
+const clientPlugins = computed<IServicePlugin[]>(() => visiblePlugins.value.filter((p) => p.side === 'client'));
 
 /* ─── Body ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 

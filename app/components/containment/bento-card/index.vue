@@ -27,9 +27,9 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { CardTiltOptions } from '~/composables/useCardTilt';
+import type { ICardTiltOptions } from '~/composables/use-card-tilt';
 
-const props = withDefaults(defineProps<CardTiltOptions>(), {
+const props = withDefaults(defineProps<ICardTiltOptions>(), {
   intensity: 10,
   scale: 1.025,
   shineOpacity: 0.12,

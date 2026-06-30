@@ -2,7 +2,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
  *                                ██        ██                     ▄▄
- *                                ██        ██                     ██
+ *                                ▀▀        ▀▀                     ██
  *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
  *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
  *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
@@ -11,11 +11,10 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████████████ #composables/useCardTilt.ts ████████████████████████████████████████████████
+ * █████████████████████████████████████ #composables/use-card-tilt/composable.ts ██████████████████████████████████████
  *
- * Mouse-driven 3D tilt + shimmer effect for bento/card elements. Reads the card rect directly
- * from e.currentTarget on each mousemove — no template-ref binding required — which makes it
- * reliable across component boundaries.
+ * Mouse-driven 3D tilt + shimmer effect for bento/card elements. Reads the card rect directly from e.currentTarget on
+ * each mousemove (no template-ref binding required), which makes it reliable across component boundaries.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -29,16 +28,14 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-export interface CardTiltOptions {
-  /** Max rotation in degrees applied symmetrically to X and Y axes. Default: 10 */
-  intensity?: number;
-  /** Uniform scale factor applied on hover. Default: 1.025 */
-  scale?: number;
-  /** Peak opacity of the radial shine overlay. Default: 0.12 */
-  shineOpacity?: number;
-}
+import type { ICardTiltOptions } from './types';
 
-export function useCardTilt(options: CardTiltOptions = {}) {
+/**
+ * A composable providing a mouse-driven 3D tilt and radial-shine effect for card elements
+ * @param options - The tilt configuration (intensity, scale, shine opacity)
+ * @returns The reactive tilt/shine styles plus the mouse event handlers to bind on the card element
+ */
+export function useCardTilt(options: ICardTiltOptions = {}) {
   const { intensity = 10, scale = 1.025, shineOpacity = 0.12 } = options;
 
   const rotateX = ref(0);
@@ -52,7 +49,7 @@ export function useCardTilt(options: CardTiltOptions = {}) {
   function onMouseMove(e: MouseEvent) {
     const target = e.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
-    // Normalise cursor position to –1…+1 relative to card centre
+    // Normalise the cursor position to the -1..+1 range relative to the card centre
     const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
     const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
     rotateX.value = -ny * intensity;

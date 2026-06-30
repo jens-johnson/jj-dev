@@ -19,7 +19,7 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { VertifixStatus } from '~/composables/useVertifixUpload';
+import type { TVertifixStatus } from '~/composables/use-vertifix-upload';
 
 const {
   items,
@@ -41,7 +41,7 @@ const fileInput = ref<HTMLInputElement | null>(null);
 
 const steps = ['Identify run', 'Replace on Strava', 'Done'] as const;
 
-const STATUS_LABEL: Record<VertifixStatus, string> = {
+const STATUS_LABEL: Record<TVertifixStatus, string> = {
   reading: 'Reading photo',
   ready: 'Ready',
   matching: 'Finding runs',
@@ -53,13 +53,13 @@ const STATUS_LABEL: Record<VertifixStatus, string> = {
   error: 'Needs attention',
 };
 
-function stageOf(status: VertifixStatus): number {
+function stageOf(status: TVertifixStatus): number {
   if (status === 'done') return 2;
   if (status === 'prepared' || status === 'committing') return 1;
   return 0;
 }
 
-function statusClass(status: VertifixStatus): string {
+function statusClass(status: TVertifixStatus): string {
   if (status === 'done') return 'bg-accent-secondary/15 text-accent-secondary';
   if (status === 'error') return 'bg-terra-600/15 text-terra-600';
   if (status === 'prepared') return 'bg-accent/10 text-accent';

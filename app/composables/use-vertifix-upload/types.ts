@@ -11,45 +11,66 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████████████ server/api/lab/vertifix/prepare.post.ts ██████████████████████████████████████
+ * █████████████████████████████████████ #composables/use-vertifix-upload/types.ts █████████████████████████████████████
  *
- * Admin-only endpoint: builds the corrected-elevation TCX for the chosen activity and returns it to the
- * browser (stateless / client-held) with a summary and the Strava activity URL for the manual-delete step.
+ * Type definitions for the Vertifix upload composable.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { IVertifixPrepareRequest, IVertifixPrepareResult } from '#shared/vertifix';
 
-const FEET_PER_METRE = 3.28084;
+import type { IVertifixCandidate, IVertifixCommitResult, IVertifixPrepareResult } from '#shared/vertifix';
 
-export default defineEventHandler(async (event): Promise<IVertifixPrepareResult> => {
-  await requireAdmin(event);
+/**
+ * A type representing the stage a Vertifix item is at as it moves through the flow
+ * @typedef
+ */
+export type TVertifixStatus =
+  | 'reading'
+  | 'ready'
+  | 'matching'
+  | 'matched'
+  | 'preparing'
+  | 'prepared'
+  | 'committing'
+  | 'done'
+  | 'error';
 
-  const body = await readBody<Partial<IVertifixPrepareRequest>>(event);
-  const activityId = Number(body?.activityId);
-  const elevationFeet = Number(body?.elevationFeet);
-  if (!Number.isFinite(activityId) || !Number.isFinite(elevationFeet) || elevationFeet < 0) {
-    throw createError({
-      statusCode: 422,
-      statusMessage: 'A numeric `activityId` and non-negative `elevationFeet` are required.',
-    });
-  }
+/**
+ * An interface representing one photo working its way through the flow; the raw File is never kept, only what the UI
+ * needs
+ * @interface
+ */
+export interface IVertifixItem {
+  /* The stable client-generated id */
+  id: string;
 
-  const [activity, streams] = await Promise.all([getActivity(activityId), getStreams(activityId)]);
-  const tcx = buildTcx(activity, streams, elevationFeet);
+  /* The original file name */
+  fileName: string;
 
-  return {
-    activityId,
-    tcx,
-    stravaUrl: `https://www.strava.com/activities/${activityId}`,
-    summary: {
-      name: activity.name,
-      description: activity.description ?? '',
-      startDate: activity.start_date,
-      distanceMeters: activity.distance,
-      movingTimeSeconds: activity.moving_time,
-      currentElevationFeet: Math.round(activity.total_elevation_gain * FEET_PER_METRE),
-      targetElevationFeet: Math.round(elevationFeet),
-    },
-  };
-});
+  /* The object URL for the local preview image */
+  previewUrl: string;
+
+  /* The EXIF capture timestamp (ISO string), or null when none could be read */
+  capturedAt: string | null;
+
+  /* The user-supplied corrected elevation in feet, or null until entered */
+  elevationFeet: number | null;
+
+  /* The Strava match candidates returned for this item */
+  candidates: IVertifixCandidate[];
+
+  /* The id of the selected candidate activity, or null until one is chosen */
+  selectedActivityId: number | null;
+
+  /* The prepared replacement payload, or null until prepared */
+  prepared: IVertifixPrepareResult | null;
+
+  /* The commit result, or null until committed */
+  result: IVertifixCommitResult | null;
+
+  /* The current stage of this item */
+  status: TVertifixStatus;
+
+  /* The current error message, or null when none */
+  error: string | null;
+}

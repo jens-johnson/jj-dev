@@ -20,9 +20,9 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { HomelabService } from '~/types/services';
+import type { IHomelabService } from '~/types/services';
 
-const { services } = defineProps<{ services: HomelabService[] }>();
+const { services } = defineProps<{ services: IHomelabService[] }>();
 </script>
 
 <template>

@@ -11,71 +11,42 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████████████████████ #composables/useVertifixUpload.ts █████████████████████████████████████████
+ * ██████████████████████████████████ #composables/use-vertifix-upload/composable.ts ███████████████████████████████████
  *
- * Client state machine for the Vertifix upload flow. Reads each photo's EXIF capture date in the browser,
- * finds candidate Strava runs, and drives each item through match → validate → prepare → manual-delete →
- * commit, holding the prepared TCX client-side (nothing is persisted server-side).
+ * Client-side state machine for the Vertifix lab flow: read photo EXIF capture time, search Strava for matching runs,
+ * prepare a corrected-elevation TCX, then commit the re-upload. The raw File is never retained; only what the UI needs
+ * is kept per item.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+
 import exifr from 'exifr';
 
-import type {
-  VertifixCandidate,
-  VertifixCommitResult,
-  VertifixMatchesResult,
-  VertifixPrepareResult,
-} from '#shared/vertifix';
+import type { IVertifixCommitResult, IVertifixMatchesResult, IVertifixPrepareResult } from '#shared/vertifix';
 
-/* ─── Types ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+import type { IVertifixItem } from './types';
 
-export type VertifixStatus =
-  | 'reading'
-  | 'ready'
-  | 'matching'
-  | 'matched'
-  | 'preparing'
-  | 'prepared'
-  | 'committing'
-  | 'done'
-  | 'error';
-
-/** One photo working its way through the flow. The raw File is never kept — only what the UI needs. */
-export interface VertifixItem {
-  id: string;
-  fileName: string;
-  previewUrl: string;
-  capturedAt: string | null;
-  elevationFeet: number | null;
-  candidates: VertifixCandidate[];
-  selectedActivityId: number | null;
-  prepared: VertifixPrepareResult | null;
-  result: VertifixCommitResult | null;
-  status: VertifixStatus;
-  error: string | null;
-}
-
-/* ─── Helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
+// The EXIF tags consulted, in priority order, to recover a photo's capture time.
 const EXIF_TAGS = ['DateTimeOriginal', 'CreateDate', 'ModifyDate'];
 
-/** Pulls the friendliest message out of a `$fetch` error (our H3 errors carry `statusMessage`). */
+// Pulls the friendliest message out of a `$fetch` error (our H3 errors carry `statusMessage`).
 function errorMessage(err: unknown): string {
   const e = err as { statusMessage?: string; data?: { statusMessage?: string; message?: string }; message?: string };
   return e?.data?.statusMessage ?? e?.data?.message ?? e?.statusMessage ?? e?.message ?? 'Something went wrong.';
 }
 
-/* ─── Composable ──────────────────────────────────────────────────────────────────────────────────────────────────── */
-
+/**
+ * A composable driving the client-side state machine for the Vertifix lab flow
+ * @returns The reactive item list plus the actions that advance each item through the flow
+ */
 export function useVertifixUpload() {
-  const items = useState<VertifixItem[]>('vertifix-items', () => []);
+  const items = useState<IVertifixItem[]>('vertifix-items', () => []);
 
-  function find(id: string): VertifixItem | undefined {
+  function find(id: string): IVertifixItem | undefined {
     return items.value.find((entry) => entry.id === id);
   }
 
-  function patch(id: string, changes: Partial<VertifixItem>) {
+  function patch(id: string, changes: Partial<IVertifixItem>) {
     const item = find(id);
     if (item) Object.assign(item, changes);
   }
@@ -138,7 +109,7 @@ export function useVertifixUpload() {
     if (!item?.capturedAt) return;
     patch(id, { status: 'matching', error: null });
     try {
-      const res = await $fetch<VertifixMatchesResult>('/api/lab/vertifix/matches', {
+      const res = await $fetch<IVertifixMatchesResult>('/api/lab/vertifix/matches', {
         query: { capturedAt: item.capturedAt },
       });
       patch(id, { candidates: res.candidates, status: 'matched' });
@@ -156,7 +127,7 @@ export function useVertifixUpload() {
     if (!item?.selectedActivityId || item.elevationFeet === null) return;
     patch(id, { status: 'preparing', error: null });
     try {
-      const res = await $fetch<VertifixPrepareResult>('/api/lab/vertifix/prepare', {
+      const res = await $fetch<IVertifixPrepareResult>('/api/lab/vertifix/prepare', {
         method: 'POST',
         body: { activityId: item.selectedActivityId, elevationFeet: item.elevationFeet },
       });
@@ -166,7 +137,7 @@ export function useVertifixUpload() {
     }
   }
 
-  /** Offers the prepared TCX as a local download — a backup before the original is deleted. */
+  // Offers the prepared TCX as a local download; a backup before the original is deleted.
   function downloadBackup(id: string) {
     const item = find(id);
     if (!item?.prepared) return;
@@ -183,7 +154,7 @@ export function useVertifixUpload() {
     if (!item?.prepared) return;
     patch(id, { status: 'committing', error: null });
     try {
-      const res = await $fetch<VertifixCommitResult>('/api/lab/vertifix/commit', {
+      const res = await $fetch<IVertifixCommitResult>('/api/lab/vertifix/commit', {
         method: 'POST',
         body: {
           activityId: item.prepared.activityId,
@@ -200,7 +171,7 @@ export function useVertifixUpload() {
     }
   }
 
-  /** Steps a failed item back to the furthest stage it can safely resume from. */
+  // Steps a failed item back to the furthest stage it can safely resume from.
   function retry(id: string) {
     const item = find(id);
     if (!item) return;

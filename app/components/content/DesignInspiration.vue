@@ -24,12 +24,12 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { Theme } from '~/composables/useTheme';
+import type { TTheme } from '~/composables/use-theme';
 
 const { theme, setTheme } = useTheme();
 
 interface InspirationCard {
-  theme: Theme;
+  theme: TTheme;
   title: string;
   vibe: string;
   image: { src: string; alt: string; credit: string };
@@ -87,7 +87,7 @@ const cards: InspirationCard[] = [
   },
 ];
 
-function preview(t: Theme) {
+function preview(t: TTheme) {
   setTheme(t);
 }
 </script>

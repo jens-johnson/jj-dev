@@ -11,45 +11,27 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████████████ server/api/lab/vertifix/prepare.post.ts ██████████████████████████████████████
+ * ████████████████████████████████████ #composables/use-substrate-metrics/types.ts ████████████████████████████████████
  *
- * Admin-only endpoint: builds the corrected-elevation TCX for the chosen activity and returns it to the
- * browser (stateless / client-held) with a summary and the Strava activity URL for the manual-delete step.
+ * Type definitions for the substrate live-metrics composable.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { IVertifixPrepareRequest, IVertifixPrepareResult } from '#shared/vertifix';
 
-const FEET_PER_METRE = 3.28084;
+/**
+ * An interface representing a per-state visual treatment (Tailwind class bundle) for the metrics UI
+ * @interface
+ */
+export interface IStateVisual {
+  /* The human-readable state label */
+  label: string;
 
-export default defineEventHandler(async (event): Promise<IVertifixPrepareResult> => {
-  await requireAdmin(event);
+  /* The Tailwind background class for the status dot */
+  dot: string;
 
-  const body = await readBody<Partial<IVertifixPrepareRequest>>(event);
-  const activityId = Number(body?.activityId);
-  const elevationFeet = Number(body?.elevationFeet);
-  if (!Number.isFinite(activityId) || !Number.isFinite(elevationFeet) || elevationFeet < 0) {
-    throw createError({
-      statusCode: 422,
-      statusMessage: 'A numeric `activityId` and non-negative `elevationFeet` are required.',
-    });
-  }
+  /* The Tailwind text-colour class */
+  text: string;
 
-  const [activity, streams] = await Promise.all([getActivity(activityId), getStreams(activityId)]);
-  const tcx = buildTcx(activity, streams, elevationFeet);
-
-  return {
-    activityId,
-    tcx,
-    stravaUrl: `https://www.strava.com/activities/${activityId}`,
-    summary: {
-      name: activity.name,
-      description: activity.description ?? '',
-      startDate: activity.start_date,
-      distanceMeters: activity.distance,
-      movingTimeSeconds: activity.moving_time,
-      currentElevationFeet: Math.round(activity.total_elevation_gain * FEET_PER_METRE),
-      targetElevationFeet: Math.round(elevationFeet),
-    },
-  };
-});
+  /* Whether the dot should pulse */
+  pulse: boolean;
+}

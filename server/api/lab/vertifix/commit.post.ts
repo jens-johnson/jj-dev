@@ -18,12 +18,12 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { VertifixCommitRequest, VertifixCommitResult } from '#shared/vertifix';
+import type { IVertifixCommitRequest, IVertifixCommitResult } from '#shared/vertifix';
 
-export default defineEventHandler(async (event): Promise<VertifixCommitResult> => {
+export default defineEventHandler(async (event): Promise<IVertifixCommitResult> => {
   await requireAdmin(event);
 
-  const body = await readBody<Partial<VertifixCommitRequest>>(event);
+  const body = await readBody<Partial<IVertifixCommitRequest>>(event);
   const activityId = Number(body?.activityId);
   const elevationFeet = Number(body?.elevationFeet);
   const expectedDistanceMeters = Number(body?.expectedDistanceMeters);

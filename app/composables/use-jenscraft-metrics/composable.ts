@@ -11,26 +11,26 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████████████ #composables/useJenscraftMetrics.ts ████████████████████████████████████████
+ * █████████████████████████████████ #composables/use-jenscraft-metrics/composable.ts ██████████████████████████████████
  *
- * Live-metrics state for the Jenscraft service dashboard. One keyed, client-only fetch of the public read route plus a
- * 30s poll, mapped to the frontmatter tile keys (players/tps/mspt/uptime/explored/mobs) so it drops straight into the
- * generic service-metrics widget. Mirrors useSubstrateMetrics; uptime formatting is reused from it.
+ * Live Jenscraft metrics for the service dashboard. A client-only fetch (the page is prerendered), a 30s poll, and a
+ * computed `live` map keyed by the jenscraft.md tile keys. Pass `enabled = false` on other service pages so it stays
+ * inert (no fetch). `live` is null until the publisher reports (offline).
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { JenscraftMetricsState, JenscraftMetricsView } from '~/types/jenscraft-metrics';
+import type { IJenscraftMetricsView, TJenscraftMetricsState } from '~/types/jenscraft-metrics';
 
 /**
- * Live Jenscraft metrics for the service dashboard. Client-only fetch (the page is prerendered), a 30s poll, and a
- * computed `live` map keyed by the jenscraft.md tile keys. Pass `enabled = false` on other service pages so it stays
- * inert (no fetch). `live` is null until the publisher reports (offline).
+ * A composable providing live Jenscraft metrics for the service dashboard
+ * @param enabled - Whether to fetch and poll; pass false on pages where the feed should stay inert
+ * @returns The raw feed data, the freshness state, a computed live-values map, and refresh/status handles
  */
 export function useJenscraftMetrics(enabled = true) {
-  const { data, refresh, status } = useFetch<JenscraftMetricsView>('/api/services/jenscraft/metrics', {
+  const { data, refresh, status } = useFetch<IJenscraftMetricsView>('/api/services/jenscraft/metrics', {
     key: 'jenscraft-metrics',
-    // Live data: the service page is prerendered, so there's no useful server value — fetch fresh on the client.
+    // Live data: the service page is prerendered, so there is no useful server value; fetch fresh on the client.
     server: false,
     immediate: enabled,
   });
@@ -41,9 +41,9 @@ export function useJenscraftMetrics(enabled = true) {
     onScopeDispose(() => clearInterval(poll));
   });
 
-  const state = computed<JenscraftMetricsState>(() => data.value?.state ?? 'offline');
+  const state = computed<TJenscraftMetricsState>(() => data.value?.state ?? 'offline');
 
-  /** Live values keyed by the jenscraft.md tile keys; null until the publisher reports (offline). */
+  // Live values keyed by the jenscraft.md tile keys; null until the publisher reports (offline).
   const live = computed<Record<string, string | number> | null>(() => {
     const d = data.value;
     if (!d || d.state === 'offline') return null;

@@ -11,7 +11,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████████████████████ #utils/tech-docs.ts █████████████████████████████████████████████████
+ * █████████████████████████████████████████████ #utils/tech-docs/utils.ts █████████████████████████████████████████████
  *
  * A central registry mapping the technologies, tools, and platforms referenced across the site to their official docs
  * pages, so tech/stack chips can render wiki-style links without each call site hard-coding URLs. Lookup is
@@ -19,16 +19,14 @@
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * techDocHref('PaperMC 26.1.2') // → 'https://docs.papermc.io/'
- * techDocHref('Homegrown thing') // → undefined (render as plain text)
+ * techDocHref('PaperMC 26.1.2') // => 'https://docs.papermc.io/'
+ * techDocHref('Homegrown thing') // => undefined (render as plain text)
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-/**
- * Canonical docs URL per technology, keyed by a normalised lowercase name (no version, trimmed). Several common
- * aliases map to the same destination so authored copy can use whatever name reads best in context.
- */
+// Canonical docs URL per technology, keyed by a normalised lowercase name (no version, trimmed). Several common
+// aliases map to the same destination so authored copy can use whatever name reads best in context.
 const TECH_DOCS: Record<string, string> = {
   /* ─── Minecraft server + plugins ─────────────────────────────────────────────────────────────────────────────── */
   paper: 'https://docs.papermc.io/',
@@ -75,16 +73,24 @@ const TECH_DOCS: Record<string, string> = {
   route53: 'https://docs.aws.amazon.com/route53/',
 };
 
-/** Normalise a tech name for lookup: lowercase, trimmed, and with a trailing version (e.g. "26.1.2") stripped. */
+/**
+ * Normalises a tech name for lookup: lowercase, trimmed, and with a trailing version (e.g. "26.1.2") stripped
+ * @param name - The raw tech name
+ * @returns The normalised lookup key
+ */
 function normalizeTech(name: string): string {
   return name
     .toLowerCase()
     .trim()
-    .replace(/\s+v?\d+[\d.]*$/, '') // drop a trailing version token ("paper 26.1.2" → "paper")
+    .replace(/\s+v?\d+[\d.]*$/, '') // drop a trailing version token, e.g. "paper 26.1.2" becomes "paper"
     .trim();
 }
 
-/** Official docs URL for a technology/tool/platform name, or `undefined` when it isn't in the registry. */
+/**
+ * Resolves the official docs URL for a technology/tool/platform name
+ * @param name - The tech name, possibly with a trailing version
+ * @returns The docs URL, or undefined when the name is not in the registry
+ */
 export function techDocHref(name: string | undefined | null): string | undefined {
   if (!name) return undefined;
   return TECH_DOCS[normalizeTech(name)];

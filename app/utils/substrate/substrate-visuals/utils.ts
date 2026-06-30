@@ -11,46 +11,48 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████████████████ #utils/substrate-visuals.ts ██████████████████████████████████████████████
+ * ████████████████████████████████████ #utils/substrate/substrate-visuals/utils.ts ████████████████████████████████████
  *
- * Shared visual lookups for the Substrate homelab section — status colours, device-kind icons, and human labels.
- * Auto-imported by Nuxt, so the topology widget and inspector panel render the same node consistently. Tailwind
- * class strings (not raw colours) so all three themes stay in sync via the token layer.
+ * Shared visual lookups for the Substrate homelab section: status colours, device-kind icons, and human labels.
+ * Auto-imported by Nuxt, so the topology widget and inspector panel render the same node consistently. Tailwind class
+ * strings (not raw colours) so all three themes stay in sync via the token layer.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { SubstrateDevice } from '~/types/substrate';
+import type { ISubstrateDevice } from '~/types/substrate';
 
-/** Tailwind class bundle for a status — dot fill, text colour, and a faint tinted background. */
-export interface StatusVisual {
-  label: string;
-  dot: string;
-  text: string;
-  tint: string;
-}
+import type { IRawSubstrateDoc, IStatusVisual } from './types';
 
-const ONLINE: StatusVisual = {
+// The visual treatment for an online device, reused as the default-online lookup.
+const ONLINE: IStatusVisual = {
   label: 'Online',
   dot: 'bg-accent-secondary',
   text: 'text-accent-secondary',
   tint: 'bg-accent-secondary/10',
 };
 
-const STATUS: Record<string, StatusVisual> = {
+// The per-status visual treatments for substrate hardware.
+const STATUS: Record<string, IStatusVisual> = {
   online: ONLINE,
   offline: { label: 'Offline', dot: 'bg-terra-600', text: 'text-terra-600', tint: 'bg-terra-600/10' },
   planned: { label: 'Planned', dot: 'bg-ink-subtle', text: 'text-ink-subtle', tint: 'bg-ink-subtle/10' },
   maintenance: { label: 'Maintenance', dot: 'bg-terra-400', text: 'text-terra-400', tint: 'bg-terra-400/10' },
 };
 
-/** Visual treatment for a device status, defaulting to "online". */
-export function statusOf(status: string): StatusVisual {
+/**
+ * Resolves the visual treatment for a device status, defaulting to "online"
+ * @param status - The device status key
+ * @returns The matching visual treatment, or the "online" treatment when unknown
+ */
+export function statusOf(status: string): IStatusVisual {
   return STATUS[status] ?? ONLINE;
 }
 
+// The fallback icon for an unknown device kind.
 const OTHER_ICON = 'lucide:box';
 
+// The per-kind Lucide icon lookup for substrate hardware.
 const KIND_ICON: Record<string, string> = {
   internet: 'lucide:globe',
   gateway: 'lucide:shield',
@@ -69,11 +71,16 @@ const KIND_ICON: Record<string, string> = {
   other: OTHER_ICON,
 };
 
-/** Lucide icon name for a device kind. */
+/**
+ * Resolves the Lucide icon name for a device kind
+ * @param kind - The device kind key
+ * @returns The matching Lucide icon name, or the fallback icon when unknown
+ */
 export function kindIcon(kind: string): string {
   return KIND_ICON[kind] ?? OTHER_ICON;
 }
 
+// The per-kind human-readable label lookup for substrate hardware.
 const KIND_LABEL: Record<string, string> = {
   internet: 'Internet',
   gateway: 'Gateway',
@@ -92,34 +99,21 @@ const KIND_LABEL: Record<string, string> = {
   other: 'Device',
 };
 
-/** Human-readable label for a device kind. */
+/**
+ * Resolves the human-readable label for a device kind
+ * @param kind - The device kind key
+ * @returns The matching label, or the kind itself when unknown
+ */
 export function kindLabel(kind: string): string {
   return KIND_LABEL[kind] ?? kind;
 }
 
 /**
- * Loose shape of a substrate doc straight from `queryCollection` — every field optional, mirroring how
- * @nuxt/content widens schema columns to `T | undefined`. Normalised into a concrete device below.
+ * Coerces a queried doc into a fully-populated device, applying schema defaults so consumers never see undefined
+ * @param d - The loosely-typed substrate doc from queryCollection
+ * @returns The fully-populated device
  */
-export interface RawSubstrateDoc {
-  nodeId?: string;
-  title?: string;
-  description?: string;
-  kind?: string;
-  layer?: string;
-  status?: string;
-  vendor?: string;
-  model?: string;
-  power?: number;
-  specs?: Array<{ label?: string; value?: string }>;
-  connections?: Array<{ to?: string; kind?: string; label?: string }>;
-  tags?: string[];
-  order?: number;
-  path?: string;
-}
-
-/** Coerce a queried doc into a fully-populated device, applying schema defaults so consumers never see undefined. */
-export function normalizeDevice(d: RawSubstrateDoc): SubstrateDevice {
+export function normalizeDevice(d: IRawSubstrateDoc): ISubstrateDevice {
   return {
     nodeId: d.nodeId ?? d.path ?? '',
     title: d.title ?? 'Untitled',
@@ -140,7 +134,11 @@ export function normalizeDevice(d: RawSubstrateDoc): SubstrateDevice {
   };
 }
 
-/** Normalise a list of queried docs. */
-export function normalizeDevices(docs: RawSubstrateDoc[]): SubstrateDevice[] {
+/**
+ * Normalises a list of queried docs
+ * @param docs - The loosely-typed substrate docs from queryCollection
+ * @returns The normalised devices
+ */
+export function normalizeDevices(docs: IRawSubstrateDoc[]): ISubstrateDevice[] {
   return docs.map(normalizeDevice);
 }

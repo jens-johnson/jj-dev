@@ -27,11 +27,11 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { SubstrateDevice } from '~/types/substrate';
+import type { ISubstrateDevice } from '~/types/substrate';
 
 const props = defineProps<{
-  device: SubstrateDevice | null;
-  devices: SubstrateDevice[];
+  device: ISubstrateDevice | null;
+  devices: ISubstrateDevice[];
   hasNotes?: boolean;
 }>();
 

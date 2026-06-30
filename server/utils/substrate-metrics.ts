@@ -46,13 +46,13 @@ export interface StoredSubstrateMetrics extends SubstrateMetricsPayload {
 }
 
 /** One compact rolling-history point, kept just for the sparklines. */
-export interface SubstrateMetricsSample {
+export interface ISubstrateMetricsSample {
   t: number;
   cpu: number;
   mem: number;
 }
 
-export type SubstrateMetricsState = 'live' | 'stale' | 'offline';
+export type TSubstrateMetricsState = 'live' | 'stale' | 'offline';
 
 /* ─── Validation (no external deps; unknown keys are dropped by construction) ──────────────────────────────────────── */
 
@@ -118,7 +118,7 @@ export async function writeLatestMetrics(p: SubstrateMetricsPayload): Promise<vo
   const receivedAt = Date.now();
   await store.setItem(KEY, { ...p, receivedAt } satisfies StoredSubstrateMetrics);
 
-  const prev = (await store.getItem<SubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
+  const prev = (await store.getItem<ISubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
   const next = [...prev, { t: receivedAt, cpu: p.node.cpuPct, mem: p.node.mem.usedPct }].slice(-HISTORY_MAX);
   await store.setItem(HISTORY_KEY, next);
 }
@@ -127,12 +127,12 @@ export async function readLatestMetrics(): Promise<StoredSubstrateMetrics | null
   return (await useStorage('substrate').getItem<StoredSubstrateMetrics>(KEY)) ?? null;
 }
 
-export async function readHistory(): Promise<SubstrateMetricsSample[]> {
-  return (await useStorage('substrate').getItem<SubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
+export async function readHistory(): Promise<ISubstrateMetricsSample[]> {
+  return (await useStorage('substrate').getItem<ISubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
 }
 
 /** Replace the rolling history outright. Used by the dev seed to pre-populate the sparklines. */
-export async function setHistory(samples: SubstrateMetricsSample[]): Promise<void> {
+export async function setHistory(samples: ISubstrateMetricsSample[]): Promise<void> {
   await useStorage('substrate').setItem(HISTORY_KEY, samples.slice(-HISTORY_MAX));
 }
 
@@ -141,9 +141,9 @@ export async function setHistory(samples: SubstrateMetricsSample[]): Promise<voi
 const LIVE_MAX_AGE_S = 90;
 const STALE_MAX_AGE_S = 600;
 
-export function metricsState(receivedAt: number, now = Date.now()): { state: SubstrateMetricsState; ageSec: number } {
+export function metricsState(receivedAt: number, now = Date.now()): { state: TSubstrateMetricsState; ageSec: number } {
   const ageSec = Math.max(0, Math.round((now - receivedAt) / 1000));
-  const state: SubstrateMetricsState =
+  const state: TSubstrateMetricsState =
     ageSec <= LIVE_MAX_AGE_S ? 'live' : ageSec <= STALE_MAX_AGE_S ? 'stale' : 'offline';
   return { state, ageSec };
 }

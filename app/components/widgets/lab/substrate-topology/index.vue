@@ -28,9 +28,9 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { SubstrateDevice } from '~/types/substrate';
+import type { ISubstrateDevice } from '~/types/substrate';
 
-const props = defineProps<{ devices: SubstrateDevice[] }>();
+const props = defineProps<{ devices: ISubstrateDevice[] }>();
 
 /** Two-way bound selected node id — null when nothing is inspected. */
 const selectedId = defineModel<string | null>('selectedId', { default: null });

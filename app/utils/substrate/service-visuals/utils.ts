@@ -11,37 +11,33 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████████████████████████ #utils/service-visuals.ts █████████████████████████████████████████████
+ * █████████████████████████████████████ #utils/substrate/service-visuals/utils.ts █████████████████████████████████████
  *
- * Shared visual lookups for the Substrate "Services" layer — status colours, service-kind icons, and human labels,
- * plus a normaliser that coerces a queried doc into a fully-populated service. Auto-imported by Nuxt; exports are
- * prefixed `service*` so they sit alongside the hardware-side `substrate-visuals` helpers without colliding.
+ * Shared visual lookups for the Substrate "Services" layer: status colours, service-kind icons, and human labels, plus
+ * a normaliser that coerces a queried doc into a fully-populated service. Auto-imported by Nuxt; exports are prefixed
+ * `service*` so they sit alongside the hardware-side substrate-visuals helpers without colliding.
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • #utils/substrate-visuals.ts — the sibling lookups for hardware nodes
+ * • #utils/substrate/substrate-visuals; the sibling lookups for hardware nodes
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { HomelabService } from '~/types/services';
+import type { IHomelabService } from '~/types/services';
 
-/** Tailwind class bundle for a status — dot fill, text colour, and a faint tinted background. */
-export interface ServiceStatusVisual {
-  label: string;
-  dot: string;
-  text: string;
-  tint: string;
-}
+import type { IRawServiceDoc, IServiceStatusVisual, ITextSegment } from './types';
 
-const SERVICE_ONLINE: ServiceStatusVisual = {
+// The visual treatment for an online service, reused as the default-online lookup.
+const SERVICE_ONLINE: IServiceStatusVisual = {
   label: 'Online',
   dot: 'bg-accent-secondary',
   text: 'text-accent-secondary',
   tint: 'bg-accent-secondary/10',
 };
 
-const SERVICE_STATUS: Record<string, ServiceStatusVisual> = {
+// The per-status visual treatments for the Services layer.
+const SERVICE_STATUS: Record<string, IServiceStatusVisual> = {
   online: SERVICE_ONLINE,
   offline: { label: 'Offline', dot: 'bg-terra-600', text: 'text-terra-600', tint: 'bg-terra-600/10' },
   planned: { label: 'Planned', dot: 'bg-ink-subtle', text: 'text-ink-subtle', tint: 'bg-ink-subtle/10' },
@@ -49,13 +45,20 @@ const SERVICE_STATUS: Record<string, ServiceStatusVisual> = {
   degraded: { label: 'Degraded', dot: 'bg-terra-400', text: 'text-terra-400', tint: 'bg-terra-400/10' },
 };
 
-/** Visual treatment for a service status, defaulting to "planned" (the common case before a service is stood up). */
-export function serviceStatusOf(status: string): ServiceStatusVisual {
+/**
+ * Resolves the visual treatment for a service status, defaulting to "planned" (the common case before a service is
+ * stood up)
+ * @param status - The service status key
+ * @returns The matching visual treatment, or the "planned" treatment when unknown
+ */
+export function serviceStatusOf(status: string): IServiceStatusVisual {
   return SERVICE_STATUS[status] ?? SERVICE_STATUS.planned!;
 }
 
+// The fallback icon for an unknown service kind.
 const SERVICE_OTHER_ICON = 'lucide:box';
 
+// The per-kind Lucide icon lookup for the Services layer.
 const SERVICE_KIND_ICON: Record<string, string> = {
   'game-server': 'lucide:gamepad-2',
   media: 'lucide:clapperboard',
@@ -67,11 +70,16 @@ const SERVICE_KIND_ICON: Record<string, string> = {
   other: SERVICE_OTHER_ICON,
 };
 
-/** Lucide icon name for a service kind. */
+/**
+ * Resolves the Lucide icon name for a service kind
+ * @param kind - The service kind key
+ * @returns The matching Lucide icon name, or the fallback icon when unknown
+ */
 export function serviceKindIcon(kind: string): string {
   return SERVICE_KIND_ICON[kind] ?? SERVICE_OTHER_ICON;
 }
 
+// The per-kind human-readable label lookup for the Services layer.
 const SERVICE_KIND_LABEL: Record<string, string> = {
   'game-server': 'Game Server',
   media: 'Media',
@@ -83,36 +91,21 @@ const SERVICE_KIND_LABEL: Record<string, string> = {
   other: 'Service',
 };
 
-/** Human-readable label for a service kind. */
+/**
+ * Resolves the human-readable label for a service kind
+ * @param kind - The service kind key
+ * @returns The matching label, or the kind itself when unknown
+ */
 export function serviceKindLabel(kind: string): string {
   return SERVICE_KIND_LABEL[kind] ?? kind;
 }
 
 /**
- * Loose shape of a services doc straight from `queryCollection` — every field optional, mirroring how
- * @nuxt/content widens schema columns to `T | undefined`. Normalised into a concrete service below.
+ * Coerces a queried doc into a fully-populated service, applying schema defaults so consumers never see undefined
+ * @param d - The loosely-typed service doc from queryCollection
+ * @returns The fully-populated service
  */
-export interface RawServiceDoc {
-  serviceId?: string;
-  title?: string;
-  description?: string;
-  kind?: string;
-  status?: string;
-  icon?: string;
-  summary?: string;
-  host?: string;
-  address?: string;
-  stack?: string[];
-  links?: { live?: string; map?: string; github?: string; docs?: string };
-  plugins?: Array<{ name?: string; side?: string; category?: string; purpose?: string; url?: string }>;
-  metrics?: Array<{ key?: string; label?: string; icon?: string; unit?: string; hint?: string }>;
-  tags?: string[];
-  order?: number;
-  path?: string;
-}
-
-/** Coerce a queried doc into a fully-populated service, applying schema defaults so consumers never see undefined. */
-export function normalizeService(d: RawServiceDoc): HomelabService {
+export function normalizeService(d: IRawServiceDoc): IHomelabService {
   return {
     serviceId: d.serviceId ?? d.path?.split('/').pop() ?? '',
     title: d.title ?? 'Untitled',
@@ -143,26 +136,26 @@ export function normalizeService(d: RawServiceDoc): HomelabService {
   };
 }
 
-/** Normalise a list of queried docs, sorted by ascending `order`. */
-export function normalizeServices(docs: RawServiceDoc[]): HomelabService[] {
+/**
+ * Normalises a list of queried docs, sorted by ascending `order`
+ * @param docs - The loosely-typed service docs from queryCollection
+ * @returns The normalised services, sorted by ascending order
+ */
+export function normalizeServices(docs: IRawServiceDoc[]): IHomelabService[] {
   return docs.map(normalizeService).sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
 }
 
-/** One run of body text — `href` set when it points at a Substrate device page (rendered monospace by callers). */
-export interface TextSegment {
-  text: string;
-  href?: string;
-}
-
-/** Matches Substrate device ids like `srv-01`, `fw-01`, `gw-01` (case-insensitive) so prose can link them to their node page. */
+// Matches Substrate device ids like `srv-01`, `fw-01`, `gw-01` (case-insensitive) so prose can link them to their page.
 const DEVICE_ID_RE = /\b((?:srv|fw|gw|sw|ap|ups|nas|pi)-\d+)\b/gi;
 
 /**
- * Split a plain string into plain + linked segments, turning any Substrate device id (e.g. `srv-01`) into a link to
- * that device's page. Lets a frontmatter string (no markdown) still render wiki-style device links + monospace.
+ * Splits a plain string into plain + linked segments, turning any Substrate device id (e.g. `srv-01`) into a link to
+ * that device page. Lets a frontmatter string (no markdown) still render wiki-style device links plus monospace
+ * @param text - The raw body text
+ * @returns The ordered text segments, with device mentions carrying an href
  */
-export function splitDeviceMentions(text: string): TextSegment[] {
-  const segments: TextSegment[] = [];
+export function splitDeviceMentions(text: string): ITextSegment[] {
+  const segments: ITextSegment[] = [];
   let last = 0;
   for (const m of text.matchAll(DEVICE_ID_RE)) {
     const start = m.index ?? 0;

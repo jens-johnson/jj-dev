@@ -11,45 +11,23 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████████████ server/api/lab/vertifix/prepare.post.ts ██████████████████████████████████████
+ * ████████████████████████████████████ #composables/use-substrate-metrics/utils.ts ████████████████████████████████████
  *
- * Admin-only endpoint: builds the corrected-elevation TCX for the chosen activity and returns it to the
- * browser (stateless / client-held) with a summary and the Strava activity URL for the manual-delete step.
+ * Formatting helpers for the substrate live-metrics composable.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { IVertifixPrepareRequest, IVertifixPrepareResult } from '#shared/vertifix';
 
-const FEET_PER_METRE = 3.28084;
-
-export default defineEventHandler(async (event): Promise<IVertifixPrepareResult> => {
-  await requireAdmin(event);
-
-  const body = await readBody<Partial<IVertifixPrepareRequest>>(event);
-  const activityId = Number(body?.activityId);
-  const elevationFeet = Number(body?.elevationFeet);
-  if (!Number.isFinite(activityId) || !Number.isFinite(elevationFeet) || elevationFeet < 0) {
-    throw createError({
-      statusCode: 422,
-      statusMessage: 'A numeric `activityId` and non-negative `elevationFeet` are required.',
-    });
-  }
-
-  const [activity, streams] = await Promise.all([getActivity(activityId), getStreams(activityId)]);
-  const tcx = buildTcx(activity, streams, elevationFeet);
-
-  return {
-    activityId,
-    tcx,
-    stravaUrl: `https://www.strava.com/activities/${activityId}`,
-    summary: {
-      name: activity.name,
-      description: activity.description ?? '',
-      startDate: activity.start_date,
-      distanceMeters: activity.distance,
-      movingTimeSeconds: activity.moving_time,
-      currentElevationFeet: Math.round(activity.total_elevation_gain * FEET_PER_METRE),
-      targetElevationFeet: Math.round(elevationFeet),
-    },
-  };
-});
+/**
+ * Formats a duration in seconds to a compact human uptime, e.g. "9d 14h"
+ * @param sec - The duration in seconds
+ * @returns The compact uptime label
+ */
+export function formatUptime(sec: number): string {
+  const d = Math.floor(sec / 86_400);
+  const h = Math.floor((sec % 86_400) / 3_600);
+  const m = Math.floor((sec % 3_600) / 60);
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
