@@ -11,12 +11,12 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████████████████████ server/utils/tcx.ts ████████████████████████████████████████████████
+ * █████████████████████████████████████████████ server/utils/tcx/utils.ts █████████████████████████████████████████████
  *
- * Pure builder that re-renders a Strava activity as a Garmin TCX file with a corrected elevation gain,
- * preserving the original time, distance, heart-rate, and cadence streams. Treadmill runs sync to Strava
- * with zero vertical gain; Vertifix injects a steady incline so the elevation metric is restored before
- * the activity is re-uploaded. Pure and side-effect free — no Strava calls, no I/O — so it is unit-tested.
+ * Pure builder that re-renders a Strava activity as a Garmin TCX file with a corrected elevation gain, preserving the
+ * original time, distance, heart-rate, and cadence streams. Treadmill runs sync to Strava with zero vertical gain;
+ * Vertifix injects a steady incline so the elevation metric is restored before the activity is re-uploaded. Pure and
+ * side-effect free (no Strava calls, no I/O), so it is unit-tested.
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -26,34 +26,14 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-/* ─── Types ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-/** The subset of a Strava activity that {@link buildTcx} reads. JEN-71's `StravaActivity` is structurally assignable. */
-export interface TcxSourceActivity {
-  /** ISO 8601 start time of the activity. */
-  start_date: string;
-  /** Total elapsed time, in seconds. */
-  elapsed_time: number;
-  /** Total distance, in metres. */
-  distance: number;
-  /** Optional free-text description, copied into the TCX `<Notes>` element. */
-  description?: string;
-}
-
-/** A single Strava data stream (e.g. `time`, `distance`, `heartrate`, `cadence`). */
-export interface TcxStream {
-  data: number[];
-}
-
-/** Map of stream key to payload, as returned by the Strava activity streams endpoint. */
-export type TcxStreams = Record<string, TcxStream | undefined>;
+import type { ITcxSourceActivity, TTcxStreams } from './types';
 
 /* ─── Constants ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Feet → metres. */
+// Feet to metres.
 const FEET_TO_METRES = 0.3048;
 
-/** XML entities that must be escaped inside the generated TCX document. */
+// XML entities that must be escaped inside the generated TCX document.
 const XML_ENTITIES: Record<string, string> = {
   '<': '&lt;',
   '>': '&gt;',
@@ -64,7 +44,7 @@ const XML_ENTITIES: Record<string, string> = {
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** XML-escapes a value for safe interpolation into the TCX document. */
+// XML-escapes a value for safe interpolation into the TCX document.
 function escapeXml(value: unknown): string {
   return String(value ?? '').replace(/[<>&'"]/g, (character) => XML_ENTITIES[character] ?? character);
 }
@@ -72,14 +52,18 @@ function escapeXml(value: unknown): string {
 /* ─── Builder ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
- * Builds a Garmin TCX document for `activity` with its elevation gain forced to `elevationFeet`.
+ * Builds a Garmin TCX document for an activity with its elevation gain forced to the given feet.
  *
- * Altitude ramps linearly from zero to the target gain across the run, modelling the steady incline of a
- * treadmill. Distance is taken from the distance stream (scaled to the activity total) and falls back to a
- * linear interpolation from elapsed time when no stream is present; heart-rate and cadence are carried
- * through per trackpoint when available and omitted otherwise.
+ * Altitude ramps linearly from zero to the target gain across the run, modelling the steady incline of a treadmill.
+ * Distance is taken from the distance stream (scaled to the activity total) and falls back to a linear interpolation
+ * from elapsed time when no stream is present; heart-rate and cadence are carried through per trackpoint when
+ * available and omitted otherwise.
+ * @param activity - The source activity fields the builder reads
+ * @param streams - The Strava streams keyed by type
+ * @param elevationFeet - The target elevation gain in feet
+ * @returns The serialised TCX document
  */
-export function buildTcx(activity: TcxSourceActivity, streams: TcxStreams, elevationFeet: number): string {
+export function buildTcx(activity: ITcxSourceActivity, streams: TTcxStreams, elevationFeet: number): string {
   const times = streams.time?.data ?? [0, activity.elapsed_time];
   const rawDistances = streams.distance?.data;
   const rawDistanceEnd = rawDistances?.at(-1) ?? 0;
@@ -134,11 +118,10 @@ export function buildTcx(activity: TcxSourceActivity, streams: TcxStreams, eleva
     '</Lap>',
     `<Notes>${escapeXml(activity.description ?? '')}</Notes>`,
     '<Creator xsi:type="Device_t">',
-    // ⚠️ DO NOT remove "barometer" from this name. Strava only honours uploaded <AltitudeMeters>
-    // when it believes the recording device has a barometric altimeter — the literal word
-    // "barometer" in the device name is how that is signalled. Without it, Strava recomputes
-    // elevation from GPS (which a treadmill run has none of) and the activity lands at 0 ft.
-    // Proven against the working prototype: identical TCX, only the device name differed.
+    // DO NOT remove "barometer" from this name. Strava only honours uploaded <AltitudeMeters> when it believes the
+    // recording device has a barometric altimeter; the literal word "barometer" in the device name is how that is
+    // signalled. Without it, Strava recomputes elevation from GPS (which a treadmill run has none of) and the
+    // activity lands at 0 ft. Proven against the working prototype: identical TCX, only the device name differed.
     '<Name>Vertifix with barometer</Name>',
     '<UnitId>0</UnitId>',
     '<ProductID>0</ProductID>',

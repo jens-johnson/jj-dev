@@ -19,12 +19,12 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ISubstrateMetricsSample,SubstrateMetricsPayload } from '../utils/substrate-metrics';
+import type { ISubstrateMetricsPayload,ISubstrateMetricsSample } from '../utils/substrate-metrics';
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-function mockPayload(): SubstrateMetricsPayload {
+function mockPayload(): ISubstrateMetricsPayload {
   return {
     v: 1,
     ts: new Date().toISOString(),

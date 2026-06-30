@@ -11,7 +11,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████████████████ #server/utils/substrate-metrics.ts ██████████████████████████████████████
+ * ██████████████████████████████████████ server/utils/substrate-metrics/utils.ts ██████████████████████████████████████
  *
  * Server-side helpers for the Substrate live-metrics feed: a dependency-free validator for the public payload, the
  * Nitro storage read/write, staleness computation, and a dev-grade rate limiter. Auto-imported into the substrate
@@ -19,40 +19,12 @@
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • docs/project-planning/substrate-metrics-feed.md — the design + payload contract
+ * • docs/project-planning/substrate-metrics-feed.md; the design + payload contract
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-/** The validated, public-safe payload the lab publisher POSTs. Counts and percentages only; never identifiers. */
-export interface SubstrateMetricsPayload {
-  v: number;
-  ts: string;
-  node: {
-    uptimeSec: number;
-    cpuPct: number;
-    loadAvg: [number, number, number];
-    mem: { usedPct: number; totalGiB: number };
-    swap?: { usedPct: number };
-  };
-  guests: { vms: number; cts: number; running: number };
-  storage?: { usedPct: number };
-  internet?: { reachable: boolean; latencyMs?: number };
-}
-
-/** Stored record adds the server's receive time, the source of truth for staleness. */
-export interface StoredSubstrateMetrics extends SubstrateMetricsPayload {
-  receivedAt: number;
-}
-
-/** One compact rolling-history point, kept just for the sparklines. */
-export interface ISubstrateMetricsSample {
-  t: number;
-  cpu: number;
-  mem: number;
-}
-
-export type TSubstrateMetricsState = 'live' | 'stale' | 'offline';
+import type { IStoredSubstrateMetrics, ISubstrateMetricsPayload, ISubstrateMetricsSample, TSubstrateMetricsState } from './types';
 
 /* ─── Validation (no external deps; unknown keys are dropped by construction) ──────────────────────────────────────── */
 
@@ -62,11 +34,14 @@ const isCount = (x: unknown): x is number => isNum(x) && Number.isInteger(x) && 
 const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
 
 /**
- * Validate an untrusted body into a clean `SubstrateMetricsPayload`. Returns `{ ok: false }` on any shape/range
- * violation (the caller responds with a generic 422 — no detail is leaked). The returned object is rebuilt from
- * known fields only, so any extra keys an attacker sends are silently dropped.
+ * Validates an untrusted body into a clean payload. The returned object is rebuilt from known fields only, so any
+ * extra keys an attacker sends are silently dropped
+ * @param input - The untrusted request body
+ * @returns An ok result with the clean value, or `{ ok: false }` on any shape/range violation
  */
-export function validateMetricsPayload(input: unknown): { ok: true; value: SubstrateMetricsPayload } | { ok: false } {
+export function validateMetricsPayload(
+  input: unknown,
+): { ok: true; value: ISubstrateMetricsPayload } | { ok: false } {
   if (!isObj(input) || !isNum(input.v) || typeof input.ts !== 'string' || input.ts.length > 40) return { ok: false };
 
   const node = input.node;
@@ -80,7 +55,7 @@ export function validateMetricsPayload(input: unknown): { ok: true; value: Subst
   if (!isPct(mem.usedPct) || !isNum(mem.totalGiB) || mem.totalGiB <= 0) return { ok: false };
   if (!isCount(guests.vms) || !isCount(guests.cts) || !isCount(guests.running)) return { ok: false };
 
-  const value: SubstrateMetricsPayload = {
+  const value: ISubstrateMetricsPayload = {
     v: input.v,
     ts: input.ts,
     node: {
@@ -110,28 +85,42 @@ export function validateMetricsPayload(input: unknown): { ok: true; value: Subst
 
 const KEY = 'metrics:latest';
 const HISTORY_KEY = 'metrics:history';
-const HISTORY_MAX = 60; // ~30 min at a 30s push cadence — enough for a live sparkline, cheap to store.
+const HISTORY_MAX = 60; // ~30 min at a 30s push cadence; enough for a live sparkline, cheap to store.
 
-/** Persist the latest snapshot and append a compact point to the rolling history (for the sparklines). */
-export async function writeLatestMetrics(p: SubstrateMetricsPayload): Promise<void> {
+/**
+ * Persists the latest snapshot and appends a compact point to the rolling history (for the sparklines)
+ * @param p - The validated payload to store
+ */
+export async function writeLatestMetrics(p: ISubstrateMetricsPayload): Promise<void> {
   const store = useStorage('substrate');
   const receivedAt = Date.now();
-  await store.setItem(KEY, { ...p, receivedAt } satisfies StoredSubstrateMetrics);
+  await store.setItem(KEY, { ...p, receivedAt } satisfies IStoredSubstrateMetrics);
 
   const prev = (await store.getItem<ISubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
   const next = [...prev, { t: receivedAt, cpu: p.node.cpuPct, mem: p.node.mem.usedPct }].slice(-HISTORY_MAX);
   await store.setItem(HISTORY_KEY, next);
 }
 
-export async function readLatestMetrics(): Promise<StoredSubstrateMetrics | null> {
-  return (await useStorage('substrate').getItem<StoredSubstrateMetrics>(KEY)) ?? null;
+/**
+ * Reads the latest stored snapshot
+ * @returns The stored record, or null when none has been written
+ */
+export async function readLatestMetrics(): Promise<IStoredSubstrateMetrics | null> {
+  return (await useStorage('substrate').getItem<IStoredSubstrateMetrics>(KEY)) ?? null;
 }
 
+/**
+ * Reads the rolling sample history
+ * @returns The stored history samples, or an empty array when none
+ */
 export async function readHistory(): Promise<ISubstrateMetricsSample[]> {
   return (await useStorage('substrate').getItem<ISubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
 }
 
-/** Replace the rolling history outright. Used by the dev seed to pre-populate the sparklines. */
+/**
+ * Replaces the rolling history outright; used by the dev seed to pre-populate the sparklines
+ * @param samples - The samples to store (trimmed to the history cap)
+ */
 export async function setHistory(samples: ISubstrateMetricsSample[]): Promise<void> {
   await useStorage('substrate').setItem(HISTORY_KEY, samples.slice(-HISTORY_MAX));
 }
@@ -141,6 +130,12 @@ export async function setHistory(samples: ISubstrateMetricsSample[]): Promise<vo
 const LIVE_MAX_AGE_S = 90;
 const STALE_MAX_AGE_S = 600;
 
+/**
+ * Computes the feed freshness state and sample age from a receive time
+ * @param receivedAt - The server receive time (epoch milliseconds)
+ * @param now - The current time (epoch milliseconds), defaulting to now
+ * @returns The freshness state and the sample age in seconds
+ */
 export function metricsState(receivedAt: number, now = Date.now()): { state: TSubstrateMetricsState; ageSec: number } {
   const ageSec = Math.max(0, Math.round((now - receivedAt) / 1000));
   const state: TSubstrateMetricsState =
@@ -152,6 +147,14 @@ export function metricsState(receivedAt: number, now = Date.now()): { state: TSu
 
 const hits = new Map<string, number[]>();
 
+/**
+ * Dev-grade in-memory rate limiter (per-process)
+ * @param key - The bucket key (e.g. the client IP)
+ * @param limit - The maximum requests allowed within the window
+ * @param windowMs - The rolling window length in milliseconds
+ * @param now - The current time (epoch milliseconds), defaulting to now
+ * @returns True when the request is allowed, false when the bucket is exhausted
+ */
 export function allowRequest(key: string, limit = 12, windowMs = 60_000, now = Date.now()): boolean {
   const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs);
   if (recent.length >= limit) {

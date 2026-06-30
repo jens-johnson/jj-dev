@@ -11,43 +11,49 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████████████ #server/plugins/jenscraft-dev-seed.ts ███████████████████████████████████████
+ * ██████████████████████████████████████ server/utils/jenscraft-metrics/types.ts ██████████████████████████████████████
  *
- * DEV ONLY. Seeds a mock jenscraft metrics snapshot (refreshed on an interval) so the service dashboard renders
- * real-looking live tiles in local dev before the real LXC publisher exists. Guarded by import.meta.dev; never runs in
- * production. Backs off the moment a real push arrives so a local publisher can take over.
+ * Type definitions for the Jenscraft live-metrics server payload and storage record.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { IJenscraftMetricsPayload } from '../utils/jenscraft-metrics';
+/**
+ * An interface representing the validated, public-safe payload the Jenscraft LXC publisher POSTs; counts and
+ * percentages only, never identifiers
+ * @interface
+ */
+export interface IJenscraftMetricsPayload {
+  /* The payload schema version */
+  v: number;
 
-const round1 = (n: number) => Math.round(n * 10) / 10;
-const round2 = (n: number) => Math.round(n * 100) / 100;
+  /* The publisher-side timestamp (ISO string) */
+  ts: string;
 
-function mockPayload(): IJenscraftMetricsPayload {
-  const online = Math.floor(Math.random() * 6); // 0–5 players
-  const bedrock = online === 0 ? 0 : Math.round(Math.random() * Math.min(2, online));
-  return {
-    v: 1,
-    ts: new Date().toISOString(),
-    players: { online, max: 20, java: online - bedrock, bedrock },
-    tps: round2(19.6 + Math.random() * 0.4),
-    mspt: round2(2.4 + Math.random() * 3),
-    uptimeSec: 3 * 86_400 + Math.floor((Date.now() / 1000) % 86_400),
-    world: { exploredPct: round1(37 + Math.random() * 1.5) },
-    mobs: { defeated: 12_840 + Math.floor((Date.now() / 1000) % 600) },
-  };
+  /* The player counts */
+  players?: { online: number; max: number; java: number; bedrock: number };
+
+  /* The ticks-per-second figure */
+  tps?: number;
+
+  /* The milliseconds-per-tick figure */
+  mspt?: number;
+
+  /* The server uptime in seconds */
+  uptimeSec?: number;
+
+  /* The world-explored percentage */
+  world?: { exploredPct: number };
+
+  /* The defeated-mob count */
+  mobs?: { defeated: number };
 }
 
-export default defineNitroPlugin(() => {
-  if (!import.meta.dev) return;
-  // Seed mock data, but back off as soon as a real push arrives so a local publisher can take over.
-  const seedIfStale = async () => {
-    const latest = await readLatestJenscraftMetrics();
-    if (latest && Date.now() - latest.receivedAt < 100_000) return;
-    await writeLatestJenscraftMetrics(mockPayload());
-  };
-  void seedIfStale();
-  setInterval(() => void seedIfStale(), 20_000);
-});
+/**
+ * An interface representing the stored record, adding the server receive time (the source of truth for staleness)
+ * @interface
+ */
+export interface IStoredJenscraftMetrics extends IJenscraftMetricsPayload {
+  /* The server receive time (epoch milliseconds) */
+  receivedAt: number;
+}
