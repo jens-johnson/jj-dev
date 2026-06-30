@@ -25,9 +25,9 @@
  * </PrimitivesBaseHero>
  *
  * Slots:
- *   #backdrop — behind content: logo mark, gradient orbs, grain overlay.
- *   #default  — foreground content: headlines, CTAs, body copy.
- *   #hint     — bottom decoration: scroll indicator.
+ *   #backdrop; behind content: logo mark, gradient orbs, grain overlay.
+ *   #default; foreground content: headlines, CTAs, body copy.
+ *   #hint; bottom decoration: scroll indicator.
  *
  * Attributes (class, @mousemove, ref, etc.) fall through to the root <section>
  * automatically via inheritAttrs.

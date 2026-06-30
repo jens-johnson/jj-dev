@@ -23,7 +23,7 @@
  *   <html data-theme="night">  → near-black, sage + sky
  *
  * All Tailwind utilities (bg-bg, text-ink, font-display, shadow-md, etc.) are generated from the @theme block.
- * Per-theme values override defaults via data-theme selectors — one attribute change switches the full palette.
+ * Per-theme values override defaults via data-theme selectors; one attribute change switches the full palette.
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -34,12 +34,13 @@
 
 @import 'tailwindcss';
 
-/* ─── Design Tokens (@theme) ──────────────────────────────────────────────────────────────────────────────────────── */
-
-/* Day theme values are defaults. Sunset/Night override below via data-theme selectors.                                */
-
+/**
+ * ─── Design Tokens (@theme) ──────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * Day theme values are defaults. Sunset/Night override below via data-theme selectors.
+ */
 @theme {
-  /* ── Semantic color tokens ─────────────────────────────────────────────── */
+  /* ── Semantic color tokens ─────────────────────────────────────────────────────────────────────────────────────── */
   --color-bg: #f8f4ee;
   --color-surface: #f0ebe3;
   --color-border: #ddd0bf;
@@ -49,7 +50,7 @@
   --color-accent: #8b6534;
   --color-accent-secondary: #5e8c65;
 
-  /* ── Raw palette (reference only — do not use in components) ──────────── */
+  /* ── Raw palette (reference only; do not use in components) ───────────────────────────────────────────────────── */
   --color-stone-50: #f8f4ee;
   --color-stone-100: #f0e8dc;
   --color-stone-200: #ddd0bf;
@@ -71,13 +72,13 @@
   --color-terra-400: #d4763b;
   --color-terra-600: #a84835;
 
-  /* ── Font families ─────────────────────────────────────────────────────── */
+  /* ── Font families ─────────────────────────────────────────────────────────────────────────────────────────────── */
   --font-display: 'Syne', sans-serif;
   --font-heading: 'Fraunces', Georgia, serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-mono: 'Geist Mono', Menlo, 'Courier New', monospace;
 
-  /* ── Type scale ────────────────────────────────────────────────────────── */
+  /* ── Type scale ────────────────────────────────────────────────────────────────────────────────────────────────── */
   --text-display: 6rem;
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.02em;
@@ -102,17 +103,17 @@
   --text-caption--line-height: 1.5;
   --text-caption--letter-spacing: 0.02em;
 
-  /* ── Spacing additions (extends Tailwind's 4px-base scale) ────────────── */
+  /* ── Spacing additions (extends Tailwind's 4px-base scale) ─────────────────────────────────────────────────────── */
   --spacing-18: 4.5rem;
   --spacing-22: 5.5rem;
   --spacing-26: 6.5rem;
   --spacing-30: 7.5rem;
 
-  /* ── Max widths ────────────────────────────────────────────────────────── */
+  /* ── Max widths ────────────────────────────────────────────────────────────────────────────────────────────────── */
   --container-prose: 720px;
   --container-content: 1280px;
 
-  /* ── Border radius ─────────────────────────────────────────────────────── */
+  /* ── Border radius ─────────────────────────────────────────────────────────────────────────────────────────────── */
   --radius-sm: 4px;
   --radius: 8px;
   --radius-md: 12px;
@@ -121,19 +122,19 @@
   --radius-2xl: 32px;
   --radius-full: 9999px;
 
-  /* ── Shadows ───────────────────────────────────────────────────────────── */
+  /* ── Shadows ───────────────────────────────────────────────────────────────────────────────────────────────────── */
   --shadow-sm: 0 1px 3px rgb(28, 20, 10, 8%);
   --shadow-md: 0 4px 12px rgb(28, 20, 10, 10%);
   --shadow-lg: 0 12px 32px rgb(28, 20, 10, 12%);
 
-  /* ── Transition durations ──────────────────────────────────────────────── */
+  /* ── Transition durations ──────────────────────────────────────────────────────────────────────────────────────── */
   --duration-fast: 150ms;
   --duration: 250ms;
   --duration-slow: 400ms;
   --duration-theme: 600ms;
 }
 
-/* ─── Day (default) ───────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── Day (default) ──────────────────────────────────────────────────────────────────────────────────────────────── */
 :root,
 [data-theme='day'] {
   --color-bg: #f8f4ee;
@@ -146,7 +147,7 @@
   --color-accent-secondary: #5e8c65;
 }
 
-/* ─── Sunset ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── Sunset ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 [data-theme='sunset'] {
   --color-bg: #140c08;
   --color-surface: #201208;
@@ -158,7 +159,7 @@
   --color-accent-secondary: #7aaa78;
 }
 
-/* ─── Night ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── Night ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 [data-theme='night'] {
   --color-bg: #080c12;
   --color-surface: #0e1820;
@@ -170,7 +171,7 @@
   --color-accent-secondary: #5080c0;
 }
 
-/* ─── Custom animations ───────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── Custom animations ──────────────────────────────────────────────────────────────────────────────────────────── */
 @keyframes scroll-pulse {
   0% {
     transform: scaleY(0);
@@ -188,7 +189,7 @@
   }
 }
 
-/* ─── Base layer ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── Base layer ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 @layer base {
   html {
     background-color: var(--color-bg);

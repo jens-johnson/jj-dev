@@ -14,7 +14,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * █████████████████████████████████████████████████ #pages/about.vue ██████████████████████████████████████████████████
  *
- * About page — background, philosophy, stack, and experience timeline.
+ * About page; background, philosophy, stack, and experience timeline.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
@@ -311,9 +311,9 @@ onUnmounted(() => {
         <!-- Section label -->
         <p class="text-caption text-ink-subtle mb-10 font-mono tracking-widest uppercase">Background</p>
 
-        <!-- Bento grid — 12 col, 4 row -->
+        <!-- Bento grid; 12 col, 4 row -->
         <div class="grid auto-rows-auto grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12">
-          <!-- A: Location — cols 1–2 -->
+          <!-- A: Location; cols 1–2 -->
           <ContainmentBentoCard
             class="border-border bg-surface relative flex flex-col items-start justify-between rounded-2xl border p-6 lg:col-span-2"
           >
@@ -324,7 +324,7 @@ onUnmounted(() => {
             </div>
           </ContainmentBentoCard>
 
-          <!-- B: The Engineer — cols 3–10 -->
+          <!-- B: The Engineer; cols 3–10 -->
           <ContainmentBentoCard
             class="border-border bg-surface relative flex flex-col justify-start rounded-2xl border p-8 lg:col-span-8"
           >
@@ -339,7 +339,7 @@ onUnmounted(() => {
             </p>
           </ContainmentBentoCard>
 
-          <!-- C: Years — cols 11–12 -->
+          <!-- C: Years; cols 11–12 -->
           <ContainmentBentoCard
             class="border-border bg-bg relative flex flex-col items-start justify-between rounded-2xl border p-6 lg:col-span-2"
           >
@@ -350,7 +350,7 @@ onUnmounted(() => {
             </div>
           </ContainmentBentoCard>
 
-          <!-- D: Quote — cols 1–4 -->
+          <!-- D: Quote; cols 1–4 -->
           <ContainmentBentoCard
             :intensity="8"
             :shine-opacity="0.08"
@@ -362,7 +362,7 @@ onUnmounted(() => {
             </p>
           </ContainmentBentoCard>
 
-          <!-- E: The Builder — cols 5–12 -->
+          <!-- E: The Builder; cols 5–12 -->
           <ContainmentBentoCard class="border-border bg-surface relative rounded-2xl border p-8 lg:col-span-8">
             <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">The Builder</p>
             <p class="font-body text-body text-ink-muted leading-relaxed">
@@ -374,7 +374,7 @@ onUnmounted(() => {
             </p>
           </ContainmentBentoCard>
 
-          <!-- F: The Human — cols 1–8 -->
+          <!-- F: The Human; cols 1–8 -->
           <ContainmentBentoCard class="border-border bg-surface relative rounded-2xl border p-8 lg:col-span-8">
             <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">The Human</p>
             <p class="font-body text-body text-ink-muted leading-relaxed">

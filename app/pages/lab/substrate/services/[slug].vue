@@ -14,7 +14,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * █████████████████████████████████████ #pages/lab/substrate/services/[slug].vue ██████████████████████████████████████
  *
- * Per-service detail page for the Substrate homelab. Renders one service's full doc — connect details, live-metrics
+ * Per-service detail page for the Substrate homelab. Renders one service's full doc; connect details, live-metrics
  * dashboard, server/client plugins, and the prose body (architecture, decisions). 404s on an unknown slug.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
@@ -352,7 +352,7 @@ useSeoMeta({
 </template>
 
 <style scoped>
-/* Prose treatment for the service's rendered markdown body — mirrors the device-doc styling. */
+/* Prose treatment for the service's rendered markdown body; mirrors the device-doc styling. */
 .service-doc :deep(h2) {
   font-family: var(--font-display);
   font-size: var(--text-h5);

@@ -6,7 +6,7 @@
 
 ## 1. Content Architecture
 
-**Why it's the most critical decision:** The site has several distinct content types — blog posts, project showcases, a resume, and a sandbox/recipe section. How and where that content lives dictates everything downstream: page rendering strategy, authoring workflow, API design, and CMS needs.
+**Why it's the most critical decision:** The site has several distinct content types; blog posts, project showcases, a resume, and a sandbox/recipe section. How and where that content lives dictates everything downstream: page rendering strategy, authoring workflow, API design, and CMS needs.
 
 ### Options
 
@@ -18,14 +18,14 @@
 
 ### Recommendation
 
-**Nuxt Content** for all editorial content (blog posts, projects, recipes). It's Git-native, versioned alongside code, and integrates natively with Nuxt's rendering pipeline. MongoDB remains available for dynamic features (contact form submissions, analytics events, etc.) if needed later — but editorial content should never require a database.
+**Nuxt Content** for all editorial content (blog posts, projects, recipes). It's Git-native, versioned alongside code, and integrates natively with Nuxt's rendering pipeline. MongoDB remains available for dynamic features (contact form submissions, analytics events, etc.) if needed later; but editorial content should never require a database.
 
 ### Content Types to Define Early
 
-- `blog/` — posts (title, date, tags, slug, cover image, body MDX)
-- `projects/` — showcase entries (name, description, tech stack, links, images, status)
-- `lab/` — sandbox entries (flexible schema — can include recipes, experiments, etc.)
-- `resume/` — structured YAML or JSON (experience, skills, education)
+- `blog/`; posts (title, date, tags, slug, cover image, body MDX)
+- `projects/`; showcase entries (name, description, tech stack, links, images, status)
+- `lab/`; sandbox entries (flexible schema; can include recipes, experiments, etc.)
+- `resume/`; structured YAML or JSON (experience, skills, education)
 
 ---
 
@@ -46,7 +46,7 @@
 **Vercel** for the Nuxt application. Reasons:
 
 - Zero-config Nuxt deployment (no `output: 'static'` required, SSR just works)
-- Automatic preview deployments per PR — essential for design review workflow
+- Automatic preview deployments per PR; essential for design review workflow
 - Globally distributed edge network
 - GitHub integration built-in
 - Free tier is sufficient for a personal site
@@ -63,10 +63,10 @@ AWS remains available for future additions (Lambda functions, S3 media storage, 
 
 ### What Needs to Be Locked In
 
-1. **Color palette** — primary, secondary, accent, neutral, semantic (success/error/warning). These map directly to `tailwind.config.js` theme extensions.
-2. **Typography** — font families (heading vs. body), scale (`text-sm` through `text-5xl`), weights
-3. **Spacing scale** — whether to extend Tailwind defaults or customize
-4. **Border radius, shadows, transitions** — consistent tokens for UI components
+1. **Color palette**; primary, secondary, accent, neutral, semantic (success/error/warning). These map directly to `tailwind.config.js` theme extensions.
+2. **Typography**; font families (heading vs. body), scale (`text-sm` through `text-5xl`), weights
+3. **Spacing scale**; whether to extend Tailwind defaults or customize
+4. **Border radius, shadows, transitions**; consistent tokens for UI components
 
 ### Aesthetic Direction
 
@@ -87,13 +87,13 @@ A Sketch mood board and color/typography spec that becomes the source of truth f
 ### Route Structure
 
 ```
-/                   — Landing / home
-/about              — Personal bio, story, interests
-/work               — Professional experience (resume equivalent)
-/projects           — Side project showcase
-/blog               — Writing (blog posts)
-/lab                — Sandbox: recipes, experiments, random things
-/uses               — Tools, gear, setup
+/; Landing / home
+/about; Personal bio, story, interests
+/work; Professional experience (resume equivalent)
+/projects; Side project showcase
+/blog; Writing (blog posts)
+/lab; Sandbox: recipes, experiments, random things
+/uses; Tools, gear, setup
 ```
 
 ---
@@ -154,7 +154,7 @@ Auth can be revisited in a later phase if dynamic features (like a public commen
 
 ### Recommendation
 
-**Tailwind-only for layout and custom components; Nuxt UI for complex interactive components** (modals, dropdowns, toasts, etc.). Nuxt UI is built specifically for Nuxt, uses Tailwind under the hood, and is highly customizable via design tokens. Avoid Vuetify entirely — it conflicts philosophically with Tailwind.
+**Tailwind-only for layout and custom components; Nuxt UI for complex interactive components** (modals, dropdowns, toasts, etc.). Nuxt UI is built specifically for Nuxt, uses Tailwind under the hood, and is highly customizable via design tokens. Avoid Vuetify entirely; it conflicts philosophically with Tailwind.
 
 ---
 
@@ -164,11 +164,11 @@ Auth can be revisited in a later phase if dynamic features (like a public commen
 
 ### Foundations to Define Early
 
-- `useSeoMeta()` / `useHead()` composable patterns — per page and globally
-- **OG image strategy** — static per-page images (simplest) vs. dynamically generated (edge function renders image with page metadata)
-- **Sitemap** — `@nuxtjs/sitemap` module, auto-generated
-- **Robots.txt** — define crawl rules
-- **Structured data** — `Person` schema for about/home, `Article` schema for blog posts, `BreadcrumbList` for navigation
+- `useSeoMeta()` / `useHead()` composable patterns; per page and globally
+- **OG image strategy**; static per-page images (simplest) vs. dynamically generated (edge function renders image with page metadata)
+- **Sitemap**; `@nuxtjs/sitemap` module, auto-generated
+- **Robots.txt**; define crawl rules
+- **Structured data**; `Person` schema for about/home, `Article` schema for blog posts, `BreadcrumbList` for navigation
 
 ### Recommendation
 
@@ -191,4 +191,4 @@ Use `nuxt-seo` (or `@nuxtjs/seo` suite) which bundles sitemap, robots, OG, and s
 
 ---
 
-_Last updated: 2026-05-17 — All decisions confirmed. Design system complete. Ready to scaffold._
+_Last updated: 2026-05-17; All decisions confirmed. Design system complete. Ready to scaffold._

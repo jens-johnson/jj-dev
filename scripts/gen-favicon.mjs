@@ -1,9 +1,26 @@
 /**
- * Favicon generator — rasterizes the JJ mark SVG into favicon.ico and apple-touch-icon.png.
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- * Uses ImageMagick (magick / convert). Run once after changing the logo mark SVG.
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
  *
- * Usage: npm run gen:favicon
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * ██████████████████████████████████████████████ scripts/gen-favicon.mjs ██████████████████████████████████████████████
+ *
+ * Favicon generator; rasterizes the JJ mark SVG into favicon.ico and apple-touch-icon.png. Uses ImageMagick (magick /
+ * convert). Run once after changing the logo mark SVG.
+ *
+ * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * pnpm gen:favicon
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
 import { execSync, spawnSync } from 'child_process';

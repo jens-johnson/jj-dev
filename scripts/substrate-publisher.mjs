@@ -16,7 +16,7 @@
  * Lab-side metrics publisher for Substrate. Reads the Proxmox node /status, /qemu and /lxc endpoints (a read-only
  * PVEAuditor token), measures a TCP-connect latency to a public host, and POSTs a scrubbed counts-and-percentages
  * payload to the site's ingest route. The lab dials outward; nothing here is publicly reachable and no identifiers
- * (IPs, hostnames, MACs) ever leave the LAN. Loops forever — intended to run on the lab side (a Mac, or an LXC).
+ * (IPs, hostnames, MACs) ever leave the LAN. Loops forever; intended to run on the lab side (a Mac, or an LXC).
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -84,7 +84,7 @@ const pve = (p) =>
     req.end();
   });
 
-// TCP-connect round-trip to a public anycast host — a ping-like latency without raw ICMP sockets. null on failure.
+// TCP-connect round-trip to a public anycast host; a ping-like latency without raw ICMP sockets. null on failure.
 const tcpPing = (host, port = 443, timeoutMs = 3000) =>
   new Promise((resolve) => {
     const start = performance.now();

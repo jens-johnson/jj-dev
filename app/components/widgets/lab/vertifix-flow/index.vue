@@ -140,7 +140,7 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
         <Icon name="lucide:image-up" size="24" />
       </span>
       <span class="font-body text-body text-ink font-semibold">Drop treadmill photos here</span>
-      <span class="font-body text-body-sm text-ink-muted">or click to choose — multiple at once is fine</span>
+      <span class="font-body text-body-sm text-ink-muted">or click to choose; multiple at once is fine</span>
       <input ref="fileInput" type="file" accept="image/*" multiple class="hidden" @change="onPick" />
     </button>
 
@@ -210,7 +210,7 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
         Reading photo metadata…
       </p>
 
-      <!-- Stage 0 — identify run + elevation -->
+      <!-- Stage 0; identify run + elevation -->
       <div v-else-if="stageOf(item.status) === 0" class="flex flex-col gap-4">
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="flex flex-col gap-1.5">
@@ -238,7 +238,7 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
 
         <p v-if="!item.capturedAt" class="font-body text-body-sm text-ink-muted flex items-start gap-2">
           <Icon name="lucide:info" size="15" class="text-accent mt-0.5 shrink-0" />
-          No timestamp in this photo's metadata (often stripped from exported or screenshotted copies) — set the date
+          No timestamp in this photo's metadata (often stripped from exported or screenshotted copies); set the date
           above to search for the run.
         </p>
 
@@ -299,7 +299,7 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
         </button>
       </div>
 
-      <!-- Stage 1 — manual delete + upload -->
+      <!-- Stage 1; manual delete + upload -->
       <div v-else-if="stageOf(item.status) === 1 && item.prepared" class="flex flex-col gap-4">
         <div class="border-border bg-bg flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border p-4">
           <span class="font-body text-body-sm text-ink font-semibold">{{ item.prepared.summary.name }}</span>
@@ -362,7 +362,7 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
                   size="15"
                   :class="item.status === 'committing' && 'animate-spin'"
                 />
-                I deleted it — upload replacement
+                I deleted it; upload replacement
               </button>
             </div>
           </li>
@@ -381,7 +381,7 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
         <p class="font-body text-body-sm text-ink-muted">
           New activity now reads {{ item.result.validation.actualElevationFeet }} ft.
           <span v-if="!item.result.validation.valid" class="text-terra-600">
-            Heads up — it's outside the expected tolerance; double-check on Strava.
+            Heads up; it's outside the expected tolerance; double-check on Strava.
           </span>
         </p>
         <a

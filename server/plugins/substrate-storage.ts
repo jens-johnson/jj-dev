@@ -16,11 +16,11 @@
  * Mounts the `substrate` storage on Upstash Redis (REST) in production so the live-metrics feed survives Vercel's
  * serverless, per-invocation memory. Dev is left on the default in-memory mount so the dev-seed plugin keeps faking
  * data with no external service. If no Redis credentials are wired yet, the mount is skipped and the feed reads as
- * offline — never an error.
+ * offline; never an error.
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • docs/project-planning/substrate-metrics-feed.md — the design + the Upstash (Phase B) plan
+ * • docs/project-planning/substrate-metrics-feed.md; the design + the Upstash (Phase B) plan
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */

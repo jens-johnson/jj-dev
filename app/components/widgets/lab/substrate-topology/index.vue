@@ -32,7 +32,7 @@ import type { ISubstrateDevice } from '~/types/substrate';
 
 const props = defineProps<{ devices: ISubstrateDevice[] }>();
 
-/** Two-way bound selected node id — null when nothing is inspected. */
+/** Two-way bound selected node id; null when nothing is inspected. */
 const selectedId = defineModel<string | null>('selectedId', { default: null });
 
 /* ─── Interaction state ───────────────────────────────────────────────────────────────────────────────────────────── */
@@ -75,7 +75,7 @@ const layout = computed(() => {
   return map;
 });
 
-interface Edge {
+interface IEdge {
   from: string;
   to: string;
   kind: string;
@@ -83,8 +83,8 @@ interface Edge {
 }
 
 /** Flatten every device's connections into drawable edges, dropping any that reference a missing node. */
-const edges = computed<Edge[]>(() => {
-  const out: Edge[] = [];
+const edges = computed<IEdge[]>(() => {
+  const out: IEdge[] = [];
   for (const d of props.devices) {
     for (const c of d.connections ?? []) {
       if (!layout.value.has(d.nodeId) || !layout.value.has(c.to)) continue;
@@ -94,8 +94,8 @@ const edges = computed<Edge[]>(() => {
   return out;
 });
 
-/** Cubic-bezier wire between two node centres — eases along x when near-horizontal, along y otherwise. */
-function edgePath(e: Edge): string {
+/** Cubic-bezier wire between two node centres; eases along x when near-horizontal, along y otherwise. */
+function edgePath(e: IEdge): string {
   const a = layout.value.get(e.from);
   const b = layout.value.get(e.to);
   if (!a || !b) return '';
@@ -130,8 +130,8 @@ const connectedIds = computed(() => {
   return set;
 });
 
-const edgeActive = (e: Edge) => !!activeId.value && (e.from === activeId.value || e.to === activeId.value);
-const edgeDimmed = (e: Edge) => !!activeId.value && !edgeActive(e);
+const edgeActive = (e: IEdge) => !!activeId.value && (e.from === activeId.value || e.to === activeId.value);
+const edgeDimmed = (e: IEdge) => !!activeId.value && !edgeActive(e);
 const nodeDimmed = (id: string) => !!activeId.value && id !== activeId.value && !connectedIds.value.has(id);
 
 /* ─── Visual maps ─────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -147,22 +147,22 @@ const EDGE_BASE: Record<string, string> = {
   power: STROKE_MUTED,
 };
 
-function edgeBaseClass(e: Edge) {
+function edgeBaseClass(e: IEdge) {
   return edgeActive(e) ? STROKE_ACCENT : (EDGE_BASE[e.kind] ?? STROKE_MUTED);
 }
-function edgeBaseOpacity(e: Edge) {
+function edgeBaseOpacity(e: IEdge) {
   if (edgeActive(e)) return 'opacity-100';
   if (edgeDimmed(e)) return 'opacity-10';
   return e.kind === 'power' ? 'opacity-25' : 'opacity-60';
 }
-function edgeFlowClass(e: Edge) {
+function edgeFlowClass(e: IEdge) {
   return edgeActive(e) ? STROKE_ACCENT : e.kind === 'data' ? STROKE_DATA : STROKE_ACCENT;
 }
 
 // Status colours + kind icons come from the auto-imported #utils/substrate-visuals (statusOf, kindIcon),
 // shared with the inspector panel so a node looks identical wherever it appears.
 
-/** Toggle selection — clicking the selected node again clears the inspector. */
+/** Toggle selection; clicking the selected node again clears the inspector. */
 function toggle(id: string) {
   selectedId.value = selectedId.value === id ? null : id;
 }

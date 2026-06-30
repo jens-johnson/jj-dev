@@ -112,7 +112,7 @@ export default withNuxt(
   /**
    * ─── Stylistic ─────────────────────────────────────────────────────────────────────────────────────────────────────
    *
-   * Formatting is owned by Prettier — see `.prettierrc.json`. We keep the @stylistic plugin registered for any
+   * Formatting is owned by Prettier; see `.prettierrc.json`. We keep the @stylistic plugin registered for any
    * non-formatting stylistic rules that might be added later, but no formatting rules live here. The
    * `eslint-config-prettier` import at the end of this file disables any rule that conflicts with Prettier.
    * @see https://eslint.style/
@@ -189,7 +189,7 @@ export default withNuxt(
       },
     },
     rules: {
-      // Disabled — Prettier owns import wrapping. Plugin kept registered so re-enabling is trivial if needed.
+      // Disabled; Prettier owns import wrapping. Plugin kept registered so re-enabling is trivial if needed.
       'local/import-specifier-newline': 'off',
     },
   },

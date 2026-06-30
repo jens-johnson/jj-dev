@@ -14,7 +14,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ████████████████████████████████████████████ #pages/blog/[...slug].vue ██████████████████████████████████████████████
  *
- * Blog post detail — renders a single markdown post from the `blog` Nuxt Content collection. The catch-all slug
+ * Blog post detail; renders a single markdown post from the `blog` Nuxt Content collection. The catch-all slug
  * means `/blog/2026-building-jj-dev` maps to `content/blog/2026-building-jj-dev.md`. Includes hero header, prose
  * body, and a footer with a back link to the index.
  *
@@ -392,7 +392,7 @@ function formatDate(iso: string): string {
   color: var(--color-ink);
 }
 
-/* Bare <pre> blocks not wrapped by ProsePre (rare — fallback) keep their own border. */
+/* Bare <pre> blocks not wrapped by ProsePre (rare; fallback) keep their own border. */
 .prose-jj :deep(pre:not(.prose-pre pre)) {
   margin: 1.75rem 0;
   border-radius: 12px;
@@ -427,7 +427,7 @@ function formatDate(iso: string): string {
   font-size: inherit;
 }
 
-/* Copy-to-clipboard button (top-right of code block). Default placement clips against the rounded corner — pad it
+/* Copy-to-clipboard button (top-right of code block). Default placement clips against the rounded corner; pad it
    in and give it a proper hit target. Hidden until the block is hovered to keep the prose calm. */
 .prose-jj :deep(.prose-pre button),
 .prose-jj :deep(pre + button),

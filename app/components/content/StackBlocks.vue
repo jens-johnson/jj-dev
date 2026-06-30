@@ -14,7 +14,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ███████████████████████████████ #components/content/StackBlocks.vue ██████████████████████████████████████████████
  *
- * MDC component embedded as `::stack-blocks`. Renders the tech stack as five layered blocks — each block is one
+ * MDC component embedded as `::stack-blocks`. Renders the tech stack as five layered blocks; each block is one
  * layer of the platform (Vercel, Nuxt 4, Tailwind, DX tooling, Agentic dev). Clicking a block expands it to reveal
  * the body copy. Default-open is the top layer; only one expanded at a time.
  *
@@ -24,7 +24,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-interface StackLayer {
+interface IStackLayer {
   num: string;
   title: string;
   icon: string;
@@ -33,7 +33,7 @@ interface StackLayer {
   links?: { label: string; href: string }[];
 }
 
-const stack: StackLayer[] = [
+const stack: IStackLayer[] = [
   {
     num: '01',
     title: 'DX-Oriented Ecosystem',

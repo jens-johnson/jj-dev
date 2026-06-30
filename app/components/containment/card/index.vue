@@ -21,17 +21,17 @@
  * <ContainmentCard :as="li" pad="lg">content</ContainmentCard>
  *
  * Props:
- *   as  — root element tag. Default "div". Use "article", "li", etc. as needed.
- *   pad — inner padding preset. Default "md". One of: none | sm | md | lg.
+ *   as; root element tag. Default "div". Use "article", "li", etc. as needed.
+ *   pad; inner padding preset. Default "md". One of: none | sm | md | lg.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-type PadPreset = 'sm' | 'md' | 'lg' | 'none';
+type TPadPreset = 'sm' | 'md' | 'lg' | 'none';
 
 interface Props {
   as?: string;
-  pad?: PadPreset;
+  pad?: TPadPreset;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -39,7 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
   pad: 'md',
 });
 
-const padClass: Record<PadPreset, string> = {
+const padClass: Record<TPadPreset, string> = {
   none: '',
   sm: 'p-4',
   md: 'p-6',

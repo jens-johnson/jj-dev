@@ -107,7 +107,7 @@ function preview(t: TTheme) {
         class="inspiration-card group bg-surface relative overflow-hidden rounded-2xl border transition-all duration-500"
         :class="theme === card.theme ? 'border-accent ring-accent/30 shadow-lg ring-1' : 'border-border'"
       >
-        <!-- Image — clean, no text overlay -->
+        <!-- Image; clean, no text overlay -->
         <div class="relative aspect-[4/5] overflow-hidden">
           <NuxtImg
             :src="card.image.src"
@@ -120,7 +120,7 @@ function preview(t: TTheme) {
             class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
 
-          <!-- Active indicator — only thing on the image -->
+          <!-- Active indicator; only thing on the image -->
           <span
             v-if="theme === card.theme"
             class="bg-accent absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] tracking-widest text-stone-50 uppercase"
@@ -132,7 +132,7 @@ function preview(t: TTheme) {
 
         <!-- Palette + meta -->
         <div class="p-5">
-          <!-- Photo credit — tiny caption, low contrast. Uses <span> + display:block to avoid the prose `<p>` overrides. -->
+          <!-- Photo credit; tiny caption, low contrast. Uses <span> + display:block to avoid the prose `<p>` overrides. -->
           <span class="credit-line text-ink-subtle/60 font-mono tracking-wide">
             {{ card.image.credit }} · Unsplash
           </span>

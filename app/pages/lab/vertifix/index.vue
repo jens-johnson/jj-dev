@@ -21,7 +21,7 @@
  */
 useSeoMeta({
   title: 'Vertifix · Lab · Jens Johnson',
-  description: 'Internal admin tool — retroactively restore elevation gain on Strava treadmill runs.',
+  description: 'Internal admin tool; retroactively restore elevation gain on Strava treadmill runs.',
   robots: 'noindex, nofollow',
 });
 

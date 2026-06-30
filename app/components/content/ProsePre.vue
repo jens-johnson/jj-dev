@@ -20,7 +20,7 @@ async function copy() {
       copied.value = false;
     }, 1800);
   } catch {
-    /* clipboard blocked — no-op */
+    /* clipboard blocked; no-op */
   }
 }
 </script>

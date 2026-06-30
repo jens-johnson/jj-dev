@@ -14,7 +14,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ████████████████████████████████████████████████ #pages/projects.vue ████████████████████████████████████████████████
  *
- * Projects listing — full portfolio of case studies and open-source work. Under construction.
+ * Projects listing; full portfolio of case studies and open-source work. Under construction.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */

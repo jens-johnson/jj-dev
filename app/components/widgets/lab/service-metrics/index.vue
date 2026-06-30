@@ -36,7 +36,7 @@ const {
   label?: string;
 }>();
 
-/** Whether any live value is present — flips the header from "planned" to "live". */
+/** Whether any live value is present; flips the header from "planned" to "live". */
 const isLive = computed(() => !!live && Object.keys(live).length > 0);
 
 /** Resolve a tile's display value + unit, or null when there's nothing live yet. */
@@ -88,7 +88,7 @@ function valueOf(tile: IServiceMetricTile): string | null {
           class="font-display text-h5 mt-1 leading-none font-bold"
           :class="valueOf(tile) ? 'text-ink' : 'text-ink-subtle/50'"
         >
-          {{ valueOf(tile) ?? '—' }}
+          {{ valueOf(tile) ?? '; ' }}
         </dd>
       </div>
     </dl>

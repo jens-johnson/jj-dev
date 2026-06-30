@@ -6,7 +6,7 @@
 
 ## Architecture: How Theming Works
 
-jj-dev has three visual themes — **Day**, **Sunset**, and **Night** — implemented via CSS custom properties scoped to a `data-theme` attribute on the `<html>` element. Tailwind's color keys reference these variables, so a single class like `bg-bg` or `text-accent` automatically reflects the active theme.
+jj-dev has three visual themes; **Day**, **Sunset**, and **Night**; implemented via CSS custom properties scoped to a `data-theme` attribute on the `<html>` element. Tailwind's color keys reference these variables, so a single class like `bg-bg` or `text-accent` automatically reflects the active theme.
 
 ```
 <html data-theme="day">   → warm cream, earth tones
@@ -22,16 +22,16 @@ No duplicate class names. No JS-swapped inline styles. Just a single attribute c
 
 These are the tokens used in components. They describe **purpose**, not appearance.
 
-| Token              | CSS Variable               | Purpose                                              |
-| ------------------ | -------------------------- | ---------------------------------------------------- |
-| `bg`               | `--color-bg`               | Page/canvas background                               |
-| `surface`          | `--color-surface`          | Cards, elevated surfaces, code blocks                |
-| `border`           | `--color-border`           | Dividers, outlines, subtle separators                |
-| `ink`              | `--color-ink`              | Primary text                                         |
-| `ink-muted`        | `--color-ink-muted`        | Secondary text, nav items                            |
-| `ink-subtle`       | `--color-ink-subtle`       | Labels, captions, placeholders                       |
-| `accent`           | `--color-accent`           | Primary brand accent — CTAs, emphasis, active states |
-| `accent-secondary` | `--color-accent-secondary` | Supporting accent — tags, highlights, hover states   |
+| Token              | CSS Variable               | Purpose                                             |
+| ------------------ | -------------------------- | --------------------------------------------------- |
+| `bg`               | `--color-bg`               | Page/canvas background                              |
+| `surface`          | `--color-surface`          | Cards, elevated surfaces, code blocks               |
+| `border`           | `--color-border`           | Dividers, outlines, subtle separators               |
+| `ink`              | `--color-ink`              | Primary text                                        |
+| `ink-muted`        | `--color-ink-muted`        | Secondary text, nav items                           |
+| `ink-subtle`       | `--color-ink-subtle`       | Labels, captions, placeholders                      |
+| `accent`           | `--color-accent`           | Primary brand accent; CTAs, emphasis, active states |
+| `accent-secondary` | `--color-accent-secondary` | Supporting accent; tags, highlights, hover states   |
 
 ### CSS Custom Properties
 
@@ -78,9 +78,9 @@ These are the tokens used in components. They describe **purpose**, not appearan
 
 ## Raw Palette (Reference Only)
 
-These are the base color scales. **Do not use these directly in components** — always use semantic tokens above. These exist as a reference and for the raw Tailwind palette definition.
+These are the base color scales. **Do not use these directly in components**; always use semantic tokens above. These exist as a reference and for the raw Tailwind palette definition.
 
-### Stone (Neutrals — warm-toned)
+### Stone (Neutrals; warm-toned)
 
 | Step | Hex       | Usage          |
 | ---- | --------- | -------------- |
@@ -167,7 +167,7 @@ These are the base color scales. **Do not use these directly in components** —
 
 ## Spacing Scale
 
-Extends Tailwind's default 4px-base spacing. No overrides — purely additive.
+Extends Tailwind's default 4px-base spacing. No overrides; purely additive.
 
 | Token        | Value | rem    |
 | ------------ | ----- | ------ |
@@ -201,7 +201,7 @@ Layout constants:
 
 ## Shadows
 
-Theme-aware — shadows use ink color at low opacity.
+Theme-aware; shadows use ink color at low opacity.
 
 | Token       | Value                             | Usage                      |
 | ----------- | --------------------------------- | -------------------------- |
@@ -224,7 +224,7 @@ Theme-aware — shadows use ink color at low opacity.
 
 ---
 
-## `tailwind.config.ts` — Full Reference
+## `tailwind.config.ts`; Full Reference
 
 ```typescript
 import type { Config } from 'tailwindcss';
@@ -344,7 +344,7 @@ export default {
 ## Usage in Components
 
 ```vue
-<!-- ✅ Correct — uses semantic tokens, theme-aware -->
+<!-- ✅ Correct; uses semantic tokens, theme-aware -->
 <div class="bg-bg text-ink border-border rounded-md border">
   <h1 class="font-display text-h1 text-ink">Hello</h1>
   <p class="font-body text-body text-ink-muted">Body copy</p>
@@ -353,10 +353,10 @@ export default {
   </button>
 </div>
 
-<!-- ❌ Incorrect — hardcoded color, breaks on theme change -->
+<!-- ❌ Incorrect; hardcoded color, breaks on theme change -->
 <div class="bg-[#F8F4EE] text-[#1C140A]">...</div>
 ```
 
 ---
 
-_Last updated: 2026-05-16 — Phase 1 design token finalization_
+_Last updated: 2026-05-16; Phase 1 design token finalization_

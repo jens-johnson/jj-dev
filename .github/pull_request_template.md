@@ -8,14 +8,14 @@
 
 ## Type of change
 
-- [ ] feat — new user-facing feature
-- [ ] fix — bug fix
-- [ ] refactor — internal change, no behavior diff
-- [ ] perf — performance improvement
-- [ ] docs — docs only
-- [ ] test — test-only change
-- [ ] chore — tooling, deps, build
-- [ ] BREAKING — breaks consumer-facing behavior
+- [ ] feat; new user-facing feature
+- [ ] fix; bug fix
+- [ ] refactor; internal change, no behavior diff
+- [ ] perf; performance improvement
+- [ ] docs; docs only
+- [ ] test; test-only change
+- [ ] chore; tooling, deps, build
+- [ ] BREAKING; breaks consumer-facing behavior
 
 ## Test plan
 

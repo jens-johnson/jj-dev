@@ -12,10 +12,10 @@
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 # █████████████████████████████████████████████ .github/workflows/ci.yml ██████████████████████████████████████████████
 #
-# Continuous integration — lint (eslint + prettier + stylelint), typecheck, and build. Runs on every PR targeting
+# Continuous integration; lint (eslint + prettier + stylelint), typecheck, and build. Runs on every PR targeting
 # main and on pushes to main. Cheap gates (lint, typecheck) run in parallel; build runs after both pass.
 #
-# Vercel handles deploys via its GitHub integration — no deploy step needed here.
+# Vercel handles deploys via its GitHub integration; no deploy step needed here.
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 

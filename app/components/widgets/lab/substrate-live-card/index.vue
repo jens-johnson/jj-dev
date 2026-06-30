@@ -27,14 +27,14 @@ const storage = computed(() => data.value?.storage ?? null);
 const vis = computed(() => METRIC_STATE[state.value]);
 const showMore = ref(false);
 
-interface Tile {
+interface ITile {
   label: string;
   value: string;
   sub: string;
   series?: number[];
 }
 
-const stats = computed<Tile[]>(() => {
+const stats = computed<ITile[]>(() => {
   const n = node.value;
   const g = guests.value;
   if (!n) return [];

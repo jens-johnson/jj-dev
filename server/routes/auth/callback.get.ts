@@ -13,7 +13,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ████████████████████████████████████████ server/routes/auth/callback.get.ts █████████████████████████████████████████
  *
- * Google OIDC login + callback endpoint — redirects to Google, then exchanges the returned code and seals the user
+ * Google OIDC login + callback endpoint; redirects to Google, then exchanges the returned code and seals the user
  * session.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -33,7 +33,7 @@
 import type { H3Event } from 'h3';
 
 /** Subset of the Google OIDC userinfo payload we consume. */
-interface GoogleUser {
+interface IGoogleUser {
   sub: string;
   name: string;
   email: string;
@@ -45,7 +45,7 @@ interface GoogleUser {
  * Origin (scheme + host, no trailing slash) for the current deployment, derived from Vercel's
  * system environment variables.
  *
- * These resolve at *runtime* in the function — unlike the request headers nuxt-auth-utils relies on.
+ * These resolve at *runtime* in the function; unlike the request headers nuxt-auth-utils relies on.
  * On Vercel's Fluid runtime the h3 event sees neither a real `Host` nor `x-forwarded-*` (the proxy
  * headers don't reach it), so `getRequestURL()` collapses to `http://localhost` and Google rejects
  * the resulting `http://localhost/auth/callback` with `Error 400: redirect_uri_mismatch`. Reading
@@ -60,7 +60,7 @@ function vercelOrigin(): string | undefined {
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
   }
   // No env var exposes the staging branch's custom domain, so map it explicitly. Other preview
-  // branches fall through — their *.vercel.app URLs aren't registered with Google anyway.
+  // branches fall through; their *.vercel.app URLs aren't registered with Google anyway.
   if (env === 'preview' && process.env.VERCEL_GIT_COMMIT_REF === 'staging') {
     return 'https://staging.jens-johnson.com';
   }
@@ -68,13 +68,13 @@ function vercelOrigin(): string | undefined {
 }
 
 /**
- * Resolve the absolute OAuth redirect URI Google must call back to — matching one of the URIs
+ * Resolve the absolute OAuth redirect URI Google must call back to; matching one of the URIs
  * registered in the Google OIDC client (prod / staging / localhost). Priority:
  *
- * 1. `NUXT_OAUTH_GOOGLE_REDIRECT_URL` — explicit per-environment override, if set in Vercel.
- * 2. Vercel system env (`vercelOrigin`) — reliable at runtime; fixes prod + staging.
- * 3. `x-forwarded-host` — for proxies that do surface it (belt-and-suspenders).
- * 4. `undefined` — local dev; nuxt-auth-utils derives it from `Host` (`http://localhost:3000/...`).
+ * 1. `NUXT_OAUTH_GOOGLE_REDIRECT_URL`; explicit per-environment override, if set in Vercel.
+ * 2. Vercel system env (`vercelOrigin`); reliable at runtime; fixes prod + staging.
+ * 3. `x-forwarded-host`; for proxies that do surface it (belt-and-suspenders).
+ * 4. `undefined`; local dev; nuxt-auth-utils derives it from `Host` (`http://localhost:3000/...`).
  */
 function resolveRedirectURL(event: H3Event): string | undefined {
   if (process.env.NUXT_OAUTH_GOOGLE_REDIRECT_URL) {
@@ -93,10 +93,10 @@ function resolveRedirectURL(event: H3Event): string | undefined {
   return undefined;
 }
 
-/* Build the handler per request so `redirectURL` can be resolved from the live request/runtime —
+/* Build the handler per request so `redirectURL` can be resolved from the live request/runtime; 
    defineOAuthGoogleEventHandler reads `config.redirectURL` before falling back to its own derivation. */
 export default defineEventHandler((event) => {
-  /* Google can redirect back here with `?error=…` instead of a `code` — denied consent, an OAuth
+  /* Google can redirect back here with `?error=…` instead of a `code`; denied consent, an OAuth
      app still in "Testing" mode, a blocked grant, etc. nuxt-auth-utils' handler only checks for
      `code`, so a no-code callback silently re-enters the flow → an endless consent⇄account-chooser
      loop that never returns to the app. Surface the error and stop, rather than restarting. */
@@ -119,9 +119,9 @@ export default defineEventHandler((event) => {
       redirectURL: resolveRedirectURL(event),
     },
 
-    /** Exchange succeeded — persist a trimmed profile and the resolved admin flag into the session. */
+    /** Exchange succeeded; persist a trimmed profile and the resolved admin flag into the session. */
     async onSuccess(event, { user }) {
-      const profile = user as GoogleUser;
+      const profile = user as IGoogleUser;
 
       await setUserSession(event, {
         user: {
@@ -138,7 +138,7 @@ export default defineEventHandler((event) => {
       return sendRedirect(event, '/');
     },
 
-    /** Exchange failed (user denied consent, bad config, etc.) — log and bounce home with a flag. */
+    /** Exchange failed (user denied consent, bad config, etc.); log and bounce home with a flag. */
     onError(event, error) {
       console.error('[auth] Google OAuth error:', error);
       return sendRedirect(event, '/?auth=error');

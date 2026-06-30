@@ -41,7 +41,7 @@ updates:
           - minor
           - patch
     ignore:
-      # Pin major versions of framework packages — upgrade intentionally.
+      # Pin major versions of framework packages; upgrade intentionally.
       - dependency-name: nuxt
         update-types: [version-update:semver-major]
       - dependency-name: vue

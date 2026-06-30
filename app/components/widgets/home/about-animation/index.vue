@@ -15,12 +15,12 @@
  * ██████████████████████████ #components/widgets/home/about-animation/index.vue ████████████████████████████████████████
  *
  * Topographic contour-line canvas animation for the About panel. Animated terrain lines react to mouse
- * position — hovering raises a "mountain peak" that pushes nearby contours apart.
+ * position; hovering raises a "mountain peak" that pushes nearby contours apart.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
  * Drop into any fixed-size container. The canvas stretches to fill via absolute inset-0.
- * Mouse events are handled internally — no props required.
+ * Mouse events are handled internally; no props required.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
@@ -35,7 +35,7 @@ const ACCENT_RGB = '139, 101, 52';
 const PEAK_SIGMA = 22_000;
 /** Maximum vertical displacement of the mountain peak at cursor centre (px). */
 const PEAK_HEIGHT = 110;
-/** Animation speed multiplier — lower is calmer. */
+/** Animation speed multiplier; lower is calmer. */
 const SPEED = 0.0032;
 
 /* ─── State ──────────────────────────────────────────────────────────────────────────────────────────────────────── */

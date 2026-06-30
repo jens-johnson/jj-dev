@@ -13,7 +13,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ████████████████████████████████████████████████ stylelint.config.mjs ████████████████████████████████████████████████
  *
- * Stylelint config — Tailwind v4 aware. Lints `main.css` and `<style>` blocks in `.vue` files.
+ * Stylelint config; Tailwind v4 aware. Lints `main.css` and `<style>` blocks in `.vue` files.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -25,7 +25,7 @@
 export default {
   extends: ['stylelint-config-standard', 'stylelint-config-recommended-vue'],
   rules: {
-    // Tailwind directives — don't flag.
+    // Tailwind directives; don't flag.
     'at-rule-no-unknown': [
       true,
       {
@@ -48,7 +48,7 @@ export default {
     'color-function-notation': null,
     // Tailwind v4 uses CSS vars heavily; allow them in custom-property names.
     'custom-property-pattern': null,
-    // Tailwind utilities dominate — no need to enforce class naming.
+    // Tailwind utilities dominate; no need to enforce class naming.
     'selector-class-pattern': null,
     // Empty `@layer base {}` blocks are fine as scaffolding.
     'block-no-empty': null,
@@ -60,7 +60,7 @@ export default {
         camelCaseSvgKeywords: true,
       },
     ],
-    // OKLCH's third arg is hue in degrees — the spec accepts a bare number.
+    // OKLCH's third arg is hue in degrees; the spec accepts a bare number.
     'hue-degree-notation': null,
     // We group tokens by section with blank lines for readability.
     'custom-property-empty-line-before': null,

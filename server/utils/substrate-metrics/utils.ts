@@ -24,7 +24,12 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { IStoredSubstrateMetrics, ISubstrateMetricsPayload, ISubstrateMetricsSample, TSubstrateMetricsState } from './types';
+import type {
+  IStoredSubstrateMetrics,
+  ISubstrateMetricsPayload,
+  ISubstrateMetricsSample,
+  TSubstrateMetricsState,
+} from './types';
 
 /* ─── Validation (no external deps; unknown keys are dropped by construction) ──────────────────────────────────────── */
 
@@ -39,9 +44,7 @@ const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object
  * @param input - The untrusted request body
  * @returns An ok result with the clean value, or `{ ok: false }` on any shape/range violation
  */
-export function validateMetricsPayload(
-  input: unknown,
-): { ok: true; value: ISubstrateMetricsPayload } | { ok: false } {
+export function validateMetricsPayload(input: unknown): { ok: true; value: ISubstrateMetricsPayload } | { ok: false } {
   if (!isObj(input) || !isNum(input.v) || typeof input.ts !== 'string' || input.ts.length > 40) return { ok: false };
 
   const node = input.node;

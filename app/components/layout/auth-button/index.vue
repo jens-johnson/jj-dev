@@ -14,11 +14,11 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * █████████████████████████████████████ #components/layout/auth-button/index.vue ██████████████████████████████████████
  *
- * Nav auth control — a Sign in button when logged out, an avatar menu with sign-out when logged in.
+ * Nav auth control; a Sign in button when logged out, an avatar menu with sign-out when logged in.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * <LayoutAuthButton /> — placed in the nav right-controls cluster, next to the theme toggle.
+ * <LayoutAuthButton />; placed in the nav right-controls cluster, next to the theme toggle.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
@@ -125,7 +125,7 @@ async function signOut() {
           </div>
         </div>
 
-        <!-- Admin badge — only shown for the allow-listed account -->
+        <!-- Admin badge; only shown for the allow-listed account -->
         <div v-if="session?.isAdmin" class="px-2.5 pb-1">
           <span
             class="border-accent/30 bg-accent/10 text-caption text-accent inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-medium"

@@ -38,7 +38,7 @@
       stroke-linejoin="round"
     >
       <!-- ════════════════════════════════════════════════════════════════════════════════════════════════════════════
-           CENTER — main browser wireframe build sequence
+           CENTER; main browser wireframe build sequence
       ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
       <g transform="translate(400, 50)">
         <!-- Browser frame -->
@@ -95,10 +95,10 @@
       </g>
 
       <!-- ════════════════════════════════════════════════════════════════════════════════════════════════════════════
-           LEFT — code bracket + mini wireframe panel
+           LEFT; code bracket + mini wireframe panel
       ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
 
-      <!-- Rotating code symbol </> — wrapped so we can rotate without losing the translate -->
+      <!-- Rotating code symbol </>; wrapped so we can rotate without losing the translate -->
       <g transform="translate(140, 130)">
         <g class="rotate-slow">
           <path d="M -22 -16 L -38 0 L -22 16" stroke-width="2" />
@@ -129,7 +129,7 @@
       </g>
 
       <!-- ════════════════════════════════════════════════════════════════════════════════════════════════════════════
-           RIGHT — terminal + git diagram
+           RIGHT; terminal + git diagram
       ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
 
       <!-- Terminal panel with flickering log lines -->
@@ -175,7 +175,7 @@
       </g>
 
       <!-- ════════════════════════════════════════════════════════════════════════════════════════════════════════════
-           SCATTERED — pulsing dots throughout the canvas
+           SCATTERED; pulsing dots throughout the canvas
       ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
       <g>
         <circle class="dot dot-1" cx="280" cy="350" r="3" fill="currentColor" stroke="none" />
@@ -189,14 +189,14 @@
       </g>
 
       <!-- ════════════════════════════════════════════════════════════════════════════════════════════════════════════
-           ROAMING CURSOR — travels around the canvas on a closed path
+           ROAMING CURSOR; travels around the canvas on a closed path
       ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
       <g class="cursor-roam">
         <path d="M 0 0 L 0 14 L 4 10 L 8 16 L 11 14 L 7 9 L 13 9 Z" fill="currentColor" stroke="none" />
       </g>
 
       <!-- ════════════════════════════════════════════════════════════════════════════════════════════════════════════
-           FLOATING GEOMETRY — abstract shapes drifting in the periphery
+           FLOATING GEOMETRY; abstract shapes drifting in the periphery
       ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
 
       <!-- Small triangle (left) -->
@@ -289,7 +289,7 @@
 
 /* ─── Ambient elements: opacity breathing ────────────────────────────────────────────────────────────────────────── */
 
-/* Float groups have inline SVG `transform="translate(...)"` attributes — we only animate opacity to avoid clobbering
+/* Float groups have inline SVG `transform="translate(...)"` attributes; we only animate opacity to avoid clobbering
    their position. Each one breathes on its own period for an asynchronous feel. */
 
 .float-1 {

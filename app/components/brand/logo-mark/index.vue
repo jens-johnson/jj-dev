@@ -14,7 +14,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ███████████████████████████████████████ #components/brand/logo-mark/index.vue ███████████████████████████████████████
  *
- * Jens Johnson botanical JJ mark — exported from Sketch, cleaned for inline SVG.
+ * Jens Johnson botanical JJ mark; exported from Sketch, cleaned for inline SVG.
  *
  * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -29,7 +29,7 @@
 
 <template>
   <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true">
-    <!-- J — left stroke with top flourish (rotated 13°) -->
+    <!-- J; left stroke with top flourish (rotated 13°) -->
     <path
       fill-rule="nonzero"
       transform="translate(200.7075,204.331) rotate(13) translate(-200.7075,-204.331)"
@@ -55,7 +55,7 @@
          C257.250231,129.447785 278.586354,108.585241 280.82,125.019087 Z"
     />
 
-    <!-- J — right stroke, mirror-reflected twin with lower flourish -->
+    <!-- J; right stroke, mirror-reflected twin with lower flourish -->
     <path
       fill-rule="nonzero"
       transform="translate(280.7075,262.331) scale(-1,1) translate(-280.7075,-262.331)"
