@@ -19,7 +19,7 @@
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * <LayoutAppNav /> — placed once in the root layout, above <slot />.
+ * <LayoutAppNav />; placed once in the root layout, above <slot />.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
@@ -50,7 +50,7 @@ const links = [
 
 /* ─── Theme toggle ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Icon hints at the *next* theme — what you'll switch to. */
+/** Icon hints at the *next* theme; what you'll switch to. */
 const themeIcon = computed(
   () =>
     ({

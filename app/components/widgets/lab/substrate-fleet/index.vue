@@ -21,9 +21,9 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { SubstrateDevice } from '~/types/substrate';
+import type { ISubstrateDevice } from '~/types/substrate';
 
-const props = defineProps<{ devices: SubstrateDevice[] }>();
+const props = defineProps<{ devices: ISubstrateDevice[] }>();
 
 const { data, state, cpuSeries, memSeries, updatedLabel } = useSubstrateMetrics();
 const node = computed(() => data.value?.node ?? null);
@@ -50,7 +50,7 @@ const rows = computed(() =>
 
 /** The one device the live feed describes today (the hypervisor); telemetry only renders on its row. */
 const liveId = computed(() => props.devices.find((d) => d.kind === 'hypervisor')?.nodeId ?? null);
-const isLive = (d: SubstrateDevice) => d.nodeId === liveId.value && state.value !== 'offline' && !!node.value;
+const isLive = (d: ISubstrateDevice) => d.nodeId === liveId.value && state.value !== 'offline' && !!node.value;
 
 /** Gauge + sparkline tone: cools to the live accent, warms to terra under pressure. */
 function tone(pct: number) {

@@ -14,7 +14,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ██████████████████████████████████████ #components/data/status-badge/index.vue ██████████████████████████████████████
  *
- * Inline status badge for a content status value — active | wip | archived — with matching color treatment.
+ * Inline status badge for a content status value; active | wip | archived; with matching color treatment.
  *
  * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *

@@ -15,7 +15,7 @@
  * ███████████████████████ #components/content/GoalsCarouselVisual.vue ███████████████████████████████████████████████
  *
  * Small SVG illustration that lives in the top of each GoalsCarousel card. Animates on parent `.goal-card:hover`.
- * Three variants — `layers` (stacked bare-metal blocks), `leaf` (organic curve), `branch` (git diagram).
+ * Three variants; `layers` (stacked bare-metal blocks), `leaf` (organic curve), `branch` (git diagram).
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */

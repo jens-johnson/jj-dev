@@ -14,7 +14,7 @@
  * ████████████████████████████████████████████ server/api/metrics.get.ts ████████████████████████████████████████████████
  *
  * Server API route that aggregates GitHub contribution data and Strava activity stats for the
- * about page metrics card. Strava credentials never reach the client — all token exchange and
+ * about page metrics card. Strava credentials never reach the client; all token exchange and
  * API calls happen here in the Nitro server layer. Responses are cached in-process for 1 hour
  * to avoid hammering third-party APIs on every page load.
  *
@@ -28,23 +28,23 @@
 
 /* ─── Types ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-interface GhContribution {
+interface IGhContribution {
   date: string;
   count: number;
   level: 0 | 1 | 2 | 3 | 4;
 }
 
-interface GhContributionsResponse {
+interface IGhContributionsResponse {
   total: Record<string, number>;
-  contributions: GhContribution[];
+  contributions: IGhContribution[];
 }
 
-interface StravaTokenResponse {
+interface IStravaTokenResponse {
   access_token: string;
   athlete: { id: number };
 }
 
-interface StravaTotals {
+interface IStravaTotals {
   count: number;
   distance: number; // metres
   moving_time: number; // seconds
@@ -52,13 +52,13 @@ interface StravaTotals {
   elevation_gain: number;
 }
 
-interface StravaStatsResponse {
-  ytd_run_totals: StravaTotals;
-  all_run_totals: StravaTotals;
-  recent_run_totals: StravaTotals;
+interface IStravaStatsResponse {
+  ytd_run_totals: IStravaTotals;
+  all_run_totals: IStravaTotals;
+  recent_run_totals: IStravaTotals;
 }
 
-interface StravaActivity {
+interface IStravaActivity {
   id: number;
   name: string;
   type: string;
@@ -67,14 +67,14 @@ interface StravaActivity {
   moving_time: number; // seconds
 }
 
-export interface MetricsWeek {
+export interface IMetricsWeek {
   days: { count: number; level: 0 | 1 | 2 | 3 | 4 }[];
 }
 
-export interface MetricsResponse {
+export interface IMetricsResponse {
   github: {
     totalContributions: number;
-    weeks: MetricsWeek[]; // last 26 weeks, each with 7 days
+    weeks: IMetricsWeek[]; // last 26 weeks, each with 7 days
   };
   strava: {
     ytdMiles: number;
@@ -87,7 +87,7 @@ export interface MetricsResponse {
 /* ─── In-process cache ────────────────────────────────────────────────────────────────────────────────────────────── */
 
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
-let cachedData: MetricsResponse | null = null;
+let cachedData: IMetricsResponse | null = null;
 let cacheTimestamp = 0;
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -101,9 +101,9 @@ function metresToFeet(m: number): number {
 }
 
 /** Groups a flat array of daily contributions into ISO weeks (Mon–Sun), newest last. */
-function groupIntoWeeks(contributions: GhContribution[], numWeeks: number): MetricsWeek[] {
+function groupIntoWeeks(contributions: IGhContribution[], numWeeks: number): IMetricsWeek[] {
   // Pad the contributions array so it starts on a Monday
-  const result: MetricsWeek[] = [];
+  const result: IMetricsWeek[] = [];
   const days = contributions.slice(-(numWeeks * 7));
 
   for (let w = 0; w < numWeeks; w++) {
@@ -119,7 +119,7 @@ function groupIntoWeeks(contributions: GhContribution[], numWeeks: number): Metr
 }
 
 /** Returns an array of total miles per week for the last N weeks from raw Strava activities. */
-function buildWeeklyMiles(activities: StravaActivity[], numWeeks: number): number[] {
+function buildWeeklyMiles(activities: IStravaActivity[], numWeeks: number): number[] {
   const now = Date.now();
   const msPerWeek = 7 * 24 * 60 * 60 * 1000;
   const buckets = Array(numWeeks).fill(0);
@@ -138,7 +138,7 @@ function buildWeeklyMiles(activities: StravaActivity[], numWeeks: number): numbe
 
 /* ─── Handler ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-export default defineEventHandler(async (): Promise<MetricsResponse> => {
+export default defineEventHandler(async (): Promise<IMetricsResponse> => {
   // Serve from cache if fresh
   if (cachedData && Date.now() - cacheTimestamp < CACHE_TTL_MS) {
     return cachedData;
@@ -146,7 +146,7 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
 
   const config = useRuntimeConfig();
 
-  // Fall back to process.env directly — Nuxt's runtimeConfig auto-override
+  // Fall back to process.env directly; Nuxt's runtimeConfig auto-override
   // requires the NUXT_ prefix, but Vercel injects the bare env var names too.
   const stravaClientId = config.stravaClientId || process.env.STRAVA_CLIENT_ID;
   const stravaClientSecret = config.stravaClientSecret || process.env.STRAVA_CLIENT_SECRET;
@@ -157,11 +157,11 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
   /* ─── GitHub ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   const ghRes = await fetch(`https://github-contributions-api.jogruber.de/v4/jens-johnson?y=${year}`).then(
-    (r) => r.json() as Promise<GhContributionsResponse>,
+    (r) => r.json() as Promise<IGhContributionsResponse>,
   );
 
   const totalContributions = ghRes.total[year] ?? 0;
-  // Filter out future-dated entries — the API returns the full calendar year,
+  // Filter out future-dated entries; the API returns the full calendar year,
   // and a naive .slice(-182) would grab months that haven't happened yet.
   const today = new Date().toISOString().slice(0, 10);
   const pastContributions = ghRes.contributions.filter((c) => c.date <= today);
@@ -190,7 +190,7 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
     });
   }
 
-  const { access_token } = tokenRes as StravaTokenResponse;
+  const { access_token } = tokenRes as IStravaTokenResponse;
 
   // Get the authenticated athlete to retrieve their ID
   const athleteRes = await fetch('https://www.strava.com/api/v3/athlete', {
@@ -216,16 +216,16 @@ export default defineEventHandler(async (): Promise<MetricsResponse> => {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
-    }).then((r) => r.json() as Promise<StravaStatsResponse>),
+    }).then((r) => r.json() as Promise<IStravaStatsResponse>),
 
     fetch('https://www.strava.com/api/v3/athlete/activities?per_page=200', {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
-    }).then((r) => r.json() as Promise<StravaActivity[]>),
+    }).then((r) => r.json() as Promise<IStravaActivity[]>),
   ]);
 
-  const data: MetricsResponse = {
+  const data: IMetricsResponse = {
     github: {
       totalContributions,
       weeks,

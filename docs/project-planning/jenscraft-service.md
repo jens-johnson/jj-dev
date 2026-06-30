@@ -1,16 +1,16 @@
-# Jenscraft Service — Design
+# Jenscraft Service; Design
 
 > Jenscraft is the first **service** to land on Substrate: a cross-platform Minecraft server, self-hosted on the
 > homelab. This document captures the public-facing build (the `services` content model + UI on `/lab/substrate`)
-> and the contract its live-metrics feed will follow. Operational detail — real endpoints, IPs, tokens, the
-> provisioning runbook — lives in the private Substrate ops space in Notion, never here and never in the repo.
+> and the contract its live-metrics feed will follow. Operational detail; real endpoints, IPs, tokens, the
+> provisioning runbook; lives in the private Substrate ops space in Notion, never here and never in the repo.
 
 ---
 
 ## 1. Goal
 
 Surface Jenscraft as a first-class entry under the Substrate **Services** tab: a card in the grid plus a detail
-page describing the architecture, the BlueMap link, the active plugins, and a metrics dashboard — so the homelab
+page describing the architecture, the BlueMap link, the active plugins, and a metrics dashboard; so the homelab
 page reads as a living system, not a static brochure.
 
 The server itself (Proxmox LXC, PaperMC, Geyser/Floodgate, BlueMap, the public relay) is provisioned by hand from
@@ -37,7 +37,7 @@ Routes:
 
 ---
 
-## 3. Live metrics — the contract (Phase 2)
+## 3. Live metrics; the contract (Phase 2)
 
 Mirrors the Substrate metrics feed exactly: **the lab pushes out; the public never pulls in.** A small publisher
 inside the Jenscraft LXC reads server health locally and POSTs a public-safe snapshot out to this site. No Minecraft
@@ -54,7 +54,7 @@ Sources the publisher can read locally:
 | `explored` | BlueMap render coverage | approx % of generated world rendered        |
 | `mobs`     | `world/stats/*.json`    | summed lifetime `minecraft:killed` hostiles |
 
-Payload is **counts and percentages only — never player names, IPs, or coordinates** (same privacy rule as the
+Payload is **counts and percentages only; never player names, IPs, or coordinates** (same privacy rule as the
 substrate feed). Proposed route shape, to be built when the publisher exists:
 
 ```
@@ -62,7 +62,7 @@ POST /api/services/jenscraft/ingest   (Bearer secret, validate + cap + rate-limi
 GET  /api/services/jenscraft/metrics  (public read: { state: live|stale|offline, ... })
 ```
 
-Until that lands, `WidgetsLabServiceMetrics` renders the declared tiles in an **awaiting-feed** state — no fake
+Until that lands, `WidgetsLabServiceMetrics` renders the declared tiles in an **awaiting-feed** state; no fake
 numbers. Wiring the feed is a follow-up ticket, gated on the server actually being provisioned.
 
 ---

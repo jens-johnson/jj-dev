@@ -1,10 +1,31 @@
+/**
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                ██        ██                     ▄▄
+ *                                ▀▀        ▀▀                     ██
+ *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                             ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * ███████████████████████████████████████████████ test/unit/tcx.test.ts ███████████████████████████████████████████████
+ *
+ * Unit tests for the TCX builder; asserts the linear altitude ramp, distance scaling/fallback, and per-trackpoint
+ * heart-rate and cadence passthrough.
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ */
+
 import { describe, expect, it } from 'vitest';
 
-import { buildTcx, type TcxSourceActivity, type TcxStreams } from '../../server/utils/tcx';
+import { buildTcx, type ITcxSourceActivity, type TTcxStreams } from '../../server/utils/tcx';
 
 /* ─── Fixtures ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const activity: TcxSourceActivity = {
+const activity: ITcxSourceActivity = {
   start_date: '2026-03-10T02:11:09.000Z',
   elapsed_time: 100,
   distance: 1000,
@@ -19,7 +40,7 @@ function readTags(tcx: string, tag: string): number[] {
 
 describe('buildTcx', () => {
   it('ramps altitude linearly from zero to the target gain in metres', () => {
-    const streams: TcxStreams = { time: { data: [0, 50, 100] }, distance: { data: [0, 500, 1000] } };
+    const streams: TTcxStreams = { time: { data: [0, 50, 100] }, distance: { data: [0, 500, 1000] } };
 
     // 100 ft → 30.48 m, distributed across time fractions 0, 0.5, 1.
     expect(readTags(buildTcx(activity, streams, 100), 'AltitudeMeters')).toEqual([0, 15.24, 30.48]);

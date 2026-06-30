@@ -12,15 +12,15 @@
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 # █████████████████████████████████████████████ .github/workflows/ci.yml ██████████████████████████████████████████████
 #
-# Continuous integration — lint (eslint + prettier + stylelint), typecheck, and build. Runs on every PR targeting
-# main and on pushes to main. Cheap gates (lint, typecheck) run in parallel; build runs after both pass.
-#
-# Vercel handles deploys via its GitHub integration — no deploy step needed here.
+# Continuous integration GitHub action; runs lint (eslint + prettier + stylelint), typecheck, and build. Runs on every
+# PR targeting main and on pushes to main. Cheap gates (lint, typecheck) run in parallel; build runs after both pass.
+# Vercel handles deploys via its GitHub integration; no deploy step needed here.
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
-name: CI
+name: 🔀 CI
 
+# Run on pushes + PRs to main
 on:
   push:
     branches: [main]
@@ -33,12 +33,15 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Specify environment values
 env:
   NODE_VERSION_FILE: .nvmrc
 
+# Jobs to be run
 jobs:
+  # Lint and Typecheck project files
   lint:
-    name: Lint & Typecheck
+    name: 🧹☑️ Lint & Typecheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -48,11 +51,12 @@ jobs:
           node-version-file: ${{ env.NODE_VERSION_FILE }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Lint (eslint + prettier + stylelint)
+      - name: 🧹 Lint (eslint + prettier + stylelint)
         run: pnpm lint
-      - name: Typecheck
+      - name: ☑️ Typecheck
         run: pnpm typecheck
 
+  # Build the project with Nuxt
   build:
     name: Build
     runs-on: ubuntu-latest

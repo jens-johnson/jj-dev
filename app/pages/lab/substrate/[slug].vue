@@ -14,7 +14,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ███████████████████████████████████████████ #pages/lab/substrate/[slug].vue ██████████████████████████████████████████
  *
- * Per-device detail page for the Substrate homelab. Renders one device's full markdown doc as a documented runbook —
+ * Per-device detail page for the Substrate homelab. Renders one device's full markdown doc as a documented runbook;
  * specs, wiring (linked to neighbours), and the prose body (config, decisions, learnings). 404s on an unknown slug.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████

@@ -14,8 +14,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * █████████████████████████ #components/widgets/lab/substrate-detail/index.vue █████████████████████████████████████████
  *
- * Inspector panel for the device selected in the Substrate topology. Renders the structured frontmatter — status,
- * vendor/model, specs, wiring, power, tags — and exposes a `#notes` slot for the device's rendered markdown body.
+ * Inspector panel for the device selected in the Substrate topology. Renders the structured frontmatter; status,
+ * vendor/model, specs, wiring, power, tags; and exposes a `#notes` slot for the device's rendered markdown body.
  * Shows a hint state when nothing is selected.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -27,11 +27,11 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { SubstrateDevice } from '~/types/substrate';
+import type { ISubstrateDevice } from '~/types/substrate';
 
 const props = defineProps<{
-  device: SubstrateDevice | null;
-  devices: SubstrateDevice[];
+  device: ISubstrateDevice | null;
+  devices: ISubstrateDevice[];
   hasNotes?: boolean;
 }>();
 

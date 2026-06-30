@@ -21,7 +21,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ServiceMetricTile } from '~/types/services';
+import type { IServiceMetricTile } from '~/types/services';
 
 const {
   tiles,
@@ -29,18 +29,18 @@ const {
   label = 'service',
 } = defineProps<{
   /** Declared tiles from the service frontmatter. */
-  tiles: ServiceMetricTile[];
+  tiles: IServiceMetricTile[];
   /** Live values keyed by tile `key`; null until the metrics publisher reports in. */
   live?: Record<string, string | number> | null;
   /** Short noun for the empty-state copy, e.g. "server". */
   label?: string;
 }>();
 
-/** Whether any live value is present — flips the header from "planned" to "live". */
+/** Whether any live value is present; flips the header from "planned" to "live". */
 const isLive = computed(() => !!live && Object.keys(live).length > 0);
 
 /** Resolve a tile's display value + unit, or null when there's nothing live yet. */
-function valueOf(tile: ServiceMetricTile): string | null {
+function valueOf(tile: IServiceMetricTile): string | null {
   const raw = live?.[tile.key];
   if (raw === undefined || raw === null || raw === '') return null;
   return tile.unit ? `${raw} ${tile.unit}` : String(raw);
@@ -88,7 +88,7 @@ function valueOf(tile: ServiceMetricTile): string | null {
           class="font-display text-h5 mt-1 leading-none font-bold"
           :class="valueOf(tile) ? 'text-ink' : 'text-ink-subtle/50'"
         >
-          {{ valueOf(tile) ?? '—' }}
+          {{ valueOf(tile) ?? '; ' }}
         </dd>
       </div>
     </dl>

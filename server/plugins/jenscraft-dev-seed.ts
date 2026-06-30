@@ -20,12 +20,12 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { JenscraftMetricsPayload } from '../utils/jenscraft-metrics';
+import type { IJenscraftMetricsPayload } from '../utils/jenscraft-metrics';
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-function mockPayload(): JenscraftMetricsPayload {
+function mockPayload(): IJenscraftMetricsPayload {
   const online = Math.floor(Math.random() * 6); // 0–5 players
   const bedrock = online === 0 ? 0 : Math.round(Math.random() * Math.min(2, online));
   return {

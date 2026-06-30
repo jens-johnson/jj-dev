@@ -69,5 +69,5 @@ const geom = computed(() => {
     <path :d="geom.line" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
     <circle :cx="geom.end[0]" :cy="geom.end[1]" r="1.7" fill="currentColor" />
   </svg>
-  <span v-else class="text-ink-subtle font-mono text-[10px]">—</span>
+  <span v-else class="text-ink-subtle font-mono text-[10px]">; </span>
 </template>

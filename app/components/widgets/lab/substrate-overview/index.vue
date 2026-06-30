@@ -20,13 +20,13 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-interface Phase {
+interface IPhase {
   title: string;
   desc: string;
   status: 'progress' | 'next' | 'planned' | 'future';
 }
 
-const phases: Phase[] = [
+const phases: IPhase[] = [
   {
     title: 'Network & edge',
     desc: 'Fiber handoff, gateway, firewall, switch, and VLAN segmentation.',
@@ -50,7 +50,7 @@ const phases: Phase[] = [
   },
 ];
 
-const STATUS: Record<Phase['status'], { label: string; dot: string; text: string; tint: string }> = {
+const STATUS: Record<IPhase['status'], { label: string; dot: string; text: string; tint: string }> = {
   // In progress reads as the green/success state; Up next keeps the bronze accent so the two stay distinct.
   progress: {
     label: 'In progress',

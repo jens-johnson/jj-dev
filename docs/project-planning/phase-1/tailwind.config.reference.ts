@@ -1,7 +1,7 @@
 // ─── tailwind.config.ts ──────────────────────────────────────────────────────
 // Design token system for jj-dev. Semantic color tokens reference CSS custom
 // properties defined per-theme in assets/css/main.css. Raw palette values are
-// provided as reference only — never use them directly in components.
+// provided as reference only; never use them directly in components.
 //
 // Themes: Day (default) | Sunset | Night
 // Usage:  <html data-theme="day|sunset|night">
@@ -30,7 +30,7 @@ export default {
           secondary: 'var(--color-accent-secondary)',
         },
 
-        // ─── Raw palette (reference only — do not use in components) ────────
+        // ─── Raw palette (reference only; do not use in components) ────────
         stone: {
           50: '#F8F4EE',
           100: '#F0E8DC',

@@ -20,11 +20,11 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { MetricsResponse } from '../../../../server/api/metrics.get';
+import type { IMetricsResponse } from '../../../../server/api/metrics.get';
 
 /* ─── Data fetch ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const { data, status } = await useFetch<MetricsResponse>('/api/metrics');
+const { data, status } = await useFetch<IMetricsResponse>('/api/metrics');
 
 /* ─── GitHub sparkline ────────────────────────────────────────────────────────────────────────────────────────────── */
 

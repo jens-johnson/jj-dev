@@ -33,7 +33,7 @@
  */
 export default defineNuxtConfig({
   /**
-   * App-level head metadata — favicon and touch icon links
+   * App-level head metadata; favicon and touch icon links
    * @see https://nuxt.com/docs/4.x/api/nuxt-config#app
    */
   app: {
@@ -65,7 +65,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-17',
 
   /**
-   * Runtime config — public values are exposed to the client, private values are server-only.
+   * Runtime config; public values are exposed to the client, private values are server-only.
    * Strava credentials are private and only accessible in server/ routes.
    * @see https://nuxt.com/docs/guide/going-further/runtime-config
    */
@@ -79,7 +79,7 @@ export default defineNuxtConfig({
     jenscraftIngestSecret: process.env.JENSCRAFT_INGEST_SECRET,
 
     /**
-     * Email granted admin-level access once authenticated. Server-only — never exposed to
+     * Email granted admin-level access once authenticated. Server-only; never exposed to
      * the client. The OAuth callback compares the Google account email against this value.
      * @see server/utils/auth.ts
      */
@@ -89,7 +89,7 @@ export default defineNuxtConfig({
      * Google OAuth credentials are intentionally NOT mapped here. Mapping them into
      * runtimeConfig bakes the secret values into the build output and only works when the env
      * var is present in the building environment's scope. Instead, the callback handler reads
-     * the bare GOOGLE_OAUTH_* vars from `process.env` at request time — they resolve at runtime
+     * the bare GOOGLE_OAUTH_* vars from `process.env` at request time; they resolve at runtime
      * in every Vercel environment (preview/staging/prod), mirroring the Strava route's fallback.
      * @see server/routes/auth/callback.get.ts
      */
@@ -102,6 +102,17 @@ export default defineNuxtConfig({
    * @see https://nuxt.com/docs/guide/directory-structure/components
    */
   components: [{ path: '~/components/content', pathPrefix: false }, '~/components'],
+
+  /**
+   * Auto-import scan directories. Composables and utils follow the barrel-directory convention
+   * (`use-x/{index,composable,types}.ts`, `utils/<group>/<name>/{index,...}.ts`), so the default top-level-only
+   * scan misses them. The recursive globs register every nested implementation file; barrel `index.ts` files use
+   * `export *`, which unimport ignores, so symbols are registered exactly once (from their defining module).
+   * @see https://nuxt.com/docs/api/nuxt-config#imports
+   */
+  imports: {
+    dirs: ['composables/**', 'utils/**'],
+  },
 
   /**
    * Nuxt modules
@@ -172,7 +183,7 @@ export default defineNuxtConfig({
   ],
 
   /**
-   * Nuxt devtools — browser panel for inspecting components, routes, and modules
+   * Nuxt devtools; browser panel for inspecting components, routes, and modules
    * @see https://devtools.nuxt.com/
    */
   devtools: {
@@ -193,13 +204,13 @@ export default defineNuxtConfig({
   },
 
   /**
-   * Global CSS entry points — Tailwind v4 CSS-first config lives in main.css
+   * Global CSS entry points; Tailwind v4 CSS-first config lives in main.css
    * @see https://nuxt.com/docs/4.x/api/nuxt-config#css
    */
   css: ['~/assets/css/main.css'],
 
   /**
-   * @nuxt/fonts — automatic font loading and optimization
+   * @nuxt/fonts; automatic font loading and optimization
    * @see https://fonts.nuxt.com/
    */
   fonts: {
@@ -244,7 +255,7 @@ export default defineNuxtConfig({
   },
 
   /**
-   * @nuxt/content v3 — file-based CMS for blog, projects, lab, and resume
+   * @nuxt/content v3; file-based CMS for blog, projects, lab, and resume
    * @see https://content.nuxt.com/
    */
   content: {
@@ -265,7 +276,7 @@ export default defineNuxtConfig({
    * Nitro server config.
    *
    * Prerender the content-driven routes to static HTML at build time. @nuxt/content v3 queries a SQLite database at
-   * request time, and that native SQLite is not available inside Vercel's serverless functions — so server-rendered
+   * request time, and that native SQLite is not available inside Vercel's serverless functions; so server-rendered
    * content comes back empty in production (blog, projects, lab, substrate all 404 / render blank). Baking the pages
    * at build sidesteps the runtime database entirely. Live data stays dynamic: the substrate metrics and the about
    * page's Strava card are fetched client-side, so static pages still hydrate with fresh data.
@@ -278,8 +289,8 @@ export default defineNuxtConfig({
 
       /**
        * Never prerender the auth routes. With `crawlLinks` on, the prerenderer follows the nav's
-       * `<a href="/auth/callback">` sign-in link and freezes the handler's *no-code* response — a
-       * redirect to Google's authorize URL — into a static file. Vercel then serves that cached
+       * `<a href="/auth/callback">` sign-in link and freezes the handler's *no-code* response; a
+       * redirect to Google's authorize URL; into a static file. Vercel then serves that cached
        * static file for the *real* callback too (`?code=…`), so the OAuth handler never runs, the
        * code is never exchanged, and the flow loops forever between Google's consent and
        * account-chooser screens. Ignoring `/auth` keeps the route dynamic (a per-request function)
@@ -302,7 +313,7 @@ export default defineNuxtConfig({
   },
 
   /**
-   * @nuxt/icon — icon rendering via Iconify
+   * @nuxt/icon; icon rendering via Iconify
    * @see https://nuxt.com/modules/icon
    */
   icon: {
@@ -312,7 +323,7 @@ export default defineNuxtConfig({
 
   /* ─── ESLint ───────────────────────────────────────────────────────────────────────────────────────────────────── */
   /**
-   * @nuxt/eslint module integration — generates .nuxt/eslint.config.mjs
+   * @nuxt/eslint module integration; generates .nuxt/eslint.config.mjs
    * @see https://eslint.nuxt.com/packages/module
    */
   eslint: {

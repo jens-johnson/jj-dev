@@ -23,22 +23,22 @@
  * </PrimitivesBaseParallax>
  *
  * Slot props:
- *   layerStyle(mx, my, sy?) → CSSProperties  — translate driven by mouse + scroll.
- *     mx / my — max pixel offset driven by lerped mouse position.
- *     sy      — scroll multiplier (e.g. 0.3 moves up at 30% of scroll speed).
- *   markStyle()             → CSSProperties  — scroll-reveal helper for a backdrop mark.
- *   smoothX / smoothY       — lerped mouse values in the range -1 → 1.
- *   scrollY                 — current window.scrollY.
+ *   layerStyle(mx, my, sy?) → CSSProperties; translate driven by mouse + scroll.
+ *     mx / my; max pixel offset driven by lerped mouse position.
+ *     sy; scroll multiplier (e.g. 0.3 moves up at 30% of scroll speed).
+ *   markStyle()             → CSSProperties; scroll-reveal helper for a backdrop mark.
+ *   smoothX / smoothY; lerped mouse values in the range -1 → 1.
+ *   scrollY; current window.scrollY.
  *
  * Props:
- *   lerp         — lerp factor; lower = smoother/slower. Default 0.055.
- *   heroFraction — hero height as fraction of viewport for markStyle progress. Default 0.92.
+ *   lerp; lerp factor; lower = smoother/slower. Default 0.055.
+ *   heroFraction; hero height as fraction of viewport for markStyle progress. Default 0.92.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
 interface Props {
-  /** Lerp factor — lower = smoother/slower. Default 0.055. */
+  /** Lerp factor; lower = smoother/slower. Default 0.055. */
   lerp?: number;
   /** Hero height fraction of viewport for markStyle progress. Default 0.92. */
   heroFraction?: number;

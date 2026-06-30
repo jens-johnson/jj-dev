@@ -16,11 +16,11 @@
  * Mounts the `jenscraft` storage on Upstash Redis (REST) in production so the live-metrics feed survives Vercel's
  * serverless, per-invocation memory. Dev is left on the default in-memory mount so an ingest→read round-trip works
  * with no external service. If no Redis credentials are wired yet, the mount is skipped and the feed reads as offline
- * — never an error.
+ *; never an error.
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • docs/project-planning/substrate-metrics-feed.md — the shared Upstash storage plan
+ * • docs/project-planning/substrate-metrics-feed.md; the shared Upstash storage plan
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */

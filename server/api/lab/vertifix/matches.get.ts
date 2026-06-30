@@ -18,9 +18,9 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { VertifixMatchesResult } from '#shared/vertifix';
+import type { IVertifixMatchesResult } from '#shared/vertifix';
 
-export default defineEventHandler(async (event): Promise<VertifixMatchesResult> => {
+export default defineEventHandler(async (event): Promise<IVertifixMatchesResult> => {
   await requireAdmin(event);
 
   const { capturedAt } = getQuery(event);

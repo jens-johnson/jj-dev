@@ -13,7 +13,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ███████████████████████████████████████████████ #pages/blog/index.vue ███████████████████████████████████████████████
  *
- * Blog index — chronological listing of published writing, queried from the `blog` Nuxt Content collection. Drafts
+ * Blog index; chronological listing of published writing, queried from the `blog` Nuxt Content collection. Drafts
  * are filtered out; supports `?tag=Foo` query param for tag filtering. Latest post features at the top with the
  * rest as a vertical timeline.
  *

@@ -19,12 +19,12 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { SubstrateMetricsPayload, SubstrateMetricsSample } from '../utils/substrate-metrics';
+import type { ISubstrateMetricsPayload, ISubstrateMetricsSample } from '../utils/substrate-metrics';
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-function mockPayload(): SubstrateMetricsPayload {
+function mockPayload(): ISubstrateMetricsPayload {
   return {
     v: 1,
     ts: new Date().toISOString(),
@@ -42,7 +42,7 @@ function mockPayload(): SubstrateMetricsPayload {
 }
 
 /** A plausible ~15 min CPU/RAM history so the sparklines aren't empty on first paint in dev. */
-function mockHistory(points = 30, stepMs = 30_000): SubstrateMetricsSample[] {
+function mockHistory(points = 30, stepMs = 30_000): ISubstrateMetricsSample[] {
   const now = Date.now();
   return Array.from({ length: points }, (_, i) => ({
     t: now - (points - 1 - i) * stepMs,

@@ -18,14 +18,14 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { VertifixPrepareRequest, VertifixPrepareResult } from '#shared/vertifix';
+import type { IVertifixPrepareRequest, IVertifixPrepareResult } from '#shared/vertifix';
 
 const FEET_PER_METRE = 3.28084;
 
-export default defineEventHandler(async (event): Promise<VertifixPrepareResult> => {
+export default defineEventHandler(async (event): Promise<IVertifixPrepareResult> => {
   await requireAdmin(event);
 
-  const body = await readBody<Partial<VertifixPrepareRequest>>(event);
+  const body = await readBody<Partial<IVertifixPrepareRequest>>(event);
   const activityId = Number(body?.activityId);
   const elevationFeet = Number(body?.elevationFeet);
   if (!Number.isFinite(activityId) || !Number.isFinite(elevationFeet) || elevationFeet < 0) {

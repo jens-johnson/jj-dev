@@ -128,7 +128,7 @@ function scrollToPanel(i: number) {
       <!-- ── Horizontal track ─────────────────────────────────────────────── -->
       <div class="flex h-full will-change-transform" :style="trackStyle">
         <!-- ══════════════════════════════════════════════════════════════════
-             PANEL 01 — ABOUT
+             PANEL 01; ABOUT
         ═══════════════════════════════════════════════════════════════════ -->
         <section class="border-border relative flex h-full w-screen flex-shrink-0 overflow-hidden border-r">
           <!-- Decorative number -->
@@ -141,7 +141,7 @@ function scrollToPanel(i: number) {
 
           <!-- Two-column layout: bio left, animation right -->
           <div class="grid h-full w-full grid-cols-1 lg:grid-cols-2">
-            <!-- Left: bio — always visible (first panel) -->
+            <!-- Left: bio; always visible (first panel) -->
             <div class="z-10 flex flex-col justify-center px-8 lg:px-16">
               <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">01 · About</p>
               <h2
@@ -171,7 +171,7 @@ function scrollToPanel(i: number) {
         </section>
 
         <!-- ══════════════════════════════════════════════════════════════════
-             PANEL 02 — PROJECTS
+             PANEL 02; PROJECTS
         ═══════════════════════════════════════════════════════════════════ -->
         <section
           class="border-border relative flex h-full w-screen flex-shrink-0 items-center overflow-hidden border-r"
@@ -228,7 +228,7 @@ function scrollToPanel(i: number) {
         </section>
 
         <!-- ══════════════════════════════════════════════════════════════════
-             PANEL 03 — WRITING
+             PANEL 03; WRITING
         ═══════════════════════════════════════════════════════════════════ -->
         <section
           class="border-border relative flex h-full w-screen flex-shrink-0 items-center overflow-hidden border-r"
@@ -340,7 +340,7 @@ function scrollToPanel(i: number) {
         </section>
 
         <!-- ══════════════════════════════════════════════════════════════════
-             PANEL 04 — CONNECT
+             PANEL 04; CONNECT
         ═══════════════════════════════════════════════════════════════════ -->
         <section
           class="relative flex h-full w-screen flex-shrink-0 items-center justify-center overflow-hidden text-center"

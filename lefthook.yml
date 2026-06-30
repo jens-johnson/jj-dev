@@ -12,7 +12,7 @@
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 # ████████████████████████████████████████████████████ lefthook.yml ████████████████████████████████████████████████████
 #
-# Lefthook — git hooks that ship with the repo. Installed automatically via the `prepare` script on `pnpm install`.
+# Lefthook; git hooks that ship with the repo. Installed automatically via the `prepare` script on `pnpm install`.
 #
 # ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
 #

@@ -1,4 +1,4 @@
-# jj-dev — Claude Project Instructions
+# jj-dev; Claude Project Instructions
 
 ## File Header Convention
 
@@ -9,7 +9,7 @@ Use `/header` to add one interactively, or follow the template below.
 
 All files use the same full logo block header. The comment syntax varies by file type.
 
-**For JS / TS / Vue files** — use a `/** */` block. In `.vue` files, place it inside
+**For JS / TS / Vue files**; use a `/** */` block. In `.vue` files, place it inside
 `<script setup lang="ts">` (add the script block above `<template>` if the file lacks one):
 
 ```js
@@ -42,7 +42,7 @@ All files use the same full logo block header. The comment syntax varies by file
  */
 ```
 
-**For shell scripts, YAML, `.envrc`, `.env.example`, `.editorconfig`, etc.** — prefix every
+**For shell scripts, YAML, `.envrc`, `.editorconfig`, etc.** prefix every
 header line with `# ` (or just `#` for empty logo lines):
 
 ```sh
@@ -63,7 +63,7 @@ header line with `# ` (or just `#` for empty logo lines):
 
 - The filename in the banner uses the path from the project root (e.g. `.editorconfig`) OR the
   Nuxt alias-prefixed path for app source files (e.g. `#pages/index.vue`, `#components/layout/app-nav/index.vue`).
-- USAGE and SEE sections are optional — omit if not needed.
+- USAGE and SEE sections are optional; omit if not needed.
 - 120-char line limit applies to description and section content lines (the `█` separator lines
   are a fixed-width design element and may exceed 120).
 - Separator line content (`█` chars) = 117. With `*` prefix = 120 chars; with `# ` prefix = 119 chars.
@@ -91,13 +91,16 @@ Three permanent branches map to three environments:
 | --------- | ----------- | --------------------------- |
 | `main`    | Production  | jens-johnson.com            |
 | `staging` | Pre-prod    | staging.jens-johnson.com    |
-| feature   | —           | Vercel preview URL (per PR) |
+| feature   | n/a         | Vercel preview URL (per PR) |
 
 **Flow:** `feat/*` → PR into `staging` (UAT review) → auto-PR into `main` (prod).
 
 When `staging` gets ahead of `main`, the [`promote-staging.yml`](.github/workflows/promote-staging.yml)
 workflow auto-opens (or updates) a `staging → main` PR with conventional-commit-grouped changelog.
-Just merge it when you're ready to ship.
+Merge it when you're ready to ship; **merge the promotion PR with a merge commit, never squash.**
+Squashing re-lists every staging commit in the squash body, which Release Please re-parses on each
+promotion and turns into duplicate changelog entries. A merge commit lands the original commit SHAs,
+which Release Please dedupes.
 
 After merging to `main`, sync `staging` back: `git merge main` on the staging branch.
 
@@ -111,14 +114,14 @@ Types: `feat` `fix` `refactor` `style` `docs` `test` `chore` `ci` `perf`
 
 Scopes: see `commitlint.config.js` for the full enum.
 
-Subject must be **lowercase** — no PascalCase/camelCase words (rewrite to plain
+Subject must be **lowercase**; no PascalCase/camelCase words (rewrite to plain
 English: "theme composable" not "useTheme", "hero component" not "HeroParallax").
 
 ---
 
 ## Component Architecture
 
-Atomic design hierarchy — every component lives in a category directory under
+Atomic design hierarchy; every component lives in a category directory under
 `app/components/`. Each component is an `index.vue` inside its own named folder.
 
 ```
@@ -143,16 +146,55 @@ Auto-import names follow full directory path:
 - `widgets/home/horizontal-journey/index.vue` → `<WidgetsHomeHorizontalJourney>`
 
 **Primitive composition pattern:**
-`PrimitivesBaseParallax` is a scoped-slot component — wrap it around
+`PrimitivesBaseParallax` is a scoped-slot component; wrap it around
 `PrimitivesBaseHero` and destructure `{ layerStyle, markStyle, scrollY }`
 from the slot to drive per-layer transforms without duplicating tracking logic.
+
+---
+
+## Module Structure (barrel exports)
+
+Composables, utils, server utils, types, and shared contracts follow a barrel-directory convention. Each module
+is a kebab-case folder with an `index.ts` that re-exports its public surface, plus files split by concern:
+
+```
+app/composables/use-card-tilt/        index, composable, types
+app/utils/substrate/service-visuals/  index, utils, types  (constants/enums as needed)
+app/types/services/                   index, types
+server/utils/strava/                  index, utils, types
+shared/vertifix/                      index, types
+```
+
+- Barrel `index.ts` uses `export *`. TypeScript resolves it for explicit imports, and unimport ignores `export *`
+  for auto-import, so each symbol registers exactly once from its defining file (no duplicate auto-imports).
+- Nested app composables/utils only auto-import because of `imports.dirs: ['composables/**', 'utils/**']` in
+  `nuxt.config.ts`. Nitro scans `server/utils/**` recursively on its own.
+- Every exported symbol under those trees is auto-imported globally, so keep internal helpers **unexported**;
+  only the intended public API lives in (or is re-exported from) its own file.
+- `server/api`, `server/routes`, and `server/plugins` keep flat filenames; Nitro routing/registration depends on them.
+
+## Type & Interface Naming
+
+- Interfaces are prefixed `I` (`IServiceStatusVisual`); type aliases are prefixed `T` (`TTheme`, `TVertifixStatus`).
+- Exempt: Vue component `interface Props` (the Vue idiom), and interfaces that augment an external module's
+  declaration; e.g. `User` / `UserSession` under `declare module '#auth-utils'`, whose names must match the
+  library's to merge.
+
+## Comments
+
+Full guide: [.claude/context-and-memory/code-comments.md](.claude/context-and-memory/code-comments.md). Highlights:
+
+- JSDoc (`/** */`) on interfaces, type aliases, functions, and exported constants.
+- Single `/* */` line comments on interface/type members (spilling across lines to keep the 120-char limit).
+- Use semicolons or a rewrite instead of em dashes; lean toward whole sentences over fragments.
+- In-file section dividers: `/* ─── Name ─── */` padded to exactly 120 chars.
 
 ---
 
 ## Tech Stack
 
 - **Nuxt 4** with Tailwind v4 CSS-first (`@theme {}` in `main.css`)
-- **@nuxt/content v3** — `defineCollection` + Zod schemas in `content.config.ts`
+- **@nuxt/content v3**; `defineCollection` + Zod schemas in `content.config.ts`
 - Three themes: `day` / `sunset` / `night` via `data-theme` on `<html>`
 - `useState` must be called inside a composable function, never at module level
 
@@ -164,11 +206,11 @@ from the slot to drive per-layer transforms without duplicating tracking logic.
   `corepack enable && pnpm install`. Lockfile is `pnpm-lock.yaml`; no `package-lock.json`.
 - **Lint:** `pnpm lint` runs ESLint + Prettier + Stylelint in parallel. `pnpm lint:fix` autofixes all three.
 - **Typecheck:** `pnpm typecheck` (vue-tsc via Nuxt).
-- **Full local CI gate:** `pnpm check` — runs lint → typecheck → build sequentially.
+- **Full local CI gate:** `pnpm check`; runs lint → typecheck → build sequentially.
 - **Git hooks:** managed by [`lefthook`](./lefthook.yml), installed automatically via the `prepare` script
   on `pnpm install`. Runs lint-staged on `pre-commit`, commitlint on `commit-msg`, and `pnpm lint && pnpm typecheck`
   on `pre-push`. Bypass a single hook: `LEFTHOOK_EXCLUDE=<name> git commit`. Skip everything: `LEFTHOOK=0 git commit`.
-- **Prettier owns formatting.** Don't reach for stylistic ESLint rules that fight with it — `eslint-config-prettier`
+- **Prettier owns formatting.** Don't reach for stylistic ESLint rules that fight with it; `eslint-config-prettier`
   is loaded last to neutralize conflicts. The `.prettierrc.json` file is the source of truth.
 - **Stylelint** lints `main.css` and `<style>` blocks in `.vue` files. Tailwind directives are whitelisted in
   `stylelint.config.mjs`.

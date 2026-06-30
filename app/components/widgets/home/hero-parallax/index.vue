@@ -43,7 +43,7 @@ onMounted(() => {
           </svg>
         </div>
 
-        <!-- ── Orb A — top right ──────────────────────────────────────────── -->
+        <!-- ── Orb A; top right ──────────────────────────────────────────── -->
         <div
           class="orb orb-a pointer-events-none absolute -top-24 -right-24 z-[10] h-[640px] w-[640px] rounded-full will-change-transform"
           :style="{
@@ -54,7 +54,7 @@ onMounted(() => {
           aria-hidden="true"
         />
 
-        <!-- ── Orb B — bottom left ────────────────────────────────────────── -->
+        <!-- ── Orb B; bottom left ────────────────────────────────────────── -->
         <div
           class="orb orb-b pointer-events-none absolute -bottom-16 -left-24 z-[10] h-[520px] w-[520px] rounded-full will-change-transform"
           :style="{
@@ -65,7 +65,7 @@ onMounted(() => {
           aria-hidden="true"
         />
 
-        <!-- ── Orb C — mid drift ──────────────────────────────────────────── -->
+        <!-- ── Orb C; mid drift ──────────────────────────────────────────── -->
         <div
           class="orb orb-c pointer-events-none absolute top-[30%] left-[40%] z-[10] h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full will-change-transform"
           :style="{
@@ -76,7 +76,7 @@ onMounted(() => {
           aria-hidden="true"
         />
 
-        <!-- ── Logo mark — scroll-reveal backdrop ────────────────────────── -->
+        <!-- ── Logo mark; scroll-reveal backdrop ────────────────────────── -->
         <div
           class="pointer-events-none absolute inset-0 z-[15] flex items-center justify-center will-change-transform select-none"
           :style="markStyle()"
@@ -105,7 +105,7 @@ onMounted(() => {
           Software engineer · San Diego, CA
         </p>
 
-        <!-- Headline — clip-based line reveal -->
+        <!-- Headline; clip-based line reveal -->
         <h1 class="font-display text-ink leading-[1.02] font-bold tracking-tight">
           <span class="block overflow-hidden">
             <span
@@ -200,7 +200,7 @@ onMounted(() => {
 
 <style scoped>
 /*
- * Ambient orb life — slow, independent `scale`/`translate`/opacity drift so the backdrop breathes. These animate the
+ * Ambient orb life; slow, independent `scale`/`translate`/opacity drift so the backdrop breathes. These animate the
  * CSS `scale`/`translate` properties (not `transform`), so they compose with the inline parallax transform instead of
  * overriding it. Gated behind prefers-reduced-motion: no-preference so it's fully static for motion-sensitive users.
  */

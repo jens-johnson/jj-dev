@@ -1,4 +1,4 @@
-# Substrate Live Metrics Feed — Design
+# Substrate Live Metrics Feed; Design
 
 > A live "this machine is alive" feed from the homelab to the public Substrate page. This document locks the plan
 > (storage, schema, routes, security, build order) **before any code is written**. It is the contract the build
