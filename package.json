@@ -106,6 +106,7 @@
     "tsx": "^4.23.0",
     "typescript": "^6.0.2",
     "vitest": "^4.1.2",
-    "vue-eslint-parser": "^10.4.0"
+    "vue-eslint-parser": "^10.4.0",
+    "vue-tsc": "^3.3.7"
   }
 }
