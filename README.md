@@ -76,7 +76,7 @@ stay inert in local dev.
 | `pnpm lint:fix`  | Autofix all three                                       |
 | `pnpm typecheck` | `vue-tsc` via Nuxt                                      |
 | `pnpm test`      | Vitest unit tests                                       |
-| `pnpm check`     | Full local CI gate: lint → typecheck → build            |
+| `pnpm check`     | Full local CI gate: lint → typecheck → test → build     |
 
 ## Architecture
 

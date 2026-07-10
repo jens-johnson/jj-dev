@@ -1,9 +1,24 @@
 # jj-dev; Claude Project Instructions
 
+## The Style Guide
+
+This repo consumes [`@jens-johnson/style-guide`](https://github.com/jens-johnson/jens-johnson) (git-tag pinned in
+`package.json`), which is the canonical source for ALL general conventions: formatting, naming (I/T prefixes),
+comments/JSDoc, TypeScript, modules/barrels, testing, CLIs, shell scripts, git workflow, and prose. Read its
+[hub README](https://github.com/jens-johnson/jens-johnson/blob/main/docs/style-guide/README.md) cheat sheet before
+generating code; load the relevant spoke for the domain you touch.
+
+The root configs are thin re-exports of the shared package: `prettier.config.mjs` spreads
+`@jens-johnson/style-guide/prettier` (+ the Tailwind plugin), `eslint.config.js` composes
+`createFrameworkEslintConfig(...)` under `withNuxt(...)`, `stylelint.config.mjs` extends the shared base, and
+`commitlint.config.js` calls `createCommitlintConfig({ scopes })`. **Change conventions upstream in the style-guide
+repo, not here**; this file only records what is jj-dev-specific (Nuxt architecture, deployment flow, local scripts).
+
 ## File Header Convention
 
 **Every source file that supports comment syntax must open with a header block.**
-Use `/header` to add one interactively, or follow the template below.
+Generate one with `pnpm header -f <path> -d "<description>" --write` (the `file-header-generator` bin shipped by the
+style-guide package; config in `file-header.config.json`), use `/header` interactively, or follow the template below.
 
 ### The JJ Logo Block Header
 
@@ -202,15 +217,25 @@ Full guide: [.claude/context-and-memory/code-comments.md](.claude/context-and-me
 
 ## Tooling
 
+- **Shared configs:** every root config re-exports [`@jens-johnson/style-guide`](https://github.com/jens-johnson/jens-johnson)
+  (see [The Style Guide](#the-style-guide)); repo-specific overrides live in the root files and are commented as such.
+- **Shell environment:** [direnv](https://direnv.net/) activates on entry (`direnv allow` once): `.envrc` switches to
+  the `.nvmrc`-pinned Node via nvm, auto-installs stale dependencies, and PATH-prepends `bin/wrappers/`, which
+  re-validate the Node version before `pnpm`/`git` runs and reject `npm`/`npx` outright (this is a pnpm repo).
 - **Package manager:** `pnpm 10.10.0` pinned via Corepack (`packageManager` field). First install:
   `corepack enable && pnpm install`. Lockfile is `pnpm-lock.yaml`; no `package-lock.json`.
 - **Lint:** `pnpm lint` runs ESLint + Prettier + Stylelint in parallel. `pnpm lint:fix` autofixes all three.
 - **Typecheck:** `pnpm typecheck` (vue-tsc via Nuxt).
-- **Full local CI gate:** `pnpm check`; runs lint → typecheck → build sequentially.
+- **Test:** `pnpm test` (Vitest, single run; `pnpm test:watch` for watch mode). Tests live in `test/unit/` as
+  `<subject>.test.ts`; pure cores land with tests.
+- **Full local CI gate:** `pnpm check`; runs lint → typecheck → test → build sequentially.
+- **Headers:** `pnpm header -f <path> -d "<description>" --write` runs the `file-header-generator` bin from the
+  style-guide package against [`file-header.config.json`](./file-header.config.json).
 - **Git hooks:** managed by [`lefthook`](./lefthook.yml), installed automatically via the `prepare` script
-  on `pnpm install`. Runs lint-staged on `pre-commit`, commitlint on `commit-msg`, and `pnpm lint && pnpm typecheck`
+  on `pnpm install`. Runs lint-staged on `pre-commit`, commitlint on `commit-msg`, and lint + typecheck + test
   on `pre-push`. Bypass a single hook: `LEFTHOOK_EXCLUDE=<name> git commit`. Skip everything: `LEFTHOOK=0 git commit`.
 - **Prettier owns formatting.** Don't reach for stylistic ESLint rules that fight with it; `eslint-config-prettier`
-  is loaded last to neutralize conflicts. The `.prettierrc.json` file is the source of truth.
-- **Stylelint** lints `main.css` and `<style>` blocks in `.vue` files. Tailwind directives are whitelisted in
-  `stylelint.config.mjs`.
+  is loaded last to neutralize conflicts (the shared config re-enables the object layout-hardening block after it).
+  `prettier.config.mjs` is the source of truth locally; it spreads the shared baseline and adds the Tailwind plugin.
+- **Stylelint** lints `main.css` and `<style>` blocks in `.vue` files. The Tailwind directive whitelist comes from
+  the shared base; jj-dev's design-token relaxations live in `stylelint.config.mjs`.

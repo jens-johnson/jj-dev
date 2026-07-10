@@ -122,10 +122,10 @@ keyed on the ref cancels in-progress runs when new commits arrive, so only the l
 
 **Jobs** (pnpm with a frozen lockfile, Node read from `.nvmrc`):
 
-1. **Lint & Typecheck** runs `pnpm lint` (eslint + prettier + stylelint in parallel) then `pnpm typecheck` (vue-tsc).
+1. **Lint, Typecheck & Test** runs `pnpm lint` (eslint + prettier + stylelint in parallel), then `pnpm typecheck` (vue-tsc), then `pnpm test` (vitest).
 2. **Build** runs `pnpm build`; it declares `needs: [lint]`, so it only runs once lint and typecheck pass.
 
-This mirrors the local `pnpm check` gate (lint to typecheck to build).
+This mirrors the local `pnpm check` gate (lint to typecheck to test to build).
 
 > **Base-branch nuance:** the `pull_request` trigger is scoped to base `main`, so CI gates PRs **into `main`** (the
 > `staging` to `main` promotion PR, plus any direct PR to `main`). Feature PRs into `staging` are validated through
@@ -179,6 +179,17 @@ that Release PR tags the release and publishes a GitHub Release. If there are no
 Because merging the Release PR is itself a `push` to `main`, the workflow re-runs and settles to a no-op until the
 next releasable change.
 
+### 🟢 Node LTS Watch ([`node-lts-watch.yml`](../../.github/workflows/node-lts-watch.yml))
+
+**Trigger:** weekly cron (Mondays 15:00 UTC) + `workflow_dispatch`.
+
+**What it does:** runs [`scripts/shell/check-node-lts.sh`](../../scripts/shell/check-node-lts.sh) to compare the
+[`.nvmrc`](../../.nvmrc) pin against the newest Node LTS from the nodejs.org release index. A stale pin opens a
+single `node-lts`-labeled issue with a bump checklist; once the pin catches up, the next run closes it
+automatically. This replaces any shell-entry LTS checking, which the direnv environment deliberately avoids (no
+network calls on `cd`). The workflow and script are copied canon from the
+[style-guide repo](https://github.com/jens-johnson/jens-johnson).
+
 ## Vercel deployments
 
 Deployments are handled by the **Vercel Git integration** (the Vercel GitHub App), not by a workflow file in this
@@ -223,6 +234,6 @@ domain mapping lives in the Vercel project settings, not in the repository.
 - **Merge commits, not squash, for promotion and release PRs** (keeps Release Please changelog entries unique).
 - **`PROMOTE_PAT`** must be set for auto-opened PRs to run required checks; without it the promotion/release PRs
   open but their checks do not fire until a manual close/reopen.
-- The local equivalent of the CI gate is **`pnpm check`** (lint to typecheck to build); run it before pushing.
+- The local equivalent of the CI gate is **`pnpm check`** (lint to typecheck to test to build); run it before pushing.
 - Git hooks ([`lefthook`](../../lefthook.yml)) run lint-staged on pre-commit, commitlint on commit-msg, and
   `pnpm lint && pnpm typecheck` on pre-push, so most CI failures surface locally first.
