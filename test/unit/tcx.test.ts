@@ -56,7 +56,11 @@ describe('buildTcx', () => {
   it('carries heart-rate and cadence through when the streams are present', () => {
     const tcx = buildTcx(
       activity,
-      { time: { data: [0, 100] }, heartrate: { data: [120, 140] }, cadence: { data: [80, 82] } },
+      {
+        time: { data: [0, 100] },
+        heartrate: { data: [120, 140] },
+        cadence: { data: [80, 82] },
+      },
       0,
     );
 
