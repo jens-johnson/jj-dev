@@ -14,14 +14,13 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ███████████████████████████████████████ #components/brand/logo-mark/index.vue ███████████████████████████████████████
  *
- * Jens Johnson botanical JJ mark; exported from Sketch, cleaned for inline SVG.
+ * An SVG component representing the Jens Johnson botanical JJ mark
  *
- * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * Renders in currentColor so it follows theme changes automatically.
+ * <BrandLogoMark />
  *
- * Two mirrored gestural strokes form the JJ: the first is a single curved J with a leaf/bud
- * flourish at the top, the second is its mirror-reflected twin.
+ * Renders in `currentColor` so it follows theme changes automatically.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */

@@ -11,7 +11,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████████████████ app/assets/css/main.css ███████████████████████████████████████████████████
+ * ██████████████████████████████████████████ app/assets/css/main.css ██████████████████████████████████████████████████
  *
  * Global styles and design token system for jj-dev. Tailwind v4 CSS-first configuration via @theme.
  *
@@ -50,7 +50,7 @@
   --color-accent: #8b6534;
   --color-accent-secondary: #5e8c65;
 
-  /* ── Raw palette (reference only; do not use in components) ───────────────────────────────────────────────────── */
+  /* ── Raw palette (reference only; do not use in components) ────────────────────────────────────────────────────── */
   --color-stone-50: #f8f4ee;
   --color-stone-100: #f0e8dc;
   --color-stone-200: #ddd0bf;

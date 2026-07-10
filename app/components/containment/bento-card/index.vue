@@ -12,11 +12,11 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████ #components/containment/bento-card/index.vue ████████████████████████████████████████████
+ * ████████████████████████████████ #components/containment/bento-card/index.vue ███████████████████████████████████████
  *
- * Wrapper that adds 3D mouse-tilt + radial shimmer to any bento grid tile. Passes all attrs
- * (class, style, grid sizing) through to the root element via Vue's default inheritAttrs behaviour,
- * so callers can use it as a drop-in replacement for a plain <div>.
+ * Wrapper that adds 3D mouse-tilt + radial shimmer to any bento grid tile. Passes all attrs (class, style, grid
+ * sizing) through to the root element via Vue's default inheritAttrs behaviour, so callers can use it as a drop-in
+ * replacement for a plain <div>.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -29,11 +29,21 @@
 
 import type { ICardTiltOptions } from '~/composables/use-card-tilt';
 
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Component props; allows users to consume the Bento Card component and alter factors like rotation intensity, hover
+ * scale, and radial shine opacity
+ * @internal
+ * @constant
+ */
 const props = withDefaults(defineProps<ICardTiltOptions>(), {
   intensity: 10,
   scale: 1.025,
   shineOpacity: 0.12,
 });
+
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 const { tiltStyle, shineStyle, onMouseMove, onMouseEnter, onMouseLeave } = useCardTilt({
   intensity: props.intensity,

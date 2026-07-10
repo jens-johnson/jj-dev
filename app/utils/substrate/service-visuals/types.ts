@@ -19,7 +19,9 @@
  */
 
 /**
- * An interface representing the Tailwind class bundle for a status: dot fill, text colour, and a faint tinted background
+ * An interface representing the Tailwind class bundle for a status indicator on a service visual, including dot fill,
+ * text color, and a faint tinted background
+ * @public
  * @interface
  */
 export interface IServiceStatusVisual {
@@ -29,7 +31,7 @@ export interface IServiceStatusVisual {
   /* The Tailwind background class for the status dot */
   dot: string;
 
-  /* The Tailwind text-colour class */
+  /* The Tailwind text-color class */
   text: string;
 
   /* The Tailwind tinted-background class */
@@ -39,6 +41,7 @@ export interface IServiceStatusVisual {
 /**
  * An interface representing one run of body text; "href" is set when it points at a Substrate device page (rendered
  * monospace by callers)
+ * @public
  * @interface
  */
 export interface ITextSegment {
@@ -50,10 +53,25 @@ export interface ITextSegment {
 }
 
 /**
+ * An interface representing the configuration for a link in a Substrate raw service document
+ * @public
+ * @interface
+ * @todo - Document these attributes
+ */
+export interface IRawServiceDocLinkConfiguration {
+  live?: string;
+  map?: string;
+  github?: string;
+  docs?: string;
+}
+
+/**
  * An interface representing the loose shape of a services doc straight from `queryCollection`; every field optional,
  * mirroring how @nuxt/content widens schema columns to `T | undefined`. Normalised into a concrete service by the
  * helpers in this module
+ * @public
  * @interface
+ * @todo Move the plugins/metrics nested types to standalone types
  */
 export interface IRawServiceDoc {
   /* The stable service id */
@@ -87,7 +105,7 @@ export interface IRawServiceDoc {
   stack?: string[];
 
   /* The outbound links */
-  links?: { live?: string; map?: string; github?: string; docs?: string };
+  links?: IRawServiceDocLinkConfiguration;
 
   /* The installed plugins / add-ons */
   plugins?: Array<{ name?: string; side?: string; category?: string; purpose?: string; url?: string }>;
