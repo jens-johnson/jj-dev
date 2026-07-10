@@ -11,6 +11,12 @@ const props = defineProps<{
 
 const copied = ref(false);
 
+/**
+ * A utility method to copy the code block's raw source to the clipboard and flash the copied state for 1.8 seconds;
+ * silently no-ops when the clipboard is unavailable or blocked
+ * @internal
+ * @function
+ */
 async function copy() {
   if (!props.code || !import.meta.client) return;
   try {

@@ -21,9 +21,24 @@
  */
 
 const rows = [
-  { branch: 'feat/*', env: 'Preview', url: 'Vercel preview URL', tone: 'muted' as const },
-  { branch: 'staging', env: 'Pre-prod', url: 'staging.jens-johnson.com', tone: 'sage' as const },
-  { branch: 'main', env: 'Production', url: 'jens-johnson.com', tone: 'accent' as const },
+  {
+    branch: 'feat/*',
+    env: 'Preview',
+    url: 'Vercel preview URL',
+    tone: 'muted' as const,
+  },
+  {
+    branch: 'staging',
+    env: 'Pre-prod',
+    url: 'staging.jens-johnson.com',
+    tone: 'sage' as const,
+  },
+  {
+    branch: 'main',
+    env: 'Production',
+    url: 'jens-johnson.com',
+    tone: 'accent' as const,
+  },
 ];
 </script>
 

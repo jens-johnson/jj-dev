@@ -20,6 +20,9 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+/**
+ *
+ */
 interface IPhase {
   title: string;
   desc: string;
@@ -42,7 +45,11 @@ const phases: IPhase[] = [
     desc: 'Minecraft, Portainer, Pi-hole, and the containers that make the lab useful.',
     status: 'progress',
   },
-  { title: 'Storage & backup', desc: 'Dedicated storage with ZFS and a 3-2-1 backup routine.', status: 'next' },
+  {
+    title: 'Storage & backup',
+    desc: 'Dedicated storage with ZFS and a 3-2-1 backup routine.',
+    status: 'next',
+  },
   {
     title: 'Failover & redundancy',
     desc: 'Clustering, redundant power and network, and graceful failover as the lab grows.',
@@ -58,9 +65,24 @@ const STATUS: Record<IPhase['status'], { label: string; dot: string; text: strin
     text: 'text-accent-secondary',
     tint: 'bg-accent-secondary/10',
   },
-  next: { label: 'Up next', dot: 'bg-accent', text: 'text-accent', tint: 'bg-accent/10' },
-  planned: { label: 'Planned', dot: 'bg-ink-subtle', text: 'text-ink-subtle', tint: 'bg-ink-subtle/10' },
-  future: { label: 'Future', dot: 'bg-ink-subtle', text: 'text-ink-subtle', tint: 'bg-ink-subtle/10' },
+  next: {
+    label: 'Up next',
+    dot: 'bg-accent',
+    text: 'text-accent',
+    tint: 'bg-accent/10',
+  },
+  planned: {
+    label: 'Planned',
+    dot: 'bg-ink-subtle',
+    text: 'text-ink-subtle',
+    tint: 'bg-ink-subtle/10',
+  },
+  future: {
+    label: 'Future',
+    dot: 'bg-ink-subtle',
+    text: 'text-ink-subtle',
+    tint: 'bg-ink-subtle/10',
+  },
 };
 </script>
 

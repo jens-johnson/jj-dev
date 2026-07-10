@@ -27,9 +27,24 @@ import type { IStateVisual } from './types';
  * @constant
  */
 export const METRIC_STATE: Record<TSubstrateMetricsState, IStateVisual> = {
-  live: { label: 'Live', dot: 'bg-accent-secondary', text: 'text-accent-secondary', pulse: true },
-  stale: { label: 'Stale', dot: 'bg-terra-400', text: 'text-terra-400', pulse: false },
-  offline: { label: 'Offline', dot: 'bg-ink-subtle', text: 'text-ink-subtle', pulse: false },
+  live: {
+    label: 'Live',
+    dot: 'bg-accent-secondary',
+    text: 'text-accent-secondary',
+    pulse: true,
+  },
+  stale: {
+    label: 'Stale',
+    dot: 'bg-terra-400',
+    text: 'text-terra-400',
+    pulse: false,
+  },
+  offline: {
+    label: 'Offline',
+    dot: 'bg-ink-subtle',
+    text: 'text-ink-subtle',
+    pulse: false,
+  },
 };
 
 /**
@@ -37,8 +52,28 @@ export const METRIC_STATE: Record<TSubstrateMetricsState, IStateVisual> = {
  * @constant
  */
 export const METRIC_HEALTH: Record<TSubstrateHealth, IStateVisual> = {
-  healthy: { label: 'Healthy', dot: 'bg-accent-secondary', text: 'text-accent-secondary', pulse: true },
-  degraded: { label: 'Degraded', dot: 'bg-terra-400', text: 'text-terra-400', pulse: true },
-  stale: { label: 'Stale', dot: 'bg-terra-400', text: 'text-terra-400', pulse: false },
-  offline: { label: 'Offline', dot: 'bg-ink-subtle', text: 'text-ink-subtle', pulse: false },
+  healthy: {
+    label: 'Healthy',
+    dot: 'bg-accent-secondary',
+    text: 'text-accent-secondary',
+    pulse: true,
+  },
+  degraded: {
+    label: 'Degraded',
+    dot: 'bg-terra-400',
+    text: 'text-terra-400',
+    pulse: true,
+  },
+  stale: {
+    label: 'Stale',
+    dot: 'bg-terra-400',
+    text: 'text-terra-400',
+    pulse: false,
+  },
+  offline: {
+    label: 'Offline',
+    dot: 'bg-ink-subtle',
+    text: 'text-ink-subtle',
+    pulse: false,
+  },
 };

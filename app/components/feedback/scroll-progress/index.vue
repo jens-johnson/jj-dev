@@ -21,6 +21,12 @@
 
 const progress = ref(0);
 
+/**
+ * A utility method to handle window scroll events; recomputes the 0..1 progress ratio from the current scroll offset
+ * and the document's scrollable height
+ * @internal
+ * @function
+ */
 function updateProgress() {
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
   progress.value = maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0;

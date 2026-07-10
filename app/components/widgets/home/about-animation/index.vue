@@ -57,6 +57,12 @@ const smoothMY = ref(-1);
 
 /* ─── Setup ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * A utility method to size the canvas backing store to its rendered dimensions at the device pixel ratio and refresh
+ * the cached 2D context
+ * @internal
+ * @function
+ */
 function resize() {
   const canvas = canvasRef.value;
   if (!canvas) return;
@@ -118,6 +124,12 @@ function drawGlow(mx: number, my: number) {
 
 /* ─── Draw ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The main render loop; clears the canvas, advances the animation clock, lerps the mouse, strokes each contour line
+ * with proximity-weighted opacity/width, and overlays the cursor glow while the mouse is active
+ * @internal
+ * @function
+ */
 function draw() {
   raf = requestAnimationFrame(draw);
   if (!ctx || W === 0 || H === 0) return;
@@ -153,6 +165,13 @@ function draw() {
 
 /* ─── Mouse handlers ─────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * A utility method to handle mouse move events on the canvas; records the cursor position in canvas coordinates and
+ * activates the mountain-peak effect
+ * @internal
+ * @function
+ * @param e - The triggering mouse event
+ */
 function onMove(e: MouseEvent) {
   const canvas = canvasRef.value;
   if (!canvas) return;
@@ -162,6 +181,12 @@ function onMove(e: MouseEvent) {
   mouseActive.value = true;
 }
 
+/**
+ * A utility method to handle mouse leave events on the canvas; deactivates the peak effect and resets the smoothed
+ * mouse position so the next entry snaps to the cursor
+ * @internal
+ * @function
+ */
 function onLeave() {
   mouseActive.value = false;
   smoothMX.value = -1;

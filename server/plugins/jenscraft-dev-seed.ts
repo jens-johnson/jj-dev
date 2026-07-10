@@ -25,13 +25,24 @@ import type { IJenscraftMetricsPayload } from '../utils/jenscraft-metrics';
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
+/**
+ * Builds a plausible mock Jenscraft metrics snapshot, lightly randomized so each reseed looks like fresh live data
+ * @internal
+ * @function
+ * @returns The mock payload stamped with the current time
+ */
 function mockPayload(): IJenscraftMetricsPayload {
   const online = Math.floor(Math.random() * 6); // 0–5 players
   const bedrock = online === 0 ? 0 : Math.round(Math.random() * Math.min(2, online));
   return {
     v: 1,
     ts: new Date().toISOString(),
-    players: { online, max: 20, java: online - bedrock, bedrock },
+    players: {
+      online,
+      max: 20,
+      java: online - bedrock,
+      bedrock,
+    },
     tps: round2(19.6 + Math.random() * 0.4),
     mspt: round2(2.4 + Math.random() * 3),
     uptimeSec: 3 * 86_400 + Math.floor((Date.now() / 1000) % 86_400),

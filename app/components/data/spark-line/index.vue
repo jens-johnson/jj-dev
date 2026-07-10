@@ -32,7 +32,11 @@ const props = withDefaults(
     height?: number;
     fill?: boolean;
   }>(),
-  { width: 88, height: 24, fill: true },
+  {
+    width: 88,
+    height: 24,
+    fill: true,
+  },
 );
 
 const PAD = 2;
@@ -59,7 +63,11 @@ const geom = computed(() => {
   const line = coords.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
   const area = `${line} L${last[0].toFixed(1)},${props.height} L${first[0].toFixed(1)},${props.height} Z`;
 
-  return { line, area, end: last };
+  return {
+    line,
+    area,
+    end: last,
+  };
 });
 </script>
 

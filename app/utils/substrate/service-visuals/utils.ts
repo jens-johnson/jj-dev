@@ -39,7 +39,7 @@ import type { IRawServiceDoc, IServiceStatusVisual, ITextSegment } from './types
  * Resolves the visual treatment for a service status, defaulting to "planned" (the common case before a service is
  * stood up)
  * @public
- * @func
+ * @function
  * @param status - The service status key
  * @returns The matching visual treatment, or the "planned" treatment when unknown
  */
@@ -100,7 +100,13 @@ export function normalizeService(doc: IRawServiceDoc): IHomelabService {
       }))
       .filter((p) => p.name),
     metrics: (doc.metrics ?? [])
-      .map((m) => ({ key: m.key ?? '', label: m.label ?? '', icon: m.icon, unit: m.unit, hint: m.hint }))
+      .map((m) => ({
+        key: m.key ?? '',
+        label: m.label ?? '',
+        icon: m.icon,
+        unit: m.unit,
+        hint: m.hint,
+      }))
       .filter((m) => m.key),
     tags: doc.tags ?? [],
     order: doc.order ?? 100,
@@ -110,6 +116,8 @@ export function normalizeService(doc: IRawServiceDoc): IHomelabService {
 
 /**
  * Normalises a list of queried docs, sorted by ascending `order`
+ * @public
+ * @function
  * @param docs - The loosely-typed service docs from queryCollection
  * @returns The normalised services, sorted by ascending order
  */
@@ -118,8 +126,10 @@ export function normalizeServices(docs: IRawServiceDoc[]): IHomelabService[] {
 }
 
 /**
- * Splits a plain string into plain + linked segments, turning any Substrate device id (e.g. `srv-01`) into a link to
+ * Splits a plain string into plain + linked segments, turning any Substrate device id (i.e. `srv-01`) into a link to
  * that device page. Lets a frontmatter string (no markdown) still render wiki-style device links plus monospace
+ * @public
+ * @function
  * @param text - The raw body text
  * @returns The ordered text segments, with device mentions carrying an href
  */

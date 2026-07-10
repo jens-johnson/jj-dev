@@ -37,6 +37,11 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+/**
+ * The props accepted by the parallax primitive; both tune the feel of the effect and are optional
+ * @internal
+ * @interface
+ */
 interface Props {
   /** Lerp factor; lower = smoother/slower. Default 0.055. */
   lerp?: number;
@@ -57,10 +62,26 @@ const smoothY = ref(0);
 const scrollY = ref(0);
 let raf: number;
 
+/**
+ * A utility method to linearly interpolate between two values
+ * @internal
+ * @function
+ * @param a - The current value
+ * @param b - The target value
+ * @param t - The interpolation factor in the 0..1 range; lower values move more slowly toward the target
+ * @returns The value moved from a toward b by factor t
+ */
 function lerpFn(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
+/**
+ * A utility method to handle mouse move events on the root element; normalizes the cursor position to the -1..+1
+ * range relative to the element center and stores it as the raw parallax input
+ * @internal
+ * @function
+ * @param e - The triggering mouse event
+ */
 function onMouseMove(e: MouseEvent) {
   if (!rootEl.value) return;
   const { left, top, width, height } = rootEl.value.getBoundingClientRect();
@@ -68,6 +89,12 @@ function onMouseMove(e: MouseEvent) {
   rawY.value = ((e.clientY - top) / height - 0.5) * 2;
 }
 
+/**
+ * The per-frame animation loop; lerps the smoothed mouse values toward the raw values, samples window.scrollY, and
+ * re-schedules itself via requestAnimationFrame
+ * @internal
+ * @function
+ */
 function tick() {
   smoothX.value = lerpFn(smoothX.value, rawX.value, props.lerp);
   smoothY.value = lerpFn(smoothY.value, rawY.value, props.lerp);
@@ -75,12 +102,28 @@ function tick() {
   raf = requestAnimationFrame(tick);
 }
 
+/**
+ * A slot-exposed style factory producing a translate transform driven by the lerped mouse position and scroll offset
+ * @internal
+ * @function
+ * @param mx - The maximum horizontal pixel offset applied at full lerped mouse deflection
+ * @param my - The maximum vertical pixel offset applied at full lerped mouse deflection
+ * @param sy - The scroll multiplier (i.e. 0.3 moves the layer at 30% of scroll speed); defaults to 0
+ * @returns The style object with the computed translate transform
+ */
 function layerStyle(mx: number, my: number, sy = 0) {
   return {
     transform: `translate(${smoothX.value * mx}px, ${smoothY.value * my + scrollY.value * sy}px)`,
   };
 }
 
+/**
+ * A slot-exposed style factory for a backdrop mark; fades in and scales up as the user scrolls through the hero
+ * (per the heroFraction prop) while drifting with the lerped mouse position
+ * @internal
+ * @function
+ * @returns The style object with the computed transform, opacity, and transition
+ */
 function markStyle() {
   const heroH = import.meta.client ? window.innerHeight * props.heroFraction : 800;
   const p = Math.min(scrollY.value / heroH, 1);

@@ -67,7 +67,11 @@ export function validateMetricsPayload(input: unknown): { ok: true; value: ISubs
       loadAvg: [Number(la[0]), Number(la[1]), Number(la[2])],
       mem: { usedPct: mem.usedPct, totalGiB: mem.totalGiB },
     },
-    guests: { vms: guests.vms, cts: guests.cts, running: guests.running },
+    guests: {
+      vms: guests.vms,
+      cts: guests.cts,
+      running: guests.running,
+    },
   };
 
   if (isObj(node.swap) && isPct(node.swap.usedPct)) value.node.swap = { usedPct: node.swap.usedPct };
@@ -100,7 +104,14 @@ export async function writeLatestMetrics(p: ISubstrateMetricsPayload): Promise<v
   await store.setItem(KEY, { ...p, receivedAt } satisfies IStoredSubstrateMetrics);
 
   const prev = (await store.getItem<ISubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
-  const next = [...prev, { t: receivedAt, cpu: p.node.cpuPct, mem: p.node.mem.usedPct }].slice(-HISTORY_MAX);
+  const next = [
+    ...prev,
+    {
+      t: receivedAt,
+      cpu: p.node.cpuPct,
+      mem: p.node.mem.usedPct,
+    },
+  ].slice(-HISTORY_MAX);
   await store.setItem(HISTORY_KEY, next);
 }
 

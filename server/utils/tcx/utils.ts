@@ -44,7 +44,13 @@ const XML_ENTITIES: Record<string, string> = {
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-// XML-escapes a value for safe interpolation into the TCX document.
+/**
+ * XML-escapes a value for safe interpolation into the TCX document; null and undefined become an empty string
+ * @internal
+ * @function
+ * @param value - The value to escape
+ * @returns The escaped string
+ */
 function escapeXml(value: unknown): string {
   return String(value ?? '').replace(/[<>&'"]/g, (character) => XML_ENTITIES[character] ?? character);
 }

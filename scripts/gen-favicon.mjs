@@ -36,6 +36,13 @@ const SVG = join(PUBLIC, 'favicon.svg');
 
 /* ─── Helpers ────────────────────────────────────────────────────────────── */
 
+/**
+ * Checks whether a CLI command is available on the PATH by invoking it with --version
+ * @internal
+ * @function
+ * @param {string} cmd - The command name to probe
+ * @returns {boolean} True when the command exits successfully
+ */
 function hasCmd(cmd) {
   const r = spawnSync(cmd, ['--version'], {
     encoding: 'utf8',
@@ -43,6 +50,17 @@ function hasCmd(cmd) {
   return r.status === 0;
 }
 
+/**
+ * Rasterizes an SVG to an image at the given dimensions via the detected ImageMagick entry point
+ * @internal
+ * @function
+ * @param {string} tool - The ImageMagick command to use ('magick' or the legacy 'convert')
+ * @param {string} src - The source SVG path
+ * @param {string} out - The output image path
+ * @param {number} width - The output width in pixels
+ * @param {number} height - The output height in pixels
+ * @param {string} [background] - The background color; defaults to transparent
+ */
 function rasterize(tool, src, out, width, height, background) {
   const bg = background ?? 'transparent';
   if (tool === 'magick') {
@@ -64,6 +82,15 @@ function buildICO(png16, png32, outPath) {
 
   const offsetBase = 6 + 16 * 2;
 
+  /**
+   * Builds one 16-byte ICONDIR entry describing a PNG image and its byte offset within the .ico file
+   * @internal
+   * @function
+   * @param {number} size - The square icon dimension in pixels
+   * @param {number} dataLen - The PNG data length in bytes
+   * @param {number} offset - The byte offset of the PNG data within the .ico file
+   * @returns {Buffer} The directory entry buffer
+   */
   function dirEntry(size, dataLen, offset) {
     const buf = Buffer.alloc(16);
     buf[0] = size;

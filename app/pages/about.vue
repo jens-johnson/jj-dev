@@ -46,6 +46,12 @@ const typeWordIdx = ref(0);
 const typeIsDeleting = ref(false);
 const typeTimer = ref<ReturnType<typeof setTimeout> | null>(null);
 
+/**
+ * Advances the hero typewriter by one character; types the current word out, pauses, deletes it, then moves to the
+ * next word, rescheduling itself with a cadence that varies per phase
+ * @internal
+ * @function
+ */
 function typeStep() {
   const word = TYPEWRITER_WORDS[typeWordIdx.value];
   if (!word) return;
@@ -216,6 +222,11 @@ const heroBgIdx = ref(0);
 const heroBgFading = ref(false);
 let heroBgTimer: ReturnType<typeof setInterval> | null = null;
 
+/**
+ * Advances the hero background carousel; fades the current image out, then swaps in the next one once the fade lands
+ * @internal
+ * @function
+ */
 function advanceHeroBg() {
   heroBgFading.value = true;
   setTimeout(() => {

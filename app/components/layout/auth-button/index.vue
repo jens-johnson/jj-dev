@@ -30,6 +30,13 @@ const root = ref<HTMLElement | null>(null);
 
 /* Close the account menu when clicking anywhere outside it. The toggle button lives inside
    `root`, so opening it doesn't immediately re-close via this handler. */
+/**
+ * A utility method to handle document-level click events; closes the account menu when the click lands outside the
+ * component root
+ * @internal
+ * @function
+ * @param e - The triggering mouse event
+ */
 function onDocumentClick(e: MouseEvent) {
   if (root.value && !root.value.contains(e.target as Node)) {
     menuOpen.value = false;
@@ -54,6 +61,11 @@ const initials = computed(() => {
 /* Google avatar URLs occasionally 403; fall back to initials if the image errors. */
 const avatarFailed = ref(false);
 
+/**
+ * A utility method to sign the user out; clears the server session and closes the account menu
+ * @internal
+ * @function
+ */
 async function signOut() {
   await clear();
   menuOpen.value = false;

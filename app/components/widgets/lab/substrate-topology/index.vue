@@ -75,6 +75,11 @@ const layout = computed(() => {
   return map;
 });
 
+/**
+ * A drawable wire between two placed nodes, flattened from the device connection lists
+ * @internal
+ * @interface
+ */
 interface IEdge {
   from: string;
   to: string;
@@ -88,7 +93,12 @@ const edges = computed<IEdge[]>(() => {
   for (const d of props.devices) {
     for (const c of d.connections ?? []) {
       if (!layout.value.has(d.nodeId) || !layout.value.has(c.to)) continue;
-      out.push({ from: d.nodeId, to: c.to, kind: c.kind ?? 'network', label: c.label });
+      out.push({
+        from: d.nodeId,
+        to: c.to,
+        kind: c.kind ?? 'network',
+        label: c.label,
+      });
     }
   }
   return out;
@@ -147,14 +157,37 @@ const EDGE_BASE: Record<string, string> = {
   power: STROKE_MUTED,
 };
 
+/**
+ * A utility method to pick the base stroke colour class for a wire; the accent when spotlighted, otherwise mapped
+ * from the connection kind
+ * @internal
+ * @function
+ * @param e - The edge being drawn
+ * @returns The Tailwind stroke class for the static wire
+ */
 function edgeBaseClass(e: IEdge) {
   return edgeActive(e) ? STROKE_ACCENT : (EDGE_BASE[e.kind] ?? STROKE_MUTED);
 }
+/**
+ * A utility method to pick the opacity class for a wire; full when spotlighted, faint when dimmed, and a subtler
+ * resting level for power feeds
+ * @internal
+ * @function
+ * @param e - The edge being drawn
+ * @returns The Tailwind opacity class for the static wire
+ */
 function edgeBaseOpacity(e: IEdge) {
   if (edgeActive(e)) return 'opacity-100';
   if (edgeDimmed(e)) return 'opacity-10';
   return e.kind === 'power' ? 'opacity-25' : 'opacity-60';
 }
+/**
+ * A utility method to pick the stroke colour class for the animated data-flow overlay on a wire
+ * @internal
+ * @function
+ * @param e - The edge being drawn
+ * @returns The Tailwind stroke class for the flow dashes
+ */
 function edgeFlowClass(e: IEdge) {
   return edgeActive(e) ? STROKE_ACCENT : e.kind === 'data' ? STROKE_DATA : STROKE_ACCENT;
 }

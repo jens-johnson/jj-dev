@@ -40,7 +40,13 @@ const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
 /* ─── Credentials & access token ──────────────────────────────────────────────────────────────────────────────────── */
 
-// Reads the Strava credentials, falling back to bare `process.env` for Vercel (see metrics.get.ts).
+/**
+ * Reads the Strava credentials from the runtime config, falling back to bare `process.env` for Vercel (see
+ * metrics.get.ts); throws a 500 when any of the three values are missing
+ * @internal
+ * @function
+ * @returns The client id, client secret, and refresh token
+ */
 function credentials() {
   const config = useRuntimeConfig();
   const clientId = config.stravaClientId || process.env.STRAVA_CLIENT_ID;
@@ -53,7 +59,11 @@ function credentials() {
         'Strava credentials are not configured (STRAVA_CLIENT_ID / STRAVA_CLIENT_SECRET / STRAVA_REFRESH_TOKEN).',
     });
   }
-  return { clientId, clientSecret, refreshToken };
+  return {
+    clientId,
+    clientSecret,
+    refreshToken,
+  };
 }
 
 // Cached on the warm Nitro instance; Strava refresh tokens are static, so the bare env token is reused.
@@ -89,7 +99,14 @@ export async function stravaAccessToken(): Promise<string> {
   return cachedAccessToken;
 }
 
-// Authenticated Strava API fetch that throws an H3 error on non-2xx responses.
+/**
+ * An authenticated fetch against the Strava API that parses the JSON body and throws an H3 error on non-2xx responses
+ * @internal
+ * @function
+ * @param path - The API path to request, relative to the Strava v3 base URL
+ * @param init - The fetch options to merge with the bearer auth header
+ * @returns The parsed JSON response (undefined for a 204)
+ */
 async function stravaFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = await stravaAccessToken();
   const response = await fetch(`${API}${path}`, {

@@ -31,7 +31,11 @@ const { data: devices } = await useAsyncData('substrate-devices-all', () => quer
 const rawDoc = computed(() => (devices.value ?? []).find((d) => d.nodeId === slug.value) ?? null);
 
 if (!rawDoc.value) {
-  throw createError({ statusCode: 404, statusMessage: `No device “${slug.value}” in Substrate`, fatal: true });
+  throw createError({
+    statusCode: 404,
+    statusMessage: `No device “${slug.value}” in Substrate`,
+    fatal: true,
+  });
 }
 
 const list = computed(() => normalizeDevices(devices.value ?? []));
@@ -47,7 +51,12 @@ const hasNotes = computed(() => {
   return Array.isArray(value) && value.length > 0;
 });
 
-const CONN_LABEL: Record<string, string> = { uplink: 'Uplink', network: 'Network', data: 'Data', power: 'Power' };
+const CONN_LABEL: Record<string, string> = {
+  uplink: 'Uplink',
+  network: 'Network',
+  data: 'Data',
+  power: 'Power',
+};
 const connLabel = (kind?: string) => CONN_LABEL[kind ?? 'network'] ?? 'Link';
 
 /* ─── Live internet (WAN node only) ───────────────────────────────────────────────────────────────────────────────── */

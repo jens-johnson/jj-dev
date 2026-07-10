@@ -28,22 +28,42 @@
 
 /* ─── Types ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * A single day of GitHub contribution activity from the contributions API
+ * @internal
+ * @interface
+ */
 interface IGhContribution {
   date: string;
   count: number;
   level: 0 | 1 | 2 | 3 | 4;
 }
 
+/**
+ * The response shape of the GitHub contributions API; per-year totals plus the per-day contribution list
+ * @internal
+ * @interface
+ */
 interface IGhContributionsResponse {
   total: Record<string, number>;
   contributions: IGhContribution[];
 }
 
+/**
+ * The response shape of the Strava OAuth refresh-token exchange
+ * @internal
+ * @interface
+ */
 interface IStravaTokenResponse {
   access_token: string;
   athlete: { id: number };
 }
 
+/**
+ * An aggregate run-totals block from the Strava athlete stats endpoint
+ * @internal
+ * @interface
+ */
 interface IStravaTotals {
   count: number;
   distance: number; // metres
@@ -52,12 +72,22 @@ interface IStravaTotals {
   elevation_gain: number;
 }
 
+/**
+ * The response shape of the Strava athlete stats endpoint; recent, year-to-date, and all-time run totals
+ * @internal
+ * @interface
+ */
 interface IStravaStatsResponse {
   ytd_run_totals: IStravaTotals;
   all_run_totals: IStravaTotals;
   recent_run_totals: IStravaTotals;
 }
 
+/**
+ * A Strava activity summary; only the fields the weekly-mileage bucketing reads
+ * @internal
+ * @interface
+ */
 interface IStravaActivity {
   id: number;
   name: string;
@@ -67,10 +97,20 @@ interface IStravaActivity {
   moving_time: number; // seconds
 }
 
+/**
+ * One week of GitHub contribution activity; seven days of counts and intensity levels
+ * @public
+ * @interface
+ */
 export interface IMetricsWeek {
   days: { count: number; level: 0 | 1 | 2 | 3 | 4 }[];
 }
 
+/**
+ * The aggregated payload this route returns; GitHub contribution weeks plus Strava year-to-date run stats
+ * @public
+ * @interface
+ */
 export interface IMetricsResponse {
   github: {
     totalContributions: number;
@@ -92,10 +132,24 @@ let cacheTimestamp = 0;
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Converts metres to miles, rounded to one decimal place
+ * @internal
+ * @function
+ * @param m - The distance in metres
+ * @returns The distance in miles
+ */
 function metresToMiles(m: number): number {
   return Math.round((m / 1609.344) * 10) / 10;
 }
 
+/**
+ * Converts metres to feet, rounded to the nearest foot
+ * @internal
+ * @function
+ * @param m - The length in metres
+ * @returns The length in feet
+ */
 function metresToFeet(m: number): number {
   return Math.round(m * 3.28084);
 }

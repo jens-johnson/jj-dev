@@ -56,6 +56,13 @@ const toc = computed<{ id: string; text: string }[]>(() => {
 
 /* ─── Formatting helpers ──────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Formats an ISO date string as a long en-US date (i.e. "July 9, 2026") for the post header metadata
+ * @internal
+ * @function
+ * @param iso - The ISO date string to format
+ * @returns The formatted date
+ */
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
     year: 'numeric',

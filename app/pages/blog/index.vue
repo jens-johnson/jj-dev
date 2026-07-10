@@ -62,6 +62,13 @@ const allTags = computed(() => {
 
 /* ─── Formatting helpers ──────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Formats an ISO date string as a long en-US date (i.e. "July 9, 2026") for the post metadata rows
+ * @internal
+ * @function
+ * @param iso - The ISO date string to format
+ * @returns The formatted date
+ */
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -70,6 +77,13 @@ function formatDate(iso: string): string {
   });
 }
 
+/**
+ * Builds the route location a tag pill links to; the blog index filtered by that tag via the `?tag=` query param
+ * @internal
+ * @function
+ * @param tag - The tag to filter by
+ * @returns The route location object
+ */
 function tagHref(tag: string) {
   return { path: '/blog', query: { tag } };
 }

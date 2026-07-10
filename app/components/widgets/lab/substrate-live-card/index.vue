@@ -27,6 +27,9 @@ const storage = computed(() => data.value?.storage ?? null);
 const vis = computed(() => METRIC_STATE[state.value]);
 const showMore = ref(false);
 
+/**
+ *
+ */
 interface ITile {
   label: string;
   value: string;
@@ -39,10 +42,28 @@ const stats = computed<ITile[]>(() => {
   const g = guests.value;
   if (!n) return [];
   return [
-    { label: 'CPU', value: `${n.cpuPct}%`, sub: '', series: cpuSeries.value },
-    { label: 'RAM', value: `${n.mem.usedPct}%`, sub: `${n.mem.totalGiB} GB`, series: memSeries.value },
-    { label: 'Uptime', value: formatUptime(n.uptimeSec), sub: '' },
-    { label: 'Services', value: g ? String(g.running) : '0', sub: g ? `of ${g.vms + g.cts}` : '' },
+    {
+      label: 'CPU',
+      value: `${n.cpuPct}%`,
+      sub: '',
+      series: cpuSeries.value,
+    },
+    {
+      label: 'RAM',
+      value: `${n.mem.usedPct}%`,
+      sub: `${n.mem.totalGiB} GB`,
+      series: memSeries.value,
+    },
+    {
+      label: 'Uptime',
+      value: formatUptime(n.uptimeSec),
+      sub: '',
+    },
+    {
+      label: 'Services',
+      value: g ? String(g.running) : '0',
+      sub: g ? `of ${g.vms + g.cts}` : '',
+    },
   ];
 });
 </script>

@@ -35,13 +35,31 @@ const isBigCount = (x: unknown): x is number => isNum(x) && Number.isInteger(x) 
 const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
 const inRange = (x: unknown, lo: number, hi: number): x is number => isNum(x) && x >= lo && x <= hi;
 
-// Validate the optional players block; returns the clean object, or null if it is present but malformed.
+/**
+ * Validates the optional players block, rebuilding it from the four known count fields only
+ * @internal
+ * @function
+ * @param p - The untrusted players value from the request body
+ * @returns The clean players object, or null when the block is present but malformed
+ */
 function cleanPlayers(p: unknown): { online: number; max: number; java: number; bedrock: number } | null {
   if (!isObj(p) || !isCount(p.online) || !isCount(p.max) || !isCount(p.java) || !isCount(p.bedrock)) return null;
-  return { online: p.online, max: p.max, java: p.java, bedrock: p.bedrock };
+  return {
+    online: p.online,
+    max: p.max,
+    java: p.java,
+    bedrock: p.bedrock,
+  };
 }
 
-// Validate + round the optional spark/uptime numbers onto `value`. Returns false if any present field is out of range.
+/**
+ * Validates and rounds the optional spark/uptime numbers (tps, mspt, uptimeSec) onto the clean payload
+ * @internal
+ * @function
+ * @param input - The untrusted request body
+ * @param value - The clean payload being built; validated numbers are written onto it in place
+ * @returns True when every present field is in range; false rejects the whole snapshot
+ */
 function applyNumbers(input: Record<string, unknown>, value: IJenscraftMetricsPayload): boolean {
   if (input.tps !== undefined) {
     if (!inRange(input.tps, 0, 20)) return false; // Paper caps TPS at 20

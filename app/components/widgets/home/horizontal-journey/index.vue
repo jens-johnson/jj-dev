@@ -41,10 +41,25 @@ const rawProgress = ref(0);
 const lerpProgress = ref(0);
 let raf: number;
 
+/**
+ * A utility method to linearly interpolate between two values
+ * @internal
+ * @function
+ * @param a - The current value
+ * @param b - The target value
+ * @param t - The interpolation factor in the 0..1 range; lower values move more slowly toward the target
+ * @returns The value moved from a toward b by factor t
+ */
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
+/**
+ * A utility method to handle window scroll events; converts how far the outer wrapper has scrolled past the top of
+ * the viewport into a clamped 0..1 raw progress value
+ * @internal
+ * @function
+ */
 function onScroll() {
   if (!outerRef.value || !import.meta.client) return;
   const rect = outerRef.value.getBoundingClientRect();
@@ -52,6 +67,12 @@ function onScroll() {
   rawProgress.value = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
 }
 
+/**
+ * The per-frame animation loop; eases the lerped progress toward the raw scroll progress and re-schedules itself via
+ * requestAnimationFrame
+ * @internal
+ * @function
+ */
 function tick() {
   lerpProgress.value = lerp(lerpProgress.value, rawProgress.value, 0.09);
   raf = requestAnimationFrame(tick);
@@ -79,6 +100,13 @@ const trackStyle = computed(() => ({
 const activePanel = computed(() => Math.min(PANELS - 1, Math.round(rawProgress.value * (PANELS - 1))));
 
 // ── Navigation click (indicator dots) ────────────────────────────────────────
+/**
+ * A utility method to smooth-scroll the window to the vertical position mapping to the given panel; used by the
+ * indicator dot buttons for direct navigation
+ * @internal
+ * @function
+ * @param i - The zero-based index of the panel to scroll to
+ */
 function scrollToPanel(i: number) {
   if (!import.meta.client || !outerRef.value) return;
   const rect = outerRef.value.getBoundingClientRect();

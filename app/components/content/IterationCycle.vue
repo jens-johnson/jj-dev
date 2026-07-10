@@ -22,10 +22,26 @@
  */
 
 const steps = [
-  { num: '01', label: 'Excited', body: 'A new framework. A new aesthetic. I start iterating on a design.' },
-  { num: '02', label: 'Momentum', body: 'A few half-baked pages, a strong trajectory, real progress.' },
-  { num: '03', label: '???', body: 'Something stalls. The plot is lost. The unknown happens.' },
-  { num: '04', label: 'Drop-off', body: 'Maintenance burden. Boredom. The project quietly tapers off.' },
+  {
+    num: '01',
+    label: 'Excited',
+    body: 'A new framework. A new aesthetic. I start iterating on a design.',
+  },
+  {
+    num: '02',
+    label: 'Momentum',
+    body: 'A few half-baked pages, a strong trajectory, real progress.',
+  },
+  {
+    num: '03',
+    label: '???',
+    body: 'Something stalls. The plot is lost. The unknown happens.',
+  },
+  {
+    num: '04',
+    label: 'Drop-off',
+    body: 'Maintenance burden. Boredom. The project quietly tapers off.',
+  },
 ];
 
 const activeIdx = ref(0);

@@ -33,7 +33,11 @@ const { data: services } = await useAsyncData('services-all', () => queryCollect
 const rawDoc = computed(() => (services.value ?? []).find((s) => s.serviceId === slug.value) ?? null);
 
 if (!rawDoc.value) {
-  throw createError({ statusCode: 404, statusMessage: `No service “${slug.value}” in Substrate`, fatal: true });
+  throw createError({
+    statusCode: 404,
+    statusMessage: `No service “${slug.value}” in Substrate`,
+    fatal: true,
+  });
 }
 
 const service = computed(() => normalizeServices(services.value ?? []).find((s) => s.serviceId === slug.value) ?? null);
@@ -72,7 +76,11 @@ const mapLink = computed(() => service.value?.links?.map ?? null);
 const linkItems = computed(() =>
   Object.entries(service.value?.links ?? {})
     .filter(([key, url]) => !!url && key !== 'map')
-    .map(([key, url]) => ({ key, url: url as string, ...(LINK_META[key] ?? { label: key, icon: 'lucide:link' }) })),
+    .map(([key, url]) => ({
+      key,
+      url: url as string,
+      ...(LINK_META[key] ?? { label: key, icon: 'lucide:link' }),
+    })),
 );
 
 /* ─── Plugins (split server / client) ─────────────────────────────────────────────────────────────────────────────── */
@@ -86,6 +94,12 @@ const pluginCategories = computed<string[]>(() => {
 
 /** Active category filter; null = show all. Clicking a chip filters the list; clicking it again (or "All") resets. */
 const activeCategory = ref<string | null>(null);
+/**
+ * Toggles the active plugin-category filter; clicking the already-active chip clears the filter back to "all"
+ * @internal
+ * @function
+ * @param category - The category chip that was clicked
+ */
 function toggleCategory(category: string) {
   activeCategory.value = activeCategory.value === category ? null : category;
 }

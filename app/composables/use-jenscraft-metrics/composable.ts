@@ -57,5 +57,11 @@ export function useJenscraftMetrics(enabled = true) {
     return Object.keys(out).length ? out : null;
   });
 
-  return { data, state, live, refresh, status };
+  return {
+    data,
+    state,
+    live,
+    refresh,
+    status,
+  };
 }

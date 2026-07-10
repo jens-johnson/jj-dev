@@ -24,6 +24,12 @@ import type { ISubstrateMetricsPayload, ISubstrateMetricsSample } from '../utils
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
+/**
+ * Builds a plausible mock Substrate metrics payload, lightly randomized so each reseed looks like fresh live data
+ * @internal
+ * @function
+ * @returns The mock payload stamped with the current time
+ */
 function mockPayload(): ISubstrateMetricsPayload {
   return {
     v: 1,
@@ -35,7 +41,11 @@ function mockPayload(): ISubstrateMetricsPayload {
       mem: { usedPct: round1(35 + Math.random() * 8), totalGiB: 16 },
       swap: { usedPct: 0 },
     },
-    guests: { vms: 2, cts: 5, running: 6 },
+    guests: {
+      vms: 2,
+      cts: 5,
+      running: 6,
+    },
     storage: { usedPct: 22.5 },
     internet: { reachable: true, latencyMs: Math.round(7 + Math.random() * 6) },
   };

@@ -50,6 +50,13 @@ const goals = [
 const activeIdx = ref(0);
 const scrollContainer = ref<HTMLElement | null>(null);
 
+/**
+ * A utility method to activate the goal card at the given index and smooth-scroll the mobile carousel to it; used by
+ * the mobile indicator dots
+ * @internal
+ * @function
+ * @param i - The zero-based index of the goal card to scroll to
+ */
 function scrollTo(i: number) {
   activeIdx.value = i;
   if (!scrollContainer.value) return;

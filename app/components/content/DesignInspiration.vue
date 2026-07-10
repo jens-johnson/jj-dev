@@ -28,7 +28,13 @@ import type { TTheme } from '~/composables/use-theme';
 
 const { theme, setTheme } = useTheme();
 
-interface InspirationCard {
+/**
+ * An inspiration card pairing a source photograph with the site theme derived from it, including the extracted
+ * palette swatches and their design-token mappings
+ * @internal
+ * @interface
+ */
+interface IInspirationCard {
   theme: TTheme;
   title: string;
   vibe: string;
@@ -36,7 +42,7 @@ interface InspirationCard {
   palette: { name: string; hex: string; token: string }[];
 }
 
-const cards: InspirationCard[] = [
+const cards: IInspirationCard[] = [
   {
     theme: 'day',
     title: 'Day',
@@ -47,10 +53,26 @@ const cards: InspirationCard[] = [
       credit: 'Kalen Emsley',
     },
     palette: [
-      { name: 'Sky', hex: '#F8F4EE', token: '--color-bg' },
-      { name: 'Stone', hex: '#DDD0BF', token: '--color-border' },
-      { name: 'Earth', hex: '#8B6534', token: '--color-accent' },
-      { name: 'Forest', hex: '#5E8C65', token: '--color-accent-secondary' },
+      {
+        name: 'Sky',
+        hex: '#F8F4EE',
+        token: '--color-bg',
+      },
+      {
+        name: 'Stone',
+        hex: '#DDD0BF',
+        token: '--color-border',
+      },
+      {
+        name: 'Earth',
+        hex: '#8B6534',
+        token: '--color-accent',
+      },
+      {
+        name: 'Forest',
+        hex: '#5E8C65',
+        token: '--color-accent-secondary',
+      },
     ],
   },
   {
@@ -63,10 +85,26 @@ const cards: InspirationCard[] = [
       credit: 'Iris Papillon',
     },
     palette: [
-      { name: 'Haze', hex: '#F4D9B8', token: '--color-bg' },
-      { name: 'Rose', hex: '#C8765A', token: '--color-border' },
-      { name: 'Ember', hex: '#A84835', token: '--color-accent' },
-      { name: 'Gold', hex: '#D4763B', token: '--color-accent-secondary' },
+      {
+        name: 'Haze',
+        hex: '#F4D9B8',
+        token: '--color-bg',
+      },
+      {
+        name: 'Rose',
+        hex: '#C8765A',
+        token: '--color-border',
+      },
+      {
+        name: 'Ember',
+        hex: '#A84835',
+        token: '--color-accent',
+      },
+      {
+        name: 'Gold',
+        hex: '#D4763B',
+        token: '--color-accent-secondary',
+      },
     ],
   },
   {
@@ -79,14 +117,36 @@ const cards: InspirationCard[] = [
       credit: 'Martin Fu',
     },
     palette: [
-      { name: 'Twilight', hex: '#1A2138', token: '--color-bg' },
-      { name: 'Steel', hex: '#3A4760', token: '--color-border' },
-      { name: 'Spark', hex: '#9DB8A0', token: '--color-accent' },
-      { name: 'Horizon', hex: '#D4763B', token: '--color-accent-secondary' },
+      {
+        name: 'Twilight',
+        hex: '#1A2138',
+        token: '--color-bg',
+      },
+      {
+        name: 'Steel',
+        hex: '#3A4760',
+        token: '--color-border',
+      },
+      {
+        name: 'Spark',
+        hex: '#9DB8A0',
+        token: '--color-accent',
+      },
+      {
+        name: 'Horizon',
+        hex: '#D4763B',
+        token: '--color-accent-secondary',
+      },
     ],
   },
 ];
 
+/**
+ * A utility method to apply the given theme site-wide as a live preview when a card's CTA is clicked
+ * @internal
+ * @function
+ * @param t - The theme to activate
+ */
 function preview(t: TTheme) {
   setTheme(t);
 }

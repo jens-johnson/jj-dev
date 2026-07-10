@@ -35,7 +35,13 @@ export function useTheme() {
   // access to the Nuxt instance.
   const theme = useState<TTheme>('theme', () => DEFAULT_THEME);
 
-  // Apply a theme to <html> and persist it to localStorage.
+  /**
+   * A utility method to apply a theme; sets the shared state, stamps `data-theme` on <html>, and persists the choice
+   * to localStorage on the client
+   * @internal
+   * @function
+   * @param next - The theme to apply
+   */
   function setTheme(next: TTheme) {
     theme.value = next;
     if (import.meta.client) {
@@ -44,14 +50,23 @@ export function useTheme() {
     }
   }
 
-  // Rotate through day, sunset, night, and back to day.
+  /**
+   * A utility method to rotate to the next theme in order (day, sunset, night, and back to day)
+   * @internal
+   * @function
+   */
   function cycleTheme() {
     const currentIndex = THEMES.indexOf(theme.value);
     const next = THEMES[(currentIndex + 1) % THEMES.length] as TTheme;
     setTheme(next);
   }
 
-  // Read the persisted preference on client mount.
+  /**
+   * A utility method to read the persisted preference from localStorage on client mount, falling back to the default
+   * theme when nothing valid is stored
+   * @internal
+   * @function
+   */
   function initTheme() {
     if (!import.meta.client) return;
     const stored = localStorage.getItem(STORAGE_KEY) as TTheme | null;

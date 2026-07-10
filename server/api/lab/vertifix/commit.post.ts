@@ -52,7 +52,11 @@ export default defineEventHandler(async (event): Promise<IVertifixCommitResult> 
     });
   }
 
-  const upload = await uploadTcx(tcx, { id: activityId, name, description });
+  const upload = await uploadTcx(tcx, {
+    id: activityId,
+    name,
+    description,
+  });
   const replacementActivityId = upload.activity_id ?? (await pollUpload(upload.id));
   await setTrainerFalse(replacementActivityId);
 

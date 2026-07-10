@@ -53,12 +53,26 @@ const STATUS_LABEL: Record<TVertifixStatus, string> = {
   error: 'Needs attention',
 };
 
+/**
+ * A utility method to map an item status onto its stepper stage (0 identify run, 1 replace on Strava, 2 done)
+ * @internal
+ * @function
+ * @param status - The current item status
+ * @returns The zero-based index of the stepper stage the status belongs to
+ */
 function stageOf(status: TVertifixStatus): number {
   if (status === 'done') return 2;
   if (status === 'prepared' || status === 'committing') return 1;
   return 0;
 }
 
+/**
+ * A utility method to pick the badge colour classes for an item status
+ * @internal
+ * @function
+ * @param status - The current item status
+ * @returns The Tailwind background/text classes for the status badge
+ */
 function statusClass(status: TVertifixStatus): string {
   if (status === 'done') return 'bg-accent-secondary/15 text-accent-secondary';
   if (status === 'error') return 'bg-terra-600/15 text-terra-600';
@@ -71,18 +85,39 @@ function statusClass(status: TVertifixStatus): string {
 const milesFmt = (metres: number) => `${(metres / 1609.344).toFixed(2)} mi`;
 const feet = (metres: number) => `${Math.round(metres * 3.28084).toLocaleString()} ft`;
 
+/**
+ * A utility method to format a duration in seconds as hours and minutes (i.e. `1h 24m`, or `42m` under an hour)
+ * @internal
+ * @function
+ * @param seconds - The duration in seconds
+ * @returns The human-readable duration string
+ */
 function duration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.round((seconds % 3600) / 60);
   return h ? `${h}h ${m}m` : `${m}m`;
 }
 
+/**
+ * A utility method to format an ISO timestamp as a locale-aware date and time string
+ * @internal
+ * @function
+ * @param iso - The ISO timestamp to format
+ * @returns The formatted date/time string in the user's locale
+ */
 function dateTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 }
 
 /* ─── Capture-time input (ISO ⇄ datetime-local) ───────────────────────────────────────────────────────────────────── */
 
+/**
+ * A utility method to convert an ISO timestamp to the local `YYYY-MM-DDTHH:mm` value a datetime-local input expects
+ * @internal
+ * @function
+ * @param iso - The ISO timestamp to convert, or null when no capture time is set
+ * @returns The datetime-local input value, or an empty string when the timestamp is null
+ */
 function toLocalInput(iso: string | null): string {
   if (!iso) return '';
   const d = new Date(iso);
@@ -90,6 +125,13 @@ function toLocalInput(iso: string | null): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+/**
+ * A utility method to convert a datetime-local input value back to an ISO timestamp
+ * @internal
+ * @function
+ * @param value - The raw datetime-local input value
+ * @returns The ISO timestamp, or null when the value is empty or unparsable
+ */
 function fromLocalInput(value: string): string | null {
   if (!value) return null;
   const d = new Date(value);
@@ -98,26 +140,62 @@ function fromLocalInput(value: string): string | null {
 
 /* ─── Event handlers ──────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * A utility method to handle drops on the dropzone; clears the drag highlight and adds any dropped files
+ * @internal
+ * @function
+ * @param event - The triggering drag event
+ */
 function onDrop(event: DragEvent) {
   dragging.value = false;
   if (event.dataTransfer?.files?.length) addFiles(event.dataTransfer.files);
 }
 
+/**
+ * A utility method to handle selections from the hidden file input; adds the chosen files, then resets the input so
+ * the same file can be picked again
+ * @internal
+ * @function
+ * @param event - The triggering change event from the file input
+ */
 function onPick(event: Event) {
   const input = event.target as HTMLInputElement;
   if (input.files?.length) addFiles(input.files);
   input.value = '';
 }
 
+/**
+ * A utility method to handle edits to the capture-time input; converts the local value to ISO and stores it
+ * @internal
+ * @function
+ * @param id - The unique id of the item being edited
+ * @param event - The triggering change event from the datetime-local input
+ */
 function onCapturedAt(id: string, event: Event) {
   setCapturedAt(id, fromLocalInput((event.target as HTMLInputElement).value));
 }
 
+/**
+ * A utility method to handle edits to the elevation input; stores the numeric value, or null when the field is
+ * cleared
+ * @internal
+ * @function
+ * @param id - The unique id of the item being edited
+ * @param event - The triggering input event from the number field
+ */
 function onElevation(id: string, event: Event) {
   const value = (event.target as HTMLInputElement).value;
   setElevation(id, value === '' ? null : Number(value));
 }
 
+/**
+ * A utility method to determine whether an item can be prepared; requires a selected run and a non-negative elevation
+ * @internal
+ * @function
+ * @param elevationFeet - The entered elevation gain in feet, or null when the field is empty
+ * @param selectedActivityId - The chosen Strava activity id, or null when none is selected
+ * @returns Whether the prepare action should be enabled
+ */
 function canPrepare(elevationFeet: number | null, selectedActivityId: number | null): boolean {
   return selectedActivityId !== null && elevationFeet !== null && elevationFeet >= 0;
 }

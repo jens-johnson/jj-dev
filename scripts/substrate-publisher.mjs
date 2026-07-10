@@ -49,7 +49,13 @@ const {
   BYPASS_TOKEN = '',
 } = process.env;
 
-for (const [k, v] of Object.entries({ PVE_HOST, PVE_NODE, PVE_TOKEN, INGEST_URL, INGEST_SECRET }))
+for (const [k, v] of Object.entries({
+  PVE_HOST,
+  PVE_NODE,
+  PVE_TOKEN,
+  INGEST_URL,
+  INGEST_SECRET,
+}))
   if (!v) {
     console.error(`Missing env: ${k}`);
     process.exit(1);
@@ -102,6 +108,13 @@ const tcpPing = (host, port = 443, timeoutMs = 3000) =>
     sock.once('error', () => finish(null));
   });
 
+/**
+ * Gathers one snapshot (Proxmox node status, guest lists, TCP latency), assembles the scrubbed counts-and-percentages
+ * payload, and POSTs it to the ingest route, logging a one-line summary with the response status
+ * @internal
+ * @function
+ * @returns {Promise<void>}
+ */
 async function push() {
   const [s, vms, cts, ping] = await Promise.all([
     pve(`/nodes/${PVE_NODE}/status`),
@@ -120,14 +133,22 @@ async function push() {
       mem: { usedPct: r1((s.memory.used / s.memory.total) * 100), totalGiB: Math.round(s.memory.total / 1024 ** 3) },
       ...(s.swap?.total ? { swap: { usedPct: r1((s.swap.used / s.swap.total) * 100) } } : {}),
     },
-    guests: { vms: vms.length, cts: cts.length, running },
+    guests: {
+      vms: vms.length,
+      cts: cts.length,
+      running,
+    },
     ...(s.rootfs?.total ? { storage: { usedPct: r1((s.rootfs.used / s.rootfs.total) * 100) } } : {}),
     internet: { reachable: ping !== null, ...(ping !== null ? { latencyMs: ping } : {}) },
   };
   const headers = { 'content-type': 'application/json', authorization: `Bearer ${INGEST_SECRET}` };
   // Pass through a protected Vercel preview/staging deploy (Protection Bypass for Automation). No-op when unset.
   if (BYPASS_TOKEN) headers['x-vercel-protection-bypass'] = BYPASS_TOKEN;
-  const res = await fetch(INGEST_URL, { method: 'POST', headers, body: JSON.stringify(payload) });
+  const res = await fetch(INGEST_URL, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload),
+  });
   console.log(
     new Date().toISOString(),
     `cpu=${payload.node.cpuPct}% mem=${payload.node.mem.usedPct}% net=${ping ?? 'x'}ms ->`,

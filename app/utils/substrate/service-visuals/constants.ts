@@ -32,10 +32,30 @@ export const SERVICE_STATUS: Record<string, IServiceStatusVisual> = {
     text: 'text-accent-secondary',
     tint: 'bg-accent-secondary/10',
   },
-  offline: { label: 'Offline', dot: 'bg-terra-600', text: 'text-terra-600', tint: 'bg-terra-600/10' },
-  planned: { label: 'Planned', dot: 'bg-ink-subtle', text: 'text-ink-subtle', tint: 'bg-ink-subtle/10' },
-  maintenance: { label: 'Maintenance', dot: 'bg-terra-400', text: 'text-terra-400', tint: 'bg-terra-400/10' },
-  degraded: { label: 'Degraded', dot: 'bg-terra-400', text: 'text-terra-400', tint: 'bg-terra-400/10' },
+  offline: {
+    label: 'Offline',
+    dot: 'bg-terra-600',
+    text: 'text-terra-600',
+    tint: 'bg-terra-600/10',
+  },
+  planned: {
+    label: 'Planned',
+    dot: 'bg-ink-subtle',
+    text: 'text-ink-subtle',
+    tint: 'bg-ink-subtle/10',
+  },
+  maintenance: {
+    label: 'Maintenance',
+    dot: 'bg-terra-400',
+    text: 'text-terra-400',
+    tint: 'bg-terra-400/10',
+  },
+  degraded: {
+    label: 'Degraded',
+    dot: 'bg-terra-400',
+    text: 'text-terra-400',
+    tint: 'bg-terra-400/10',
+  },
 };
 
 /**

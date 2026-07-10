@@ -39,5 +39,12 @@ export default defineNitroPlugin(() => {
   // No credentials wired yet → leave the default memory mount; the feed simply reads as offline until they exist.
   if (!url || !token) return;
 
-  useStorage().mount('substrate', upstashDriver({ base: 'substrate', url, token }));
+  useStorage().mount(
+    'substrate',
+    upstashDriver({
+      base: 'substrate',
+      url,
+      token,
+    }),
+  );
 });

@@ -35,6 +35,14 @@ const weeklyContributions = computed<number[]>(() =>
 
 const maxWeeklyContributions = computed(() => Math.max(...weeklyContributions.value, 1));
 
+/**
+ * A utility method to compute the rendered bar height for a weekly GitHub contribution total, scaled against the
+ * busiest week; zero-contribution weeks render as a 3px baseline stub
+ * @internal
+ * @function
+ * @param count - The total contributions for the week
+ * @returns The CSS height value for the sparkline bar
+ */
 function ghBarHeight(count: number): string {
   if (count === 0) return '3px';
   const pct = count / maxWeeklyContributions.value;
@@ -45,6 +53,14 @@ function ghBarHeight(count: number): string {
 
 const maxWeeklyMiles = computed(() => Math.max(...(data.value?.strava.weeklyMiles ?? [1])));
 
+/**
+ * A utility method to compute the rendered bar height for a weekly Strava mileage total, scaled against the highest
+ * mileage week; zero-mile weeks render as a 3px baseline stub
+ * @internal
+ * @function
+ * @param miles - The total miles run for the week
+ * @returns The CSS height value for the sparkline bar
+ */
 function barHeight(miles: number): string {
   if (!maxWeeklyMiles.value) return '4px';
   const pct = miles / maxWeeklyMiles.value;

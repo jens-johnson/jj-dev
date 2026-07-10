@@ -35,9 +35,24 @@ const ONLINE: IStatusVisual = {
 // The per-status visual treatments for substrate hardware.
 const STATUS: Record<string, IStatusVisual> = {
   online: ONLINE,
-  offline: { label: 'Offline', dot: 'bg-terra-600', text: 'text-terra-600', tint: 'bg-terra-600/10' },
-  planned: { label: 'Planned', dot: 'bg-ink-subtle', text: 'text-ink-subtle', tint: 'bg-ink-subtle/10' },
-  maintenance: { label: 'Maintenance', dot: 'bg-terra-400', text: 'text-terra-400', tint: 'bg-terra-400/10' },
+  offline: {
+    label: 'Offline',
+    dot: 'bg-terra-600',
+    text: 'text-terra-600',
+    tint: 'bg-terra-600/10',
+  },
+  planned: {
+    label: 'Planned',
+    dot: 'bg-ink-subtle',
+    text: 'text-ink-subtle',
+    tint: 'bg-ink-subtle/10',
+  },
+  maintenance: {
+    label: 'Maintenance',
+    dot: 'bg-terra-400',
+    text: 'text-terra-400',
+    tint: 'bg-terra-400/10',
+  },
 };
 
 /**
@@ -126,7 +141,11 @@ export function normalizeDevice(d: IRawSubstrateDoc): ISubstrateDevice {
     power: d.power,
     specs: (d.specs ?? []).map((s) => ({ label: s.label ?? '', value: s.value ?? '' })),
     connections: (d.connections ?? [])
-      .map((c) => ({ to: c.to ?? '', kind: c.kind, label: c.label }))
+      .map((c) => ({
+        to: c.to ?? '',
+        kind: c.kind,
+        label: c.label,
+      }))
       .filter((c) => c.to),
     tags: d.tags ?? [],
     order: d.order ?? 100,
