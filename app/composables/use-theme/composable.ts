@@ -27,10 +27,10 @@ const STORAGE_KEY: string = 'jj-theme';
 const DEFAULT_THEME: TTheme = 'day';
 
 /**
- * A composable exposing the active site theme plus helpers to set, cycle, and initialise it
+ * A composable exposing the active site theme plus helpers to set, cycle, and initialize it
  * @public
  * @function
- * @returns The reactive theme ref, the setter/cycler/initialiser functions, and the ordered theme list
+ * @returns The reactive theme ref, the setter/cycler/initializer functions, and the ordered theme list
  */
 export function useTheme(): IUseThemeReturn {
   /**

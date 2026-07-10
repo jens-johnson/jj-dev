@@ -13,7 +13,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * █████████████████████████████████████ #utils/substrate/service-visuals/index.ts █████████████████████████████████████
  *
- * Barrel export for the Services-layer visual lookups and the service-doc normaliser.
+ * Barrel export for the Services-layer visual lookups and the service-doc normalizer.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */

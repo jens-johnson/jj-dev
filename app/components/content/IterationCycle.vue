@@ -77,8 +77,10 @@ onUnmounted(() => {
           >
             {{ step.num }}
           </span>
+
           <div class="min-w-0">
             <p class="font-display text-h5 text-ink mb-1 font-bold">{{ step.label }}</p>
+
             <p class="font-body text-body-sm text-ink-muted">{{ step.body }}</p>
           </div>
         </li>
@@ -96,14 +98,32 @@ onUnmounted(() => {
           aria-hidden="true"
           style="top: 50%; left: 50%; transform: translate(-50%, -50%)"
         >
-          <circle cx="50" cy="50" r="48" stroke-dasharray="2 4" />
+          <circle
+            cx="50"
+            cy="50"
+            r="48"
+            stroke-dasharray="2 4"
+          />
           <!-- Orbit dot -->
-          <circle r="3" fill="currentColor" stroke="none" class="orbit-dot">
-            <animateMotion dur="8.8s" repeatCount="indefinite">
+          <circle
+            r="3"
+            fill="currentColor"
+            stroke="none"
+            class="orbit-dot"
+          >
+            <animateMotion
+              dur="8.8s"
+              repeatCount="indefinite"
+            >
               <mpath href="#orbit-path" />
             </animateMotion>
           </circle>
-          <path id="orbit-path" d="M 50 2 A 48 48 0 1 1 49.99 2 Z" stroke="none" />
+
+          <path
+            id="orbit-path"
+            d="M 50 2 A 48 48 0 1 1 49.99 2 Z"
+            stroke="none"
+          />
         </svg>
 
         <!-- Cycle indicator at center -->
@@ -111,7 +131,11 @@ onUnmounted(() => {
           class="absolute inset-0 m-auto flex h-20 w-20 items-center justify-center"
           style="top: 50%; left: 50%; transform: translate(-50%, -50%)"
         >
-          <Icon name="lucide:rotate-cw" size="32" class="text-accent opacity-40" />
+          <Icon
+            name="lucide:rotate-cw"
+            size="32"
+            class="text-accent opacity-40"
+          />
         </div>
 
         <div class="grid grid-cols-2 gap-x-32 gap-y-8">
@@ -128,9 +152,16 @@ onUnmounted(() => {
               >
                 {{ step.num }}
               </span>
-              <span v-if="i === activeIdx" class="bg-accent h-2 w-2 animate-pulse rounded-full" aria-hidden="true" />
+
+              <span
+                v-if="i === activeIdx"
+                class="bg-accent h-2 w-2 animate-pulse rounded-full"
+                aria-hidden="true"
+              />
             </div>
+
             <p class="font-display text-h5 text-ink mb-2 font-bold">{{ step.label }}</p>
+
             <p class="font-body text-body-sm text-ink-muted leading-relaxed">{{ step.body }}</p>
           </div>
         </div>

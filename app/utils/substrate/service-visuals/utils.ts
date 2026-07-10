@@ -115,11 +115,11 @@ export function normalizeService(doc: IRawServiceDoc): IHomelabService {
 }
 
 /**
- * Normalises a list of queried docs, sorted by ascending `order`
+ * Normalizes a list of queried docs, sorted by ascending `order`
  * @public
  * @function
  * @param docs - The loosely-typed service docs from queryCollection
- * @returns The normalised services, sorted by ascending order
+ * @returns The normalized services, sorted by ascending order
  */
 export function normalizeServices(docs: IRawServiceDoc[]): IHomelabService[] {
   return docs.map(normalizeService).sort((a, b) => (a.order ?? 100) - (b.order ?? 100));

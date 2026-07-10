@@ -2,33 +2,42 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ▀▀        ▀▀                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ██████████████████████████████████████ #components/data/status-badge/index.vue ██████████████████████████████████████
  *
  * Inline status badge for a content status value; active | wip | archived; with matching color treatment.
  *
- * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
  * <DataStatusBadge status="active" />
  * <DataStatusBadge status="wip" />
  * <DataStatusBadge status="archived" />
  *
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • status
+ *     - Description: The content status to render; unknown values fall back to a neutral badge showing the raw value
+ *     - Type: string
+ *     - Required: false
+ *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-
 /**
- *
+ * The props accepted by the status badge; the status value is optional and unknown values fall back to a neutral badge
+ * @internal
+ * @interface
  */
 interface Props {
+  /* The content status to render; active | wip | archived, or any raw value for the neutral fallback */
   status?: string;
 }
 const props = defineProps<Props>();

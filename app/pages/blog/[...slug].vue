@@ -73,26 +73,42 @@ function formatDate(iso: string): string {
 </script>
 
 <template>
-  <article v-if="post" class="bg-bg min-h-screen">
+  <article
+    v-if="post"
+    class="bg-bg min-h-screen"
+  >
     <!-- ─── Header ────────────────────────────────────────────────────────────── -->
     <header class="border-border relative overflow-hidden border-b">
       <WidgetsBlogHeaderAnimation />
+
       <div class="relative mx-auto max-w-3xl px-6 pt-20 pb-12 md:pt-28">
         <!-- Back link -->
         <NuxtLink
           to="/blog"
           class="text-caption text-ink-subtle hover:text-accent mb-8 inline-flex items-center gap-1.5 font-mono tracking-widest uppercase transition-colors"
         >
-          <Icon name="lucide:arrow-left" size="13" /> All writing
+          <Icon
+            name="lucide:arrow-left"
+            size="13"
+          />
+          All writing
         </NuxtLink>
 
         <!-- Meta -->
         <div class="mb-6 flex flex-wrap items-center gap-3">
           <p class="text-caption text-ink-subtle font-mono">{{ formatDate(post.publishedAt) }}</p>
-          <span v-if="post.series" class="text-caption text-ink-subtle font-mono">
+
+          <span
+            v-if="post.series"
+            class="text-caption text-ink-subtle font-mono"
+          >
             · {{ post.series.name }} · Part {{ post.series.part }}
           </span>
-          <span v-if="post.readingTime" class="text-caption text-ink-subtle font-mono">
+
+          <span
+            v-if="post.readingTime"
+            class="text-caption text-ink-subtle font-mono"
+          >
             · {{ post.readingTime }} min read
           </span>
         </div>
@@ -103,7 +119,10 @@ function formatDate(iso: string): string {
         </h1>
 
         <!-- Subtitle -->
-        <p v-if="post.subtitle" class="font-display text-h5 text-ink-muted mb-6 leading-snug font-medium italic">
+        <p
+          v-if="post.subtitle"
+          class="font-display text-h5 text-ink-muted mb-6 leading-snug font-medium italic"
+        >
           {{ post.subtitle }}
         </p>
 
@@ -135,14 +154,23 @@ function formatDate(iso: string): string {
         </article>
 
         <!-- TOC sidebar (desktop only) -->
-        <aside v-if="toc.length > 0" class="hidden lg:block">
+        <aside
+          v-if="toc.length > 0"
+          class="hidden lg:block"
+        >
           <div class="sticky top-24">
             <p class="text-caption text-ink-subtle mb-5 font-mono tracking-widest uppercase">In this piece</p>
+
             <ol class="space-y-3">
-              <li v-for="(link, i) in toc" :key="link.id" class="flex gap-3">
+              <li
+                v-for="(link, i) in toc"
+                :key="link.id"
+                class="flex gap-3"
+              >
                 <span class="text-caption text-ink-subtle/60 mt-0.5 shrink-0 font-mono leading-snug">
                   {{ String(i + 1).padStart(2, '0') }}
                 </span>
+
                 <a
                   :href="`#${link.id}`"
                   class="font-body text-body-sm text-ink-muted hover:text-accent leading-snug transition-colors"
@@ -160,11 +188,16 @@ function formatDate(iso: string): string {
     <footer class="border-border bg-surface border-t">
       <div class="mx-auto max-w-3xl px-6 py-12">
         <p class="text-caption text-ink-subtle mb-4 font-mono tracking-widest uppercase">Keep reading</p>
+
         <NuxtLink
           to="/blog"
           class="font-display text-h5 text-ink hover:text-accent inline-flex items-center gap-1.5 font-bold transition-colors"
         >
-          All writing <Icon name="lucide:arrow-right" size="15" />
+          All writing
+          <Icon
+            name="lucide:arrow-right"
+            size="15"
+          />
         </NuxtLink>
       </div>
     </footer>

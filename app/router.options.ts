@@ -13,7 +13,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * █████████████████████████████████████████████ #app/router.options.ts ████████████████████████████████████████████████
  *
- * Vue Router scroll behaviour override. Forces scroll-to-top on every new route navigation so links from deep within
+ * Vue Router scroll behavior override. Forces scroll-to-top on every new route navigation so links from deep within
  * the tall horizontal-journey home page don't leave the next page scrolled past its content. Preserves saved scroll
  * positions on back/forward navigation so the user returns to where they were.
  *

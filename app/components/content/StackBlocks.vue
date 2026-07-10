@@ -125,6 +125,7 @@ const expandedIdx = ref(0);
             <h3 class="font-display text-h5 text-ink leading-tight font-bold">
               {{ layer.title }}
             </h3>
+
             <p class="font-body text-body-sm text-ink-muted truncate">
               {{ layer.tagline }}
             </p>
@@ -149,7 +150,11 @@ const expandedIdx = ref(0);
               <p class="font-body text-body-sm text-ink-muted leading-relaxed">
                 {{ layer.body }}
               </p>
-              <div v-if="layer.links?.length" class="mt-3 flex flex-wrap gap-2">
+
+              <div
+                v-if="layer.links?.length"
+                class="mt-3 flex flex-wrap gap-2"
+              >
                 <a
                   v-for="link in layer.links"
                   :key="link.href"
@@ -159,7 +164,10 @@ const expandedIdx = ref(0);
                   class="text-caption text-accent border-accent/30 hover:bg-accent/10 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 font-mono transition-colors"
                 >
                   {{ link.label }}
-                  <Icon name="lucide:arrow-up-right" size="11" />
+                  <Icon
+                    name="lucide:arrow-up-right"
+                    size="11"
+                  />
                 </a>
               </div>
             </div>

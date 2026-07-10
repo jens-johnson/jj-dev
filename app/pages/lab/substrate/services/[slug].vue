@@ -135,14 +135,21 @@ useSeoMeta({
 </script>
 
 <template>
-  <div v-if="service" class="bg-bg min-h-screen">
+  <div
+    v-if="service"
+    class="bg-bg min-h-screen"
+  >
     <div class="mx-auto max-w-3xl px-6 pt-20 pb-24 md:pt-28">
       <!-- Back -->
       <NuxtLink
         to="/lab/substrate?view=services"
         class="text-caption text-ink-subtle hover:text-accent mb-7 inline-flex items-center gap-1.5 font-mono tracking-widest uppercase transition-colors"
       >
-        <Icon name="lucide:arrow-left" size="13" /> Services
+        <Icon
+          name="lucide:arrow-left"
+          size="13"
+        />
+        Services
       </NuxtLink>
 
       <!-- Header -->
@@ -151,17 +158,30 @@ useSeoMeta({
           class="flex size-14 shrink-0 items-center justify-center rounded-2xl"
           :class="isPlanned ? 'border-border text-ink-subtle border border-dashed' : 'bg-accent/10 text-accent'"
         >
-          <Icon :name="service.icon ?? serviceKindIcon(service.kind)" size="28" />
+          <Icon
+            :name="service.icon ?? serviceKindIcon(service.kind)"
+            size="28"
+          />
         </span>
 
         <div class="min-w-0 flex-1">
           <p class="text-accent mb-1 font-mono text-[11px] tracking-widest uppercase">
             {{ serviceKindLabel(service.kind) }}
           </p>
-          <h1 class="font-display text-ink font-bold tracking-tight" style="font-size: clamp(2rem, 5vw, 3rem)">
+
+          <h1
+            class="font-display text-ink font-bold tracking-tight"
+            style="font-size: clamp(2rem, 5vw, 3rem)"
+          >
             {{ service.title }}
           </h1>
-          <p v-if="service.address" class="text-body-sm text-ink-subtle mt-1 font-mono">{{ service.address }}</p>
+
+          <p
+            v-if="service.address"
+            class="text-body-sm text-ink-subtle mt-1 font-mono"
+          >
+            {{ service.address }}
+          </p>
         </div>
 
         <div class="flex shrink-0 flex-col items-end gap-2">
@@ -169,7 +189,11 @@ useSeoMeta({
             class="text-caption inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono font-medium"
             :class="serviceStatusOf(service.status).tint"
           >
-            <span class="size-2 rounded-full" :class="serviceStatusOf(service.status).dot" />
+            <span
+              class="size-2 rounded-full"
+              :class="serviceStatusOf(service.status).dot"
+            />
+
             <span :class="serviceStatusOf(service.status).text">{{ serviceStatusOf(service.status).label }}</span>
           </span>
 
@@ -181,29 +205,52 @@ useSeoMeta({
             rel="noopener noreferrer"
             class="text-caption text-ink-muted hover:text-accent inline-flex items-center gap-1 font-mono transition-colors"
           >
-            <Icon name="lucide:map" size="13" /> View Map
+            <Icon
+              name="lucide:map"
+              size="13"
+            />
+            View Map
           </a>
         </div>
       </header>
 
-      <p v-if="service.description" class="font-body text-body-lg text-ink-muted mt-6 leading-relaxed">
-        <template v-for="(seg, i) in descriptionSegments" :key="i"
-          ><NuxtLink v-if="seg.href" :to="seg.href" class="text-accent font-mono hover:underline">{{
-            seg.text
-          }}</NuxtLink
-          ><template v-else>{{ seg.text }}</template></template
+      <p
+        v-if="service.description"
+        class="font-body text-body-lg text-ink-muted mt-6 leading-relaxed"
+      >
+        <template
+          v-for="(seg, i) in descriptionSegments"
+          :key="i"
+          ><NuxtLink
+            v-if="seg.href"
+            :to="seg.href"
+            class="text-accent font-mono hover:underline"
+            >{{ seg.text }}</NuxtLink
+          >
+
+          <template v-else>{{ seg.text }}</template></template
         >
       </p>
 
       <!-- Links -->
-      <div v-if="linkItems.length" class="mt-6 flex flex-wrap gap-2">
-        <template v-for="link in linkItems" :key="link.key">
+      <div
+        v-if="linkItems.length"
+        class="mt-6 flex flex-wrap gap-2"
+      >
+        <template
+          v-for="link in linkItems"
+          :key="link.key"
+        >
           <!-- Planned: non-clickable pill (the destination isn't live yet). -->
           <span
             v-if="isPlanned"
             class="border-border text-caption text-ink-subtle inline-flex items-center gap-1.5 rounded-full border border-dashed px-3 py-1.5 font-mono"
           >
-            <Icon :name="link.icon" size="13" /> {{ link.label }}
+            <Icon
+              :name="link.icon"
+              size="13"
+            />
+            {{ link.label }}
             <span class="text-ink-subtle/60">· planned</span>
           </span>
           <!-- Live: real anchor. -->
@@ -214,17 +261,31 @@ useSeoMeta({
             rel="noopener noreferrer"
             class="border-border bg-surface text-body-sm text-ink hover:border-accent/60 hover:text-accent inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-medium transition-colors"
           >
-            <Icon :name="link.icon" size="14" /> {{ link.label }}
+            <Icon
+              :name="link.icon"
+              size="14"
+            />
+            {{ link.label }}
           </a>
         </template>
       </div>
 
       <!-- Summary: stack + host -->
       <div class="mt-8 grid gap-4 sm:grid-cols-2">
-        <div v-if="service.stack?.length" class="border-border bg-surface rounded-2xl border p-5">
+        <div
+          v-if="service.stack?.length"
+          class="border-border bg-surface rounded-2xl border p-5"
+        >
           <p class="text-ink-subtle mb-3 font-mono text-[10px] tracking-widest uppercase">Stack</p>
-          <ul class="flex flex-wrap gap-1.5" role="list">
-            <li v-for="tech in service.stack" :key="tech">
+
+          <ul
+            class="flex flex-wrap gap-1.5"
+            role="list"
+          >
+            <li
+              v-for="tech in service.stack"
+              :key="tech"
+            >
               <component
                 :is="techDocHref(tech) ? 'a' : 'span'"
                 v-bind="
@@ -234,23 +295,42 @@ useSeoMeta({
                 :class="techDocHref(tech) ? 'hover:border-accent/60 hover:text-accent transition-colors' : ''"
               >
                 {{ tech }}
-                <Icon v-if="techDocHref(tech)" name="lucide:external-link" size="10" class="opacity-60" />
+                <Icon
+                  v-if="techDocHref(tech)"
+                  name="lucide:external-link"
+                  size="10"
+                  class="opacity-60"
+                />
               </component>
             </li>
           </ul>
         </div>
 
-        <div v-if="service.host" class="border-border bg-surface rounded-2xl border p-5">
+        <div
+          v-if="service.host"
+          class="border-border bg-surface rounded-2xl border p-5"
+        >
           <p class="text-ink-subtle mb-3 font-mono text-[10px] tracking-widest uppercase">Runs on</p>
+
           <NuxtLink
             :to="`/lab/substrate/${service.host}`"
             class="group border-border bg-bg/40 hover:border-accent/60 flex items-center gap-2.5 rounded-lg border px-3 py-2 transition-colors"
           >
-            <Icon name="lucide:cpu" size="14" class="text-ink-subtle shrink-0" />
+            <Icon
+              name="lucide:cpu"
+              size="14"
+              class="text-ink-subtle shrink-0"
+            />
+
             <span class="text-body-sm text-ink group-hover:text-accent flex-1 truncate font-medium transition-colors">
               {{ hostTitle }}
             </span>
-            <Icon name="lucide:arrow-up-right" size="14" class="text-ink-subtle shrink-0" />
+
+            <Icon
+              name="lucide:arrow-up-right"
+              size="14"
+              class="text-ink-subtle shrink-0"
+            />
           </NuxtLink>
         </div>
       </div>
@@ -265,11 +345,17 @@ useSeoMeta({
       />
 
       <!-- Plugins -->
-      <section v-if="service.plugins?.length" class="mt-8">
+      <section
+        v-if="service.plugins?.length"
+        class="mt-8"
+      >
         <h2 class="font-display text-h5 text-ink mb-4 font-bold tracking-tight">Plugins &amp; add-ons</h2>
 
         <!-- Category filter: click a tag to show only that category; "All" (or the active tag again) resets. -->
-        <div v-if="pluginCategories.length > 1" class="mb-5 flex flex-wrap items-center gap-1.5">
+        <div
+          v-if="pluginCategories.length > 1"
+          class="mb-5 flex flex-wrap items-center gap-1.5"
+        >
           <button
             type="button"
             class="text-caption rounded-full border px-2.5 py-0.5 font-mono transition-colors"
@@ -282,6 +368,7 @@ useSeoMeta({
           >
             All
           </button>
+
           <button
             v-for="cat in pluginCategories"
             :key="cat"
@@ -300,8 +387,16 @@ useSeoMeta({
 
         <div v-if="serverPlugins.length">
           <p class="text-ink-subtle mb-2 font-mono text-[10px] tracking-widest uppercase">Server-side</p>
-          <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2" role="list">
-            <li v-for="p in serverPlugins" :key="p.name" class="border-border bg-surface rounded-xl border p-4">
+
+          <ul
+            class="grid grid-cols-1 gap-2 sm:grid-cols-2"
+            role="list"
+          >
+            <li
+              v-for="p in serverPlugins"
+              :key="p.name"
+              class="border-border bg-surface rounded-xl border p-4"
+            >
               <div class="flex items-center justify-between gap-2">
                 <component
                   :is="p.url ? 'a' : 'span'"
@@ -311,10 +406,12 @@ useSeoMeta({
                 >
                   {{ p.name }}
                 </component>
+
                 <span class="flex shrink-0 items-center gap-1.5">
                   <span class="border-border text-caption text-ink-subtle rounded-full border px-2 py-0.5 font-mono">
                     {{ p.category }}
                   </span>
+
                   <a
                     v-if="p.url"
                     :href="p.url"
@@ -323,19 +420,34 @@ useSeoMeta({
                     class="text-ink-subtle hover:text-accent transition-colors"
                     :aria-label="`${p.name} documentation`"
                   >
-                    <Icon name="lucide:external-link" size="14" />
+                    <Icon
+                      name="lucide:external-link"
+                      size="14"
+                    />
                   </a>
                 </span>
               </div>
+
               <p class="text-caption text-ink-muted mt-1.5 leading-relaxed">{{ p.purpose }}</p>
             </li>
           </ul>
         </div>
 
-        <div v-if="clientPlugins.length" class="mt-5">
+        <div
+          v-if="clientPlugins.length"
+          class="mt-5"
+        >
           <p class="text-ink-subtle mb-2 font-mono text-[10px] tracking-widest uppercase">Client-side (recommended)</p>
-          <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2" role="list">
-            <li v-for="p in clientPlugins" :key="p.name" class="border-border bg-surface rounded-xl border p-4">
+
+          <ul
+            class="grid grid-cols-1 gap-2 sm:grid-cols-2"
+            role="list"
+          >
+            <li
+              v-for="p in clientPlugins"
+              :key="p.name"
+              class="border-border bg-surface rounded-xl border p-4"
+            >
               <div class="flex items-center justify-between gap-2">
                 <component
                   :is="p.url ? 'a' : 'span'"
@@ -345,10 +457,12 @@ useSeoMeta({
                 >
                   {{ p.name }}
                 </component>
+
                 <span class="flex shrink-0 items-center gap-1.5">
                   <span class="border-border text-caption text-ink-subtle rounded-full border px-2 py-0.5 font-mono">
                     {{ p.category }}
                   </span>
+
                   <a
                     v-if="p.url"
                     :href="p.url"
@@ -357,10 +471,14 @@ useSeoMeta({
                     class="text-ink-subtle hover:text-accent transition-colors"
                     :aria-label="`${p.name} documentation`"
                   >
-                    <Icon name="lucide:external-link" size="14" />
+                    <Icon
+                      name="lucide:external-link"
+                      size="14"
+                    />
                   </a>
                 </span>
               </div>
+
               <p class="text-caption text-ink-muted mt-1.5 leading-relaxed">{{ p.purpose }}</p>
             </li>
           </ul>
@@ -368,8 +486,14 @@ useSeoMeta({
       </section>
 
       <!-- Body / write-up -->
-      <article v-if="hasNotes" class="service-doc border-border mt-10 border-t pt-8">
-        <ContentRenderer v-if="rawDoc" :value="rawDoc" />
+      <article
+        v-if="hasNotes"
+        class="service-doc border-border mt-10 border-t pt-8"
+      >
+        <ContentRenderer
+          v-if="rawDoc"
+          :value="rawDoc"
+        />
       </article>
     </div>
   </div>

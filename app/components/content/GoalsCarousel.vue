@@ -96,9 +96,15 @@ function onScroll(): void {
         class="goal-card border-border bg-surface w-[85%] shrink-0 snap-center rounded-2xl border p-6"
         :class="{ 'is-active': i === activeIdx }"
       >
-        <ContentGoalsCarouselVisual :variant="goal.visual" :icon="goal.icon" />
+        <ContentGoalsCarouselVisual
+          :variant="goal.visual"
+          :icon="goal.icon"
+        />
+
         <p class="text-caption text-accent mt-4 font-mono tracking-widest">{{ goal.num }}</p>
+
         <h3 class="font-display text-h5 text-ink mt-1 mb-3 leading-tight font-bold">{{ goal.title }}</h3>
+
         <p class="font-body text-body-sm text-ink-muted leading-relaxed">{{ goal.body }}</p>
       </article>
     </div>
@@ -134,14 +140,19 @@ function onScroll(): void {
 
         <!-- Visual illustration -->
         <div class="relative z-10 mb-5">
-          <ContentGoalsCarouselVisual :variant="goal.visual" :icon="goal.icon" />
+          <ContentGoalsCarouselVisual
+            :variant="goal.visual"
+            :icon="goal.icon"
+          />
         </div>
 
         <!-- Meta -->
         <p class="text-caption text-accent relative z-10 font-mono tracking-widest">{{ goal.num }}</p>
+
         <h3 class="font-display text-h5 text-ink relative z-10 mt-1 mb-3 leading-tight font-bold">
           {{ goal.title }}
         </h3>
+
         <p class="font-body text-body-sm text-ink-muted relative z-10 leading-relaxed">
           {{ goal.body }}
         </p>

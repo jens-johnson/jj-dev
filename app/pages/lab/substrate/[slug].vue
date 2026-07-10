@@ -83,14 +83,21 @@ useSeoMeta({
 </script>
 
 <template>
-  <div v-if="device" class="bg-bg min-h-screen">
+  <div
+    v-if="device"
+    class="bg-bg min-h-screen"
+  >
     <div class="mx-auto max-w-3xl px-6 pt-20 pb-24 md:pt-28">
       <!-- Back -->
       <NuxtLink
         to="/lab/substrate"
         class="text-caption text-ink-subtle hover:text-accent mb-7 inline-flex items-center gap-1.5 font-mono tracking-widest uppercase transition-colors"
       >
-        <Icon name="lucide:arrow-left" size="13" /> Substrate
+        <Icon
+          name="lucide:arrow-left"
+          size="13"
+        />
+        Substrate
       </NuxtLink>
 
       <!-- Header -->
@@ -103,56 +110,101 @@ useSeoMeta({
               : 'bg-accent/10 text-accent'
           "
         >
-          <Icon :name="kindIcon(device.kind)" size="28" />
+          <Icon
+            :name="kindIcon(device.kind)"
+            size="28"
+          />
         </span>
 
         <div class="min-w-0 flex-1">
           <p class="text-accent mb-1 font-mono text-[11px] tracking-widest uppercase">{{ kindLabel(device.kind) }}</p>
-          <h1 class="font-display text-ink font-bold tracking-tight" style="font-size: clamp(2rem, 5vw, 3rem)">
+
+          <h1
+            class="font-display text-ink font-bold tracking-tight"
+            style="font-size: clamp(2rem, 5vw, 3rem)"
+          >
             {{ device.title }}
           </h1>
-          <p v-if="vendorModel" class="text-body-sm text-ink-subtle mt-1 font-mono">{{ vendorModel }}</p>
+
+          <p
+            v-if="vendorModel"
+            class="text-body-sm text-ink-subtle mt-1 font-mono"
+          >
+            {{ vendorModel }}
+          </p>
         </div>
 
         <span
           class="text-caption inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 font-mono font-medium"
           :class="statusOf(device.status).tint"
         >
-          <span class="size-2 rounded-full" :class="statusOf(device.status).dot" />
+          <span
+            class="size-2 rounded-full"
+            :class="statusOf(device.status).dot"
+          />
+
           <span :class="statusOf(device.status).text">{{ statusOf(device.status).label }}</span>
         </span>
       </header>
 
-      <p v-if="device.description" class="font-body text-body-lg text-ink-muted mt-6 leading-relaxed">
+      <p
+        v-if="device.description"
+        class="font-body text-body-lg text-ink-muted mt-6 leading-relaxed"
+      >
         {{ device.description }}
       </p>
 
       <!-- Summary: specs + connections -->
       <div class="mt-8 grid gap-4 sm:grid-cols-2">
-        <div v-if="device.specs?.length" class="border-border bg-surface rounded-2xl border p-5">
+        <div
+          v-if="device.specs?.length"
+          class="border-border bg-surface rounded-2xl border p-5"
+        >
           <p class="text-ink-subtle mb-3 font-mono text-[10px] tracking-widest uppercase">Specs</p>
+
           <dl class="flex flex-col gap-2">
-            <div v-for="s in device.specs" :key="s.label" class="flex items-baseline justify-between gap-4">
+            <div
+              v-for="s in device.specs"
+              :key="s.label"
+              class="flex items-baseline justify-between gap-4"
+            >
               <dt class="text-caption text-ink-subtle shrink-0 font-mono uppercase">{{ s.label }}</dt>
+
               <dd class="text-body-sm text-ink text-right font-medium">{{ s.value }}</dd>
             </div>
           </dl>
         </div>
 
-        <div v-if="device.connections?.length" class="border-border bg-surface rounded-2xl border p-5">
+        <div
+          v-if="device.connections?.length"
+          class="border-border bg-surface rounded-2xl border p-5"
+        >
           <p class="text-ink-subtle mb-3 font-mono text-[10px] tracking-widest uppercase">Connections</p>
-          <ul class="flex flex-col gap-1.5" role="list">
-            <li v-for="c in device.connections" :key="`${c.to}-${c.kind}`">
+
+          <ul
+            class="flex flex-col gap-1.5"
+            role="list"
+          >
+            <li
+              v-for="c in device.connections"
+              :key="`${c.to}-${c.kind}`"
+            >
               <NuxtLink
                 :to="`/lab/substrate/${c.to}`"
                 class="group border-border bg-bg/40 hover:border-accent/60 flex items-center gap-2.5 rounded-lg border px-3 py-2 transition-colors"
               >
-                <Icon name="lucide:arrow-up-right" size="14" class="text-ink-subtle shrink-0" />
+                <Icon
+                  name="lucide:arrow-up-right"
+                  size="14"
+                  class="text-ink-subtle shrink-0"
+                />
+
                 <span
                   class="text-body-sm text-ink group-hover:text-accent flex-1 truncate font-medium transition-colors"
                 >
                   {{ titleOf(c.to) }}
                 </span>
+
                 <span class="text-caption text-ink-subtle bg-surface rounded-full px-2 py-0.5 font-mono">
                   {{ c.label ?? connLabel(c.kind) }}
                 </span>
@@ -163,28 +215,43 @@ useSeoMeta({
       </div>
 
       <!-- Live metrics (host only) -->
-      <WidgetsLabSubstrateLiveCard v-if="device.kind === 'hypervisor'" class="mt-8" />
+      <WidgetsLabSubstrateLiveCard
+        v-if="device.kind === 'hypervisor'"
+        class="mt-8"
+      />
 
       <!-- Live internet (WAN only) -->
-      <div v-if="liveInternet" class="border-border bg-surface mt-8 rounded-2xl border p-5">
+      <div
+        v-if="liveInternet"
+        class="border-border bg-surface mt-8 rounded-2xl border p-5"
+      >
         <div class="mb-3 flex items-center justify-between gap-3">
           <span class="inline-flex items-center gap-2">
             <span class="relative flex size-2">
               <span
                 class="bg-accent-secondary absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:hidden"
               />
+
               <span class="bg-accent-secondary relative inline-flex size-2 rounded-full" />
             </span>
+
             <span class="text-caption text-accent-secondary font-mono tracking-widest uppercase">Live</span>
+
             <span class="text-caption text-ink-subtle font-mono">internet edge</span>
           </span>
-          <span v-if="liveUpdated" class="text-caption text-ink-subtle shrink-0 font-mono">
+
+          <span
+            v-if="liveUpdated"
+            class="text-caption text-ink-subtle shrink-0 font-mono"
+          >
             updated {{ liveUpdated }}
           </span>
         </div>
+
         <dl class="grid grid-cols-2 gap-3">
           <div class="border-border bg-bg/40 rounded-xl border px-3 py-2.5">
             <dt class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Reachable</dt>
+
             <dd
               class="font-display text-h5 mt-0.5 leading-none font-bold"
               :class="liveInternet.reachable ? 'text-accent-secondary' : 'text-terra-600'"
@@ -192,18 +259,35 @@ useSeoMeta({
               {{ liveInternet.reachable ? 'Yes' : 'No' }}
             </dd>
           </div>
-          <div v-if="liveInternet.latencyMs !== undefined" class="border-border bg-bg/40 rounded-xl border px-3 py-2.5">
+
+          <div
+            v-if="liveInternet.latencyMs !== undefined"
+            class="border-border bg-bg/40 rounded-xl border px-3 py-2.5"
+          >
             <dt class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Ping</dt>
+
             <dd class="font-display text-h5 text-ink mt-0.5 leading-none font-bold">{{ liveInternet.latencyMs }} ms</dd>
           </div>
         </dl>
       </div>
 
       <!-- Body / runbook -->
-      <article v-if="hasNotes" class="substrate-doc border-border mt-10 border-t pt-8">
-        <ContentRenderer v-if="rawDoc" :value="rawDoc" />
+      <article
+        v-if="hasNotes"
+        class="substrate-doc border-border mt-10 border-t pt-8"
+      >
+        <ContentRenderer
+          v-if="rawDoc"
+          :value="rawDoc"
+        />
       </article>
-      <p v-else class="text-body-sm text-ink-subtle mt-10 font-mono italic">No notes documented yet.</p>
+
+      <p
+        v-else
+        class="text-body-sm text-ink-subtle mt-10 font-mono italic"
+      >
+        No notes documented yet.
+      </p>
     </div>
   </div>
 </template>

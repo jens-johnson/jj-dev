@@ -280,6 +280,7 @@ onUnmounted((): void => {
         />
         <!-- Fade edges into bg so it blends seamlessly -->
         <div class="from-bg to-bg absolute inset-0 bg-gradient-to-r via-transparent" />
+
         <div class="from-bg/60 to-bg absolute inset-0 bg-gradient-to-b via-transparent" />
       </div>
 
@@ -297,6 +298,7 @@ onUnmounted((): void => {
         >
           About me
         </p>
+
         <h1
           class="font-display text-h1 text-ink leading-tight font-bold tracking-tight"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'"
@@ -307,9 +309,15 @@ onUnmounted((): void => {
             transition-delay: 80ms;
           "
         >
-          <span class="text-accent">{{ typeText }}</span
-          ><span class="text-accent" style="animation: blink 1s step-end infinite">|</span>
+          <span class="text-accent">{{ typeText }}</span>
+
+          <span
+            class="text-accent"
+            style="animation: blink 1s step-end infinite"
+            >|</span
+          >
         </h1>
+
         <p
           class="font-body text-body-lg text-ink-muted mt-6 max-w-2xl leading-relaxed"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
@@ -342,9 +350,15 @@ onUnmounted((): void => {
           <ContainmentBentoCard
             class="border-border bg-surface relative flex flex-col items-start justify-between rounded-2xl border p-6 lg:col-span-2"
           >
-            <Icon name="lucide:map-pin" size="20" class="text-accent" />
+            <Icon
+              name="lucide:map-pin"
+              size="20"
+              class="text-accent"
+            />
+
             <div>
               <p class="font-display text-h5 text-ink font-bold">San Diego</p>
+
               <p class="text-caption text-ink-subtle font-mono">California</p>
             </div>
           </ContainmentBentoCard>
@@ -354,6 +368,7 @@ onUnmounted((): void => {
             class="border-border bg-surface relative flex flex-col justify-start rounded-2xl border p-8 lg:col-span-8"
           >
             <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">The Engineer</p>
+
             <p class="font-body text-body text-ink-muted leading-relaxed">
               I'm an engineer in the classical sense. I love understanding how things work, and designing, building, and
               (sometimes) breaking systems to solve problems creatively. But I also consider myself a product-focused,
@@ -368,9 +383,15 @@ onUnmounted((): void => {
           <ContainmentBentoCard
             class="border-border bg-bg relative flex flex-col items-start justify-between rounded-2xl border p-6 lg:col-span-2"
           >
-            <Icon name="lucide:briefcase" size="20" class="text-accent" />
+            <Icon
+              name="lucide:briefcase"
+              size="20"
+              class="text-accent"
+            />
+
             <div>
               <p class="font-display text-h5 text-ink font-bold">5+ Years</p>
+
               <p class="text-caption text-ink-subtle font-mono">Industry experience</p>
             </div>
           </ContainmentBentoCard>
@@ -382,6 +403,7 @@ onUnmounted((): void => {
             class="bg-accent/10 relative flex flex-col justify-center rounded-2xl p-8 lg:col-span-4"
           >
             <span class="font-display text-accent mb-3 block text-4xl leading-none opacity-50">"</span>
+
             <p class="font-body text-body-lg text-ink leading-relaxed font-medium">
               Technology is best when grounded in natural principles and designed in service of the people that use it.
             </p>
@@ -390,6 +412,7 @@ onUnmounted((): void => {
           <!-- E: The Builder; cols 5–12 -->
           <ContainmentBentoCard class="border-border bg-surface relative rounded-2xl border p-8 lg:col-span-8">
             <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">The Builder</p>
+
             <p class="font-body text-body text-ink-muted leading-relaxed">
               My professional career has provided me with the ability to develop and create solutions for a variety of
               organizations and end-users, from designing sport research platforms at Nike to developing data center
@@ -402,6 +425,7 @@ onUnmounted((): void => {
           <!-- F: The Human; cols 1–8 -->
           <ContainmentBentoCard class="border-border bg-surface relative rounded-2xl border p-8 lg:col-span-8">
             <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">The Human</p>
+
             <p class="font-body text-body text-ink-muted leading-relaxed">
               When I'm not behind a keyboard, my passions lie outdoors: hiking, trail running, going to the beach to
               catch a sunset on the southern California coast. You'll inevitably see some "non-tech" subject matter on
@@ -423,6 +447,7 @@ onUnmounted((): void => {
       <div class="mx-auto max-w-6xl px-6 py-20">
         <div class="mb-12 grid gap-4 md:grid-cols-[200px_1fr]">
           <p class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Experience</p>
+
           <p class="font-body text-body text-ink-muted">
             5+ years across sports technology, cloud infrastructure, and gemological science.
           </p>
@@ -441,6 +466,7 @@ onUnmounted((): void => {
                 <span class="text-caption text-accent font-mono font-medium tracking-widest uppercase">
                   {{ role.orgShort }}
                 </span>
+
                 <span
                   v-if="role.current"
                   class="bg-accent/10 text-caption text-accent rounded-full px-2 py-0.5 font-mono"
@@ -448,21 +474,28 @@ onUnmounted((): void => {
                   Now
                 </span>
               </div>
+
               <p class="font-body text-body-sm text-ink-subtle">{{ role.dates }}</p>
+
               <p class="font-body text-body-sm text-ink-subtle">{{ role.location }}</p>
             </div>
 
             <!-- Right: content -->
             <div>
               <h3 class="font-display text-h5 text-ink mb-1 font-bold">{{ role.title }}</h3>
+
               <p class="font-body text-body-sm text-ink-muted mb-4">{{ role.org }}</p>
+
               <ul class="space-y-2.5">
                 <li
                   v-for="highlight in role.highlights"
                   :key="highlight"
                   class="font-body text-body text-ink-muted flex gap-3"
                 >
-                  <span class="bg-accent mt-2 size-1 shrink-0 rounded-full" aria-hidden="true" />
+                  <span
+                    class="bg-accent mt-2 size-1 shrink-0 rounded-full"
+                    aria-hidden="true"
+                  />
                   {{ highlight }}
                 </li>
               </ul>
@@ -480,10 +513,15 @@ onUnmounted((): void => {
         </div>
 
         <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <div v-for="group in stack" :key="group.category" class="border-border bg-surface rounded-xl border p-5">
+          <div
+            v-for="group in stack"
+            :key="group.category"
+            class="border-border bg-surface rounded-xl border p-5"
+          >
             <p class="text-caption text-accent mb-3 font-mono tracking-widest uppercase">
               {{ group.category }}
             </p>
+
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="item in group.items"
@@ -511,23 +549,34 @@ onUnmounted((): void => {
               rel="noopener noreferrer"
               class="border-border font-body text-body-sm text-ink-muted hover:border-ink hover:text-ink inline-flex items-center gap-2 rounded-full border px-5 py-2.5 font-medium transition-colors"
             >
-              <Icon name="lucide:github" size="15" />
+              <Icon
+                name="lucide:github"
+                size="15"
+              />
               GitHub
             </a>
+
             <a
               href="https://linkedin.com/in/jens-johnson"
               target="_blank"
               rel="noopener noreferrer"
               class="border-border font-body text-body-sm text-ink-muted hover:border-ink hover:text-ink inline-flex items-center gap-2 rounded-full border px-5 py-2.5 font-medium transition-colors"
             >
-              <Icon name="lucide:linkedin" size="15" />
+              <Icon
+                name="lucide:linkedin"
+                size="15"
+              />
               LinkedIn
             </a>
+
             <a
               href="mailto:jens@jens-johnson.com"
               class="bg-accent font-body text-body-sm inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold text-stone-50 transition-opacity hover:opacity-90"
             >
-              <Icon name="lucide:mail" size="15" />
+              <Icon
+                name="lucide:mail"
+                size="15"
+              />
               Say hello
             </a>
           </div>

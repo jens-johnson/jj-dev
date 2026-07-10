@@ -45,7 +45,11 @@ const rows = [
 <template>
   <div class="not-prose border-border bg-surface my-10 overflow-hidden rounded-2xl border">
     <div class="divide-border grid divide-y md:grid-cols-3 md:divide-x md:divide-y-0">
-      <div v-for="row in rows" :key="row.branch" class="relative p-6">
+      <div
+        v-for="row in rows"
+        :key="row.branch"
+        class="relative p-6"
+      >
         <!-- Accent stripe -->
         <span
           class="absolute top-0 left-0 h-1 w-full"

@@ -67,7 +67,7 @@ export interface IRawServiceDocLinkConfiguration {
 
 /**
  * An interface representing the loose shape of a services doc straight from `queryCollection`; every field optional,
- * mirroring how @nuxt/content widens schema columns to `T | undefined`. Normalised into a concrete service by the
+ * mirroring how @nuxt/content widens schema columns to `T | undefined`. Normalized into a concrete service by the
  * helpers in this module
  * @public
  * @interface

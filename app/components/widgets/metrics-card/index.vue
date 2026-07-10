@@ -79,8 +79,11 @@ function barHeight(miles: number): string {
     <template v-if="status === 'pending'">
       <div class="flex flex-1 animate-pulse flex-col gap-4">
         <div class="bg-border h-4 w-24 rounded" />
+
         <div class="bg-border h-16 rounded" />
+
         <div class="bg-border h-4 w-24 rounded" />
+
         <div class="bg-border h-12 rounded" />
       </div>
     </template>
@@ -88,9 +91,15 @@ function barHeight(miles: number): string {
     <!-- Error state -->
     <template v-else-if="status === 'error' || !data">
       <div class="flex flex-1 flex-col items-start justify-between">
-        <Icon name="lucide:activity" size="20" class="text-ink-subtle" />
+        <Icon
+          name="lucide:activity"
+          size="20"
+          class="text-ink-subtle"
+        />
+
         <div>
           <p class="font-display text-h5 text-ink-subtle font-bold">Offline</p>
+
           <p class="text-caption text-ink-subtle font-mono">Metrics unavailable</p>
         </div>
       </div>
@@ -103,9 +112,15 @@ function barHeight(miles: number): string {
         <!-- Header row -->
         <div class="mb-3 flex items-center justify-between">
           <div class="flex items-center gap-1.5">
-            <Icon name="lucide:github" size="13" class="text-ink-subtle" />
+            <Icon
+              name="lucide:github"
+              size="13"
+              class="text-ink-subtle"
+            />
+
             <p class="text-caption text-ink-subtle font-mono tracking-widest uppercase">GitHub</p>
           </div>
+
           <p class="text-caption text-ink-subtle font-mono">
             <span class="text-ink font-semibold">{{ data.github.totalContributions }}</span> contributions
           </p>
@@ -116,6 +131,7 @@ function barHeight(miles: number): string {
           <p class="text-ink-subtle/60 mb-2 font-mono text-[10px] tracking-widest uppercase">
             Weekly contributions · last 16 wks
           </p>
+
           <div class="flex h-[52px] items-end gap-[3px]">
             <div
               v-for="(count, i) in weeklyContributions"
@@ -126,6 +142,7 @@ function barHeight(miles: number): string {
               :title="`${count} contribution${count !== 1 ? 's' : ''}`"
             />
           </div>
+
           <p class="text-ink-subtle/50 mt-2 font-mono text-[9px] italic">
             * Public contributions only; excludes activity in enterprise GitHub organizations.
           </p>
@@ -139,12 +156,18 @@ function barHeight(miles: number): string {
       <div class="flex flex-1 flex-col justify-between">
         <!-- Header -->
         <div class="mb-3 flex items-center gap-1.5">
-          <!-- Strava's brand colour -->
-          <svg class="size-[13px]" viewBox="0 0 24 24" fill="#FC4C02" aria-hidden="true">
+          <!-- Strava's brand color -->
+          <svg
+            class="size-[13px]"
+            viewBox="0 0 24 24"
+            fill="#FC4C02"
+            aria-hidden="true"
+          >
             <path
               d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"
             />
           </svg>
+
           <p class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Strava</p>
         </div>
 
@@ -152,18 +175,25 @@ function barHeight(miles: number): string {
         <div class="mb-4 flex gap-4">
           <div>
             <p class="font-display text-h4 text-ink leading-none font-bold">{{ data.strava.ytdMiles }}</p>
+
             <p class="text-caption text-ink-subtle mt-1 font-mono">miles</p>
           </div>
+
           <div class="bg-border w-px" />
+
           <div>
             <p class="font-display text-h4 text-ink leading-none font-bold">{{ data.strava.ytdRuns }}</p>
+
             <p class="text-caption text-ink-subtle mt-1 font-mono">runs</p>
           </div>
+
           <div class="bg-border w-px" />
+
           <div>
             <p class="font-display text-h4 text-ink leading-none font-bold">
               {{ data.strava.ytdElevationFt.toLocaleString() }}
             </p>
+
             <p class="text-caption text-ink-subtle mt-1 font-mono">ft gain</p>
           </div>
         </div>
@@ -173,6 +203,7 @@ function barHeight(miles: number): string {
           <p class="text-ink-subtle/60 mb-2 font-mono text-[10px] tracking-widest uppercase">
             Weekly miles · last 16 wks
           </p>
+
           <div class="flex items-end gap-[3px]">
             <div
               v-for="(miles, i) in data.strava.weeklyMiles"

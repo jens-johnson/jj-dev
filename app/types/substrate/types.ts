@@ -52,7 +52,7 @@ export interface ISubstrateSpec {
 }
 
 /**
- * A type representing the operational state of a device; drives status dots and badge colour
+ * A type representing the operational state of a device; drives status dots and badge color
  * @typedef
  */
 export type TSubstrateStatus = 'online' | 'offline' | 'planned' | 'maintenance';

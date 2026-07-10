@@ -13,9 +13,9 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ████████████████████████████████████ #utils/substrate/substrate-visuals/utils.ts ████████████████████████████████████
  *
- * Shared visual lookups for the Substrate homelab section: status colours, device-kind icons, and human labels.
+ * Shared visual lookups for the Substrate homelab section: status colors, device-kind icons, and human labels.
  * Auto-imported by Nuxt, so the topology widget and inspector panel render the same node consistently. Tailwind class
- * strings (not raw colours) so all three themes stay in sync via the token layer.
+ * strings (not raw colors) so all three themes stay in sync via the token layer.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
@@ -154,9 +154,9 @@ export function normalizeDevice(d: IRawSubstrateDoc): ISubstrateDevice {
 }
 
 /**
- * Normalises a list of queried docs
+ * Normalizes a list of queried docs
  * @param docs - The loosely-typed substrate docs from queryCollection
- * @returns The normalised devices
+ * @returns The normalized devices
  */
 export function normalizeDevices(docs: IRawSubstrateDoc[]): ISubstrateDevice[] {
   return docs.map(normalizeDevice);

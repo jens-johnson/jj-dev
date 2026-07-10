@@ -41,26 +41,43 @@ const reportingLabel = computed(() => {
           class="absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:hidden"
           :class="vis.dot"
         />
-        <span class="relative inline-flex size-2.5 rounded-full" :class="vis.dot" />
+
+        <span
+          class="relative inline-flex size-2.5 rounded-full"
+          :class="vis.dot"
+        />
       </span>
+
       <span class="font-display text-body text-ink leading-none font-bold">{{ vis.label }}</span>
     </span>
 
     <span class="text-caption text-ink-subtle font-mono tracking-wide">{{ reportingLabel }}</span>
 
     <!-- Headline metrics -->
-    <div v-if="node && state !== 'offline'" class="flex flex-wrap items-center gap-x-4 gap-y-1">
+    <div
+      v-if="node && state !== 'offline'"
+      class="flex flex-wrap items-center gap-x-4 gap-y-1"
+    >
       <span class="text-caption text-ink-muted font-mono">
         CPU <span class="text-ink font-semibold">{{ node.cpuPct }}%</span>
       </span>
+
       <span class="text-caption text-ink-muted font-mono">
         RAM <span class="text-ink font-semibold">{{ node.mem.usedPct }}%</span>
       </span>
-      <span v-if="internet?.latencyMs !== undefined" class="text-caption text-ink-muted font-mono">
+
+      <span
+        v-if="internet?.latencyMs !== undefined"
+        class="text-caption text-ink-muted font-mono"
+      >
         NET <span class="text-ink font-semibold">{{ internet.latencyMs }}ms</span>
       </span>
     </div>
 
-    <span v-if="updatedLabel" class="text-caption text-ink-subtle ml-auto font-mono">updated {{ updatedLabel }}</span>
+    <span
+      v-if="updatedLabel"
+      class="text-caption text-ink-subtle ml-auto font-mono"
+      >updated {{ updatedLabel }}</span
+    >
   </div>
 </template>

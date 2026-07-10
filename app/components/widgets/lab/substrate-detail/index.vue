@@ -2,21 +2,21 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ▀▀        ▀▀                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████ #components/widgets/lab/substrate-detail/index.vue █████████████████████████████████████████
+ * ████████████████████████████████ #components/widgets/lab/substrate-detail/index.vue █████████████████████████████████
  *
  * Inspector panel for the device selected in the Substrate topology. Renders the structured frontmatter; status,
- * vendor/model, specs, wiring, power, tags; and exposes a `#notes` slot for the device's rendered markdown body.
- * Shows a hint state when nothing is selected.
+ * vendor/model, specs, wiring, power, tags; and exposes a `#notes` slot for the device's rendered markdown body. Shows
+ * a hint state when nothing is selected.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -24,9 +24,28 @@
  *   <template #notes><ContentRenderer :value="selectedDoc" /></template>
  * </WidgetsLabSubstrateDetail>
  *
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • device
+ *     - Description: The device being inspected; null renders the select-a-node hint state
+ *     - Type: ISubstrateDevice | null
+ *     - Required: true
+ *   • devices
+ *     - Description: The full device inventory, used to resolve connection targets to their titles
+ *     - Type: ISubstrateDevice[]
+ *     - Required: true
+ *   • hasNotes
+ *     - Description: Whether the page is providing rendered markdown for the #notes slot
+ *     - Type: boolean
+ *     - Required: false
+ *
+ * ─── SLOTS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • notes
+ *     - Description: The device's rendered markdown body (i.e. a ContentRenderer), shown when has-notes is true
+ *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-
 import type { ISubstrateDevice } from '~/types/substrate';
 import type { ISubstrateInternet, ISubstrateMetricsNode } from '~/types/substrate-metrics';
 
@@ -66,6 +85,7 @@ const vendorModel: ComputedRef<string> = computed((): string =>
 
 /* ─── Live metrics (shown only for the live Proxmox host) ──────────────────────────────────────────────────────────── */
 
+// The shared live-metrics feed: the current snapshot, its feed state, and a human-readable freshness label
 const { data: liveData, state: liveState, updatedLabel: liveUpdated } = useSubstrateMetrics();
 const liveNode: ComputedRef<ISubstrateMetricsNode | null> = computed((): ISubstrateMetricsNode | null =>
   props.device?.kind === 'hypervisor' && liveState.value !== 'offline' ? (liveData.value?.node ?? null) : null,
@@ -78,20 +98,31 @@ const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubst
 <template>
   <aside class="border-border bg-surface flex h-full min-h-[340px] flex-col rounded-2xl border p-6">
     <!-- ─── Hint state ─────────────────────────────────────────────────────────── -->
-    <div v-if="!device" class="flex flex-1 flex-col items-center justify-center text-center">
+    <div
+      v-if="!device"
+      class="flex flex-1 flex-col items-center justify-center text-center"
+    >
       <span
         class="bg-bg text-ink-subtle border-border mb-4 flex size-12 items-center justify-center rounded-full border"
       >
-        <Icon name="lucide:mouse-pointer-click" size="20" />
+        <Icon
+          name="lucide:mouse-pointer-click"
+          size="20"
+        />
       </span>
+
       <p class="font-display text-h5 text-ink font-bold">Select a node</p>
+
       <p class="font-body text-body-sm text-ink-muted mt-2 max-w-[28ch] leading-relaxed">
         Tap any device in the topology to inspect its specs, wiring, and notes.
       </p>
     </div>
 
     <!-- ─── Device detail ──────────────────────────────────────────────────────── -->
-    <div v-else class="flex flex-1 flex-col gap-5">
+    <div
+      v-else
+      class="flex flex-1 flex-col gap-5"
+    >
       <!-- Header -->
       <div class="flex items-start gap-3">
         <span
@@ -102,13 +133,23 @@ const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubst
               : 'bg-accent/10 text-accent'
           "
         >
-          <Icon :name="kindIcon(device.kind)" size="22" />
+          <Icon
+            :name="kindIcon(device.kind)"
+            size="22"
+          />
         </span>
 
         <div class="min-w-0 flex-1">
           <p class="text-accent mb-0.5 font-mono text-[10px] tracking-widest uppercase">{{ kindLabel(device.kind) }}</p>
+
           <h3 class="font-display text-h5 text-ink leading-tight font-bold">{{ device.title }}</h3>
-          <p v-if="vendorModel" class="text-caption text-ink-subtle mt-0.5 font-mono">{{ vendorModel }}</p>
+
+          <p
+            v-if="vendorModel"
+            class="text-caption text-ink-subtle mt-0.5 font-mono"
+          >
+            {{ vendorModel }}
+          </p>
         </div>
 
         <!-- Status pill -->
@@ -116,18 +157,28 @@ const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubst
           class="text-caption inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 font-mono font-medium"
           :class="statusOf(device.status).tint"
         >
-          <span class="size-1.5 rounded-full" :class="statusOf(device.status).dot" />
+          <span
+            class="size-1.5 rounded-full"
+            :class="statusOf(device.status).dot"
+          />
+
           <span :class="statusOf(device.status).text">{{ statusOf(device.status).label }}</span>
         </span>
       </div>
 
       <!-- Description -->
-      <p v-if="device.description" class="font-body text-body-sm text-ink-muted leading-relaxed">
+      <p
+        v-if="device.description"
+        class="font-body text-body-sm text-ink-muted leading-relaxed"
+      >
         {{ device.description }}
       </p>
 
       <!-- Live metrics (host only) -->
-      <div v-if="liveNode" class="border-border bg-bg/40 rounded-xl border p-3">
+      <div
+        v-if="liveNode"
+        class="border-border bg-bg/40 rounded-xl border p-3"
+      >
         <div class="mb-2 flex items-center justify-between">
           <span
             class="text-caption text-accent-secondary inline-flex items-center gap-1.5 font-mono tracking-widest uppercase"
@@ -135,15 +186,23 @@ const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubst
             <span class="bg-accent-secondary size-1.5 animate-pulse rounded-full motion-reduce:animate-none" />
             Live
           </span>
-          <span v-if="liveUpdated" class="text-caption text-ink-subtle font-mono">{{ liveUpdated }}</span>
+
+          <span
+            v-if="liveUpdated"
+            class="text-caption text-ink-subtle font-mono"
+            >{{ liveUpdated }}</span
+          >
         </div>
+
         <div class="flex flex-wrap gap-x-4 gap-y-1">
           <span class="text-caption text-ink-muted font-mono">
             CPU <span class="text-ink font-semibold">{{ liveNode.cpuPct }}%</span>
           </span>
+
           <span class="text-caption text-ink-muted font-mono">
             RAM <span class="text-ink font-semibold">{{ liveNode.mem.usedPct }}%</span>
           </span>
+
           <span class="text-caption text-ink-muted font-mono">
             up <span class="text-ink font-semibold">{{ formatUptime(liveNode.uptimeSec) }}</span>
           </span>
@@ -151,7 +210,10 @@ const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubst
       </div>
 
       <!-- Live internet (the WAN node only) -->
-      <div v-if="liveInternet" class="border-border bg-bg/40 rounded-xl border p-3">
+      <div
+        v-if="liveInternet"
+        class="border-border bg-bg/40 rounded-xl border p-3"
+      >
         <div class="mb-2 flex items-center justify-between">
           <span
             class="text-caption text-accent-secondary inline-flex items-center gap-1.5 font-mono tracking-widest uppercase"
@@ -159,16 +221,29 @@ const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubst
             <span class="bg-accent-secondary size-1.5 animate-pulse rounded-full motion-reduce:animate-none" />
             Live
           </span>
-          <span v-if="liveUpdated" class="text-caption text-ink-subtle font-mono">{{ liveUpdated }}</span>
+
+          <span
+            v-if="liveUpdated"
+            class="text-caption text-ink-subtle font-mono"
+            >{{ liveUpdated }}</span
+          >
         </div>
+
         <div class="flex flex-wrap gap-x-4 gap-y-1">
           <span class="text-caption text-ink-muted font-mono">
             Reachable
-            <span class="font-semibold" :class="liveInternet.reachable ? 'text-accent-secondary' : 'text-terra-600'">
+            <span
+              class="font-semibold"
+              :class="liveInternet.reachable ? 'text-accent-secondary' : 'text-terra-600'"
+            >
               {{ liveInternet.reachable ? 'yes' : 'no' }}
             </span>
           </span>
-          <span v-if="liveInternet.latencyMs !== undefined" class="text-caption text-ink-muted font-mono">
+
+          <span
+            v-if="liveInternet.latencyMs !== undefined"
+            class="text-caption text-ink-muted font-mono"
+          >
             ping <span class="text-ink font-semibold">{{ liveInternet.latencyMs }}ms</span>
           </span>
         </div>
@@ -177,6 +252,7 @@ const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubst
       <!-- Specs -->
       <div v-if="device.specs?.length">
         <p class="text-ink-subtle mb-2 font-mono text-[10px] tracking-widest uppercase">Specs</p>
+
         <dl class="border-border divide-border divide-y overflow-hidden rounded-xl border">
           <div
             v-for="s in device.specs"
@@ -184,6 +260,7 @@ const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubst
             class="bg-bg/40 flex items-baseline justify-between gap-4 px-3 py-2"
           >
             <dt class="text-caption text-ink-subtle shrink-0 font-mono uppercase">{{ s.label }}</dt>
+
             <dd class="text-body-sm text-ink text-right font-medium">{{ s.value }}</dd>
           </div>
         </dl>
@@ -192,14 +269,24 @@ const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubst
       <!-- Connections -->
       <div v-if="device.connections?.length">
         <p class="text-ink-subtle mb-2 font-mono text-[10px] tracking-widest uppercase">Connections</p>
-        <ul class="flex flex-col gap-1.5" role="list">
+
+        <ul
+          class="flex flex-col gap-1.5"
+          role="list"
+        >
           <li
             v-for="c in device.connections"
             :key="`${c.to}-${c.kind}`"
             class="border-border bg-bg/40 flex items-center gap-2.5 rounded-lg border px-3 py-2"
           >
-            <Icon :name="connIcon(c.kind)" size="14" class="text-ink-subtle shrink-0" />
+            <Icon
+              :name="connIcon(c.kind)"
+              size="14"
+              class="text-ink-subtle shrink-0"
+            />
+
             <span class="text-body-sm text-ink flex-1 truncate font-medium">{{ titleOf(c.to) }}</span>
+
             <span class="text-caption text-ink-subtle bg-surface rounded-full px-2 py-0.5 font-mono">
               {{ c.label ?? connLabel(c.kind) }}
             </span>
@@ -213,12 +300,19 @@ const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubst
         class="border-border bg-bg/40 hover:border-accent/60 text-body-sm text-ink hover:text-accent flex w-fit items-center gap-1.5 rounded-lg border px-3 py-2 font-semibold transition-colors"
       >
         Open full page
-        <Icon name="lucide:arrow-up-right" size="14" />
+        <Icon
+          name="lucide:arrow-up-right"
+          size="14"
+        />
       </NuxtLink>
 
       <!-- Notes (rendered markdown body, provided by the page) -->
-      <div v-if="hasNotes" class="border-border border-t pt-4">
+      <div
+        v-if="hasNotes"
+        class="border-border border-t pt-4"
+      >
         <p class="text-ink-subtle mb-2 font-mono text-[10px] tracking-widest uppercase">Notes</p>
+
         <div class="substrate-notes">
           <slot name="notes" />
         </div>

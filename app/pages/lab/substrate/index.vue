@@ -123,7 +123,11 @@ onMounted(() => {
           to="/lab"
           class="text-caption text-ink-subtle hover:text-accent mb-5 inline-flex items-center gap-1.5 font-mono tracking-widest uppercase transition-colors"
         >
-          <Icon name="lucide:arrow-left" size="13" /> Lab
+          <Icon
+            name="lucide:arrow-left"
+            size="13"
+          />
+          Lab
         </NuxtLink>
 
         <h1
@@ -164,7 +168,11 @@ onMounted(() => {
         :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'"
       >
         <!-- Tab bar -->
-        <div class="border-border mb-8 flex gap-1 overflow-x-auto border-b" role="tablist" aria-label="Substrate views">
+        <div
+          class="border-border mb-8 flex gap-1 overflow-x-auto border-b"
+          role="tablist"
+          aria-label="Substrate views"
+        >
           <button
             v-for="t in TABS"
             :key="t.key"
@@ -178,45 +186,69 @@ onMounted(() => {
             @click="setView(t.key)"
           >
             {{ t.label }}
-            <span v-if="t.soon" class="text-ink-subtle font-mono text-[9px] tracking-wider uppercase">soon</span>
+            <span
+              v-if="t.soon"
+              class="text-ink-subtle font-mono text-[9px] tracking-wider uppercase"
+              >soon</span
+            >
           </button>
         </div>
 
         <!-- Overview panel -->
-        <section v-show="activeView === 'overview'" role="tabpanel" aria-label="Overview">
+        <section
+          v-show="activeView === 'overview'"
+          role="tabpanel"
+          aria-label="Overview"
+        >
           <WidgetsLabSubstrateOverview />
         </section>
 
         <!-- Topology panel -->
-        <section v-show="activeView === 'topology'" role="tabpanel" aria-label="Topology">
+        <section
+          v-show="activeView === 'topology'"
+          role="tabpanel"
+          aria-label="Topology"
+        >
           <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
             <!-- Topology canvas -->
             <div
               class="border-border bg-surface/50 relative overflow-hidden rounded-2xl border p-4 sm:p-6 lg:col-span-8"
             >
-              <WidgetsLabSubstrateTopology v-model:selected-id="selectedId" :devices="list" />
+              <WidgetsLabSubstrateTopology
+                v-model:selected-id="selectedId"
+                :devices="list"
+              />
 
               <!-- Legend -->
               <div class="border-border mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 border-t pt-4">
                 <div class="flex flex-wrap items-center gap-3">
                   <span class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Status</span>
+
                   <span
                     v-for="s in statusLegend"
                     :key="s.label"
                     class="text-caption text-ink-muted flex items-center gap-1.5"
                   >
-                    <span class="size-2 rounded-full" :class="s.dot" />
+                    <span
+                      class="size-2 rounded-full"
+                      :class="s.dot"
+                    />
                     {{ s.label }}
                   </span>
                 </div>
+
                 <div class="flex flex-wrap items-center gap-3">
                   <span class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Link</span>
+
                   <span
                     v-for="l in linkLegend"
                     :key="l.label"
                     class="text-caption text-ink-muted flex items-center gap-1.5"
                   >
-                    <span class="h-0.5 w-4 rounded-full" :class="l.cls" />
+                    <span
+                      class="h-0.5 w-4 rounded-full"
+                      :class="l.cls"
+                    />
                     {{ l.label }}
                   </span>
                 </div>
@@ -226,9 +258,17 @@ onMounted(() => {
             <!-- Inspector -->
             <div class="lg:col-span-4">
               <div class="lg:sticky lg:top-24">
-                <WidgetsLabSubstrateDetail :device="selectedDevice" :devices="list" :has-notes="hasNotes">
+                <WidgetsLabSubstrateDetail
+                  :device="selectedDevice"
+                  :devices="list"
+                  :has-notes="hasNotes"
+                >
                   <template #notes>
-                    <ContentRenderer v-if="selectedRawDoc" :key="selectedRawDoc.nodeId" :value="selectedRawDoc" />
+                    <ContentRenderer
+                      v-if="selectedRawDoc"
+                      :key="selectedRawDoc.nodeId"
+                      :value="selectedRawDoc"
+                    />
                   </template>
                 </WidgetsLabSubstrateDetail>
               </div>
@@ -237,7 +277,11 @@ onMounted(() => {
         </section>
 
         <!-- Services panel -->
-        <section v-show="activeView === 'services'" role="tabpanel" aria-label="Services">
+        <section
+          v-show="activeView === 'services'"
+          role="tabpanel"
+          aria-label="Services"
+        >
           <WidgetsLabServicesOverview :services="services" />
         </section>
       </div>

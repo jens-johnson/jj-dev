@@ -39,7 +39,9 @@
 <template>
   <section class="relative flex min-h-[92vh] items-center overflow-hidden">
     <slot name="backdrop" />
+
     <slot />
+
     <slot name="hint" />
   </section>
 </template>

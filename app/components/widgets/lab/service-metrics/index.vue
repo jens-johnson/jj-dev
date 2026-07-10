@@ -2,25 +2,41 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ▀▀        ▀▀                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████████ #components/widgets/lab/service-metrics/index.vue ████████████████████████████████
+ * █████████████████████████████████ #components/widgets/lab/service-metrics/index.vue █████████████████████████████████
  *
  * A service's live-telemetry dashboard. Renders the metric tiles declared in the service's frontmatter; values come
  * from the `live` payload when its metrics publisher is reporting, and fall back to an "awaiting feed" state until
  * then. Mirrors the Substrate live-card presentation so services read as living, not static.
  *
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • tiles
+ *     - Description: The declared metric tiles from the service frontmatter
+ *     - Type: IServiceMetricTile[]
+ *     - Required: true
+ *   • live
+ *     - Description: Live values keyed by tile `key`; null until the metrics publisher reports in
+ *     - Type: Record<string, string | number> | null
+ *     - Required: false
+ *     - Default: null
+ *   • label
+ *     - Description: Short noun for the empty-state copy, e.g. "server"
+ *     - Type: string
+ *     - Required: false
+ *     - Default: 'service'
+ *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-
 import type { IServiceMetricTile } from '~/types/services';
 
 const {
@@ -59,23 +75,29 @@ function valueOf(tile: IServiceMetricTile): string | null {
             v-if="isLive"
             class="bg-accent-secondary absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:hidden"
           />
+
           <span
             class="relative inline-flex size-2 rounded-full"
             :class="isLive ? 'bg-accent-secondary' : 'bg-ink-subtle'"
           />
         </span>
+
         <span
           class="text-caption font-mono tracking-widest uppercase"
           :class="isLive ? 'text-accent-secondary' : 'text-ink-subtle'"
         >
           {{ isLive ? 'Live' : 'Live feed planned' }}
         </span>
+
         <span class="text-caption text-ink-subtle font-mono">metrics</span>
       </span>
     </div>
 
     <!-- Tiles -->
-    <dl v-if="tiles.length" class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <dl
+      v-if="tiles.length"
+      class="grid grid-cols-2 gap-3 sm:grid-cols-3"
+    >
       <div
         v-for="tile in tiles"
         :key="tile.key"
@@ -83,9 +105,14 @@ function valueOf(tile: IServiceMetricTile): string | null {
         :title="tile.hint"
       >
         <dt class="text-caption text-ink-subtle flex items-center gap-1.5 font-mono tracking-widest uppercase">
-          <Icon v-if="tile.icon" :name="tile.icon" size="12" />
+          <Icon
+            v-if="tile.icon"
+            :name="tile.icon"
+            size="12"
+          />
           {{ tile.label }}
         </dt>
+
         <dd
           class="font-display text-h5 mt-1 leading-none font-bold"
           :class="valueOf(tile) ? 'text-ink' : 'text-ink-subtle/50'"
@@ -96,7 +123,10 @@ function valueOf(tile: IServiceMetricTile): string | null {
     </dl>
 
     <!-- Footer note (planned only) -->
-    <p v-if="!isLive" class="font-body text-body-sm text-ink-subtle mt-4 leading-relaxed">
+    <p
+      v-if="!isLive"
+      class="font-body text-body-sm text-ink-subtle mt-4 leading-relaxed"
+    >
       Live telemetry appears here once the {{ label }} metrics publisher reports in.
     </p>
   </div>

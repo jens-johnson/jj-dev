@@ -29,7 +29,7 @@
 
 /** Number of contour lines drawn across the canvas. */
 const NUM_LINES = 24;
-/** Base accent colour (earth brown) as R,G,B components for rgba() composition. */
+/** Base accent color (earth brown) as R,G,B components for rgba() composition. */
 const ACCENT_RGB = '139, 101, 52';
 /** Gaussian sigma² controlling how far the mouse peak spreads (px²). */
 const PEAK_SIGMA = 22_000;

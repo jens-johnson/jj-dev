@@ -2,41 +2,50 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ▀▀        ▀▀                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ██████████████████████████████████ #components/primitives/base-parallax/index.vue ███████████████████████████████████
  *
- * Mouse and scroll parallax behaviour primitive. Lerps mouse position and scroll offset, exposing them via a scoped slot.
+ * Mouse and scroll parallax behavior primitive. Lerps mouse position and scroll offset, exposing them via a scoped
+ * slot.
  *
- * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
  * <PrimitivesBaseParallax v-slot="{ layerStyle, markStyle, smoothX, smoothY, scrollY }">
  *   ...slot content using layerStyle(mx, my, sy?) and markStyle()...
  * </PrimitivesBaseParallax>
  *
- * Slot props:
- *   layerStyle(mx, my, sy?) → CSSProperties; translate driven by mouse + scroll.
- *     mx / my; max pixel offset driven by lerped mouse position.
- *     sy; scroll multiplier (e.g. 0.3 moves up at 30% of scroll speed).
- *   markStyle()             → CSSProperties; scroll-reveal helper for a backdrop mark.
- *   smoothX / smoothY; lerped mouse values in the range -1 → 1.
- *   scrollY; current window.scrollY.
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * Props:
- *   lerp; lerp factor; lower = smoother/slower. Default 0.055.
- *   heroFraction; hero height as fraction of viewport for markStyle progress. Default 0.92.
+ *   • lerp
+ *     - Description: The lerp factor applied per frame; lower = smoother/slower
+ *     - Type: number
+ *     - Required: false
+ *     - Default: 0.055
+ *   • heroFraction
+ *     - Description: The hero height as a fraction of the viewport, used to derive markStyle scroll progress
+ *     - Type: number
+ *     - Required: false
+ *     - Default: 0.92
+ *
+ * ─── SLOTS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • default
+ *     - Description: The parallax-driven content; destructure the scoped props to drive per-layer transforms
+ *     - Slot props: layerStyle(mx, my, sy?) and markStyle() style factories returning CSSProperties; smoothX / smoothY,
+ *         the lerped mouse values in the -1..1 range; scrollY, the current window.scrollY
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-
+import type { TPropsWithDefaults } from '@jens-johnson/style-guide/types/vue';
 import type { CSSProperties } from 'vue';
 
 /**
@@ -50,7 +59,7 @@ interface Props {
   /** Hero height fraction of viewport for markStyle progress. Default 0.92. */
   heroFraction?: number;
 }
-const props = withDefaults(defineProps<Props>(), {
+const props: TPropsWithDefaults<Props, 'lerp' | 'heroFraction'> = withDefaults(defineProps<Props>(), {
   lerp: 0.055,
   heroFraction: 0.92,
 });
@@ -164,7 +173,11 @@ onUnmounted((): void => cancelAnimationFrame(raf));
 </script>
 
 <template>
-  <div ref="root" class="contents" @mousemove="onMouseMove">
+  <div
+    ref="root"
+    class="contents"
+    @mousemove="onMouseMove"
+  >
     <slot
       :layer-style="layerStyle"
       :mark-style="markStyle"

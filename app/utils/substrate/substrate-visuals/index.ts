@@ -13,7 +13,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ████████████████████████████████████ #utils/substrate/substrate-visuals/index.ts ████████████████████████████████████
  *
- * Barrel export for the Substrate hardware visual lookups and the device-doc normaliser.
+ * Barrel export for the Substrate hardware visual lookups and the device-doc normalizer.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */

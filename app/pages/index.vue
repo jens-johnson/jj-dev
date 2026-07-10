@@ -30,6 +30,7 @@ useSeoMeta({
 <template>
   <div>
     <WidgetsHomeHeroParallax />
+
     <WidgetsHomeHorizontalJourney />
   </div>
 </template>

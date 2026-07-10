@@ -25,7 +25,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-// Canonical docs URL per technology, keyed by a normalised lowercase name (no version, trimmed). Several common
+// Canonical docs URL per technology, keyed by a normalized lowercase name (no version, trimmed). Several common
 // aliases map to the same destination so authored copy can use whatever name reads best in context.
 const TECH_DOCS: Record<string, string> = {
   /* ─── Minecraft server + plugins ─────────────────────────────────────────────────────────────────────────────── */
@@ -74,9 +74,9 @@ const TECH_DOCS: Record<string, string> = {
 };
 
 /**
- * Normalises a tech name for lookup: lowercase, trimmed, and with a trailing version (e.g. "26.1.2") stripped
+ * Normalizes a tech name for lookup: lowercase, trimmed, and with a trailing version (e.g. "26.1.2") stripped
  * @param name - The raw tech name
- * @returns The normalised lookup key
+ * @returns The normalized lookup key
  */
 function normalizeTech(name: string): string {
   return name

@@ -83,12 +83,20 @@ async function signOut(): Promise<void> {
     href="/auth/callback"
     class="border-border text-body-sm text-ink-muted hover:border-accent hover:text-accent flex h-9 items-center gap-2 rounded-full border px-3.5 font-medium transition-colors"
   >
-    <Icon name="lucide:log-in" size="16" />
+    <Icon
+      name="lucide:log-in"
+      size="16"
+    />
+
     <span>Sign in</span>
   </a>
 
   <!-- Logged in: avatar button toggles a small account menu -->
-  <div v-else ref="root" class="relative">
+  <div
+    v-else
+    ref="root"
+    class="relative"
+  >
     <button
       type="button"
       class="border-border text-body-sm text-ink-muted hover:border-accent hover:text-accent flex size-9 items-center justify-center overflow-hidden rounded-full border font-semibold transition-colors"
@@ -105,6 +113,7 @@ async function signOut(): Promise<void> {
         class="size-full object-cover"
         @error="avatarFailed = true"
       />
+
       <span v-else>{{ initials }}</span>
     </button>
 
@@ -133,20 +142,29 @@ async function signOut(): Promise<void> {
               referrerpolicy="no-referrer"
               class="size-full object-cover"
             />
+
             <span v-else>{{ initials }}</span>
           </div>
+
           <div class="min-w-0">
             <p class="text-body-sm text-ink truncate font-semibold">{{ user?.name }}</p>
+
             <p class="text-caption text-ink-muted truncate">{{ user?.email }}</p>
           </div>
         </div>
 
         <!-- Admin badge; only shown for the allow-listed account -->
-        <div v-if="session?.isAdmin" class="px-2.5 pb-1">
+        <div
+          v-if="session?.isAdmin"
+          class="px-2.5 pb-1"
+        >
           <span
             class="border-accent/30 bg-accent/10 text-caption text-accent inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-medium"
           >
-            <Icon name="lucide:shield-check" size="12" />
+            <Icon
+              name="lucide:shield-check"
+              size="12"
+            />
             Admin
           </span>
         </div>
@@ -160,7 +178,10 @@ async function signOut(): Promise<void> {
           class="text-body-sm text-ink-muted hover:bg-surface hover:text-ink flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left font-medium transition-colors"
           @click="signOut"
         >
-          <Icon name="lucide:log-out" size="16" />
+          <Icon
+            name="lucide:log-out"
+            size="16"
+          />
           Sign out
         </button>
       </div>

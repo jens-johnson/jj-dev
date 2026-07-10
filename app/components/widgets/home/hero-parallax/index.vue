@@ -29,17 +29,40 @@ onMounted(() => {
 </script>
 
 <template>
-  <PrimitivesBaseParallax v-slot="{ layerStyle, markStyle, scrollY }" :lerp="0.055">
+  <PrimitivesBaseParallax
+    v-slot="{ layerStyle, markStyle, scrollY }"
+    :lerp="0.055"
+  >
     <PrimitivesBaseHero>
       <template #backdrop>
         <!-- ── Grain overlay ──────────────────────────────────────────────── -->
-        <div class="pointer-events-none fixed inset-0 z-[5] opacity-[0.06]" aria-hidden="true">
-          <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+        <div
+          class="pointer-events-none fixed inset-0 z-[5] opacity-[0.06]"
+          aria-hidden="true"
+        >
+          <svg
+            class="h-full w-full"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <filter id="grain-filter">
-              <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-              <feColorMatrix type="saturate" values="0" />
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.65"
+                numOctaves="3"
+                stitchTiles="stitch"
+              />
+
+              <feColorMatrix
+                type="saturate"
+                values="0"
+              />
             </filter>
-            <rect width="100%" height="100%" filter="url(#grain-filter)" />
+
+            <rect
+              width="100%"
+              height="100%"
+              filter="url(#grain-filter)"
+            />
           </svg>
         </div>
 
@@ -122,6 +145,7 @@ onMounted(() => {
               Jens
             </span>
           </span>
+
           <span class="block overflow-hidden">
             <span
               class="block"
@@ -169,8 +193,12 @@ onMounted(() => {
             class="bg-accent font-body text-body-sm inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-stone-50 transition-opacity hover:opacity-90"
           >
             My work
-            <Icon name="lucide:arrow-right" size="14" />
+            <Icon
+              name="lucide:arrow-right"
+              size="14"
+            />
           </NuxtLink>
+
           <NuxtLink
             to="/about"
             class="border-border font-body text-body-sm text-ink-muted hover:border-ink hover:text-ink inline-flex items-center gap-2 rounded-full border px-6 py-3 font-semibold transition-colors"
@@ -188,6 +216,7 @@ onMounted(() => {
           aria-hidden="true"
         >
           <span class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Scroll</span>
+
           <div
             class="from-ink-subtle h-10 w-[1px] origin-top bg-gradient-to-b to-transparent"
             style="animation: scroll-pulse 1.8s ease-in-out infinite"

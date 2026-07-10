@@ -38,7 +38,7 @@ export interface IStateVisual {
   /* The Tailwind background class for the status dot */
   dot: string;
 
-  /* The Tailwind text-colour class */
+  /* The Tailwind text-color class */
   text: string;
 
   /* Whether the dot should pulse */

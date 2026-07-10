@@ -26,10 +26,13 @@ onMounted(initTheme);
 <template>
   <div class="bg-bg text-ink flex min-h-screen flex-col transition-colors duration-[--duration-theme]">
     <FeedbackScrollProgress />
+
     <LayoutAppNav />
+
     <main class="flex-1">
       <slot />
     </main>
+
     <LayoutAppFooter />
   </div>
 </template>

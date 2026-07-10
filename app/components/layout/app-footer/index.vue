@@ -59,8 +59,14 @@ const socials = [
       </p>
 
       <!-- Socials -->
-      <ul class="flex items-center gap-4" role="list">
-        <li v-for="social in socials" :key="social.href">
+      <ul
+        class="flex items-center gap-4"
+        role="list"
+      >
+        <li
+          v-for="social in socials"
+          :key="social.href"
+        >
           <a
             :href="social.href"
             target="_blank"
@@ -68,7 +74,10 @@ const socials = [
             :aria-label="social.label"
             class="text-ink-subtle hover:text-ink flex size-8 items-center justify-center transition-colors"
           >
-            <Icon :name="social.icon" size="16" />
+            <Icon
+              :name="social.icon"
+              size="16"
+            />
           </a>
         </li>
       </ul>

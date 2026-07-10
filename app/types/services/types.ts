@@ -87,7 +87,7 @@ export interface IServiceLinks {
 }
 
 /**
- * A type representing the operational state of a service; drives status dots and badge colour
+ * A type representing the operational state of a service; drives status dots and badge color
  * @typedef
  */
 export type TServiceStatus = 'online' | 'offline' | 'planned' | 'maintenance' | 'degraded';

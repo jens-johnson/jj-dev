@@ -2,21 +2,21 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ▀▀        ▀▀                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████ #components/widgets/lab/substrate-topology/index.vue ████████████████████████████████████████
+ * ███████████████████████████████ #components/widgets/lab/substrate-topology/index.vue ████████████████████████████████
  *
- * Interactive network diagram of the homelab. Devices are placed in horizontal bands by `layer`; connections are
- * drawn as curved SVG wires behind HTML node cards, with animated dashes conveying live data flow. Hovering or
- * selecting a node spotlights its wiring and dims everything else.
+ * Interactive network diagram of the homelab. Devices are placed in horizontal bands by `layer`; connections are drawn
+ * as curved SVG wires behind HTML node cards, with animated dashes conveying live data flow. Hovering or selecting a
+ * node spotlights its wiring and dims everything else.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -25,9 +25,23 @@
  * Layout is deterministic (SSR-safe): SVG uses a fixed 1000×620 viewBox and HTML nodes are positioned by the same
  * percentage coordinates, so wires and cards stay aligned at any scale. Honours prefers-reduced-motion.
  *
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • devices
+ *     - Description: The device inventory to place and wire; layout derives from each device's layer and order
+ *     - Type: ISubstrateDevice[]
+ *     - Required: true
+ *
+ * ─── MODEL ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • selectedId
+ *     - Description: Two-way bound selected node id; null when nothing is inspected
+ *     - Type: string | null
+ *     - Required: false
+ *     - Default: null
+ *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-
 import type { CSSProperties } from 'vue';
 
 import type { ISubstrateDevice } from '~/types/substrate';
@@ -185,7 +199,7 @@ const EDGE_BASE: Record<string, string> = {
 };
 
 /**
- * A utility method to pick the base stroke colour class for a wire; the accent when spotlighted, otherwise mapped
+ * A utility method to pick the base stroke color class for a wire; the accent when spotlighted, otherwise mapped
  * from the connection kind
  * @internal
  * @function
@@ -214,7 +228,7 @@ function edgeBaseOpacity(e: IEdge): string {
   return e.kind === 'power' ? 'opacity-25' : 'opacity-60';
 }
 /**
- * A utility method to pick the stroke colour class for the animated data-flow overlay on a wire
+ * A utility method to pick the stroke color class for the animated data-flow overlay on a wire
  * @internal
  * @function
  * @param e - The edge being drawn
@@ -224,7 +238,7 @@ function edgeFlowClass(e: IEdge): string {
   return edgeActive(e) ? STROKE_ACCENT : e.kind === 'data' ? STROKE_DATA : STROKE_ACCENT;
 }
 
-// Status colours + kind icons come from the auto-imported #utils/substrate-visuals (statusOf, kindIcon),
+// Status colors + kind icons come from the auto-imported #utils/substrate-visuals (statusOf, kindIcon),
 // shared with the inspector panel so a node looks identical wherever it appears.
 
 /** Toggle selection; clicking the selected node again clears the inspector. */
@@ -241,7 +255,10 @@ function toggle(id: string): void {
       @mouseleave="hoveredId = null"
     >
       <!-- Dotted infrastructure backdrop -->
-      <div class="substrate-grid pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div
+        class="substrate-grid pointer-events-none absolute inset-0"
+        aria-hidden="true"
+      />
 
       <!-- Wires (behind the nodes; clicks pass through) -->
       <svg
@@ -251,7 +268,10 @@ function toggle(id: string): void {
         fill="none"
         aria-hidden="true"
       >
-        <g v-for="(e, i) in edges" :key="`${e.from}-${e.to}-${i}`">
+        <g
+          v-for="(e, i) in edges"
+          :key="`${e.from}-${e.to}-${i}`"
+        >
           <!-- Static wire -->
           <path
             :d="edgePath(e)"
@@ -305,12 +325,16 @@ function toggle(id: string): void {
               d.status === 'planned' ? 'border-border text-ink-subtle border border-dashed' : 'bg-accent/10 text-accent'
             "
           >
-            <Icon :name="kindIcon(d.kind)" size="16" />
+            <Icon
+              :name="kindIcon(d.kind)"
+              size="16"
+            />
           </span>
 
           <!-- Name + kind -->
           <span class="min-w-0 flex-1">
             <span class="text-body-sm text-ink block truncate leading-tight font-semibold">{{ d.title }}</span>
+
             <span class="text-ink-subtle block truncate font-mono text-[10px] tracking-wide uppercase">
               {{ d.kind }}
             </span>
@@ -323,7 +347,11 @@ function toggle(id: string): void {
               class="absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:hidden"
               :class="statusOf(d.status).dot"
             />
-            <span class="relative inline-flex size-2 rounded-full" :class="statusOf(d.status).dot" />
+
+            <span
+              class="relative inline-flex size-2 rounded-full"
+              :class="statusOf(d.status).dot"
+            />
           </span>
         </div>
       </button>

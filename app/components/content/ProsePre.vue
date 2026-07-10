@@ -1,7 +1,43 @@
 <script setup lang="ts">
 /**
- * Override of Nuxt Content's default ProsePre. Renders a minimal pre+code block with a `data-language` attribute
- * so our prose-jj CSS can position a language label. Includes a copy-to-clipboard button.
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ *
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+ * █████████████████████████████████████████ #components/content/ProsePre.vue ██████████████████████████████████████████
+ *
+ * Override of Nuxt Content's default ProsePre. Renders a minimal pre+code block with a `data-language` attribute so our
+ * prose-jj CSS can position a language label. Includes a copy-to-clipboard button.
+ *
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • code
+ *     - Description: The raw source of the code block; used by the copy-to-clipboard button
+ *     - Type: string
+ *     - Required: false
+ *   • language
+ *     - Description: The fence language identifier; rendered as the `data-language` attribute
+ *     - Type: string
+ *     - Required: false
+ *   • filename
+ *     - Description: The source filename from the fence header
+ *     - Type: string
+ *     - Required: false
+ *
+ * ─── SLOTS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • default
+ *     - Description: The highlighted code content rendered inside the pre element
+ *
+ * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 const props = defineProps<{
   code?: string;
@@ -38,8 +74,17 @@ async function copy(): Promise<void> {
 <template>
   <div class="prose-pre">
     <pre :data-language="language"><slot /></pre>
-    <button type="button" class="prose-pre-copy" :aria-label="copied ? 'Copied' : 'Copy code'" @click="copy">
-      <Icon :name="copied ? 'lucide:check' : 'lucide:copy'" size="14" />
+
+    <button
+      type="button"
+      class="prose-pre-copy"
+      :aria-label="copied ? 'Copied' : 'Copy code'"
+      @click="copy"
+    >
+      <Icon
+        :name="copied ? 'lucide:check' : 'lucide:copy'"
+        size="14"
+      />
     </button>
   </div>
 </template>

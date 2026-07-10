@@ -72,7 +72,7 @@ function stageOf(status: TVertifixStatus): number {
 }
 
 /**
- * A utility method to pick the badge colour classes for an item status
+ * A utility method to pick the badge color classes for an item status
  * @internal
  * @function
  * @param status - The current item status
@@ -242,20 +242,45 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
       @drop.prevent="onDrop"
     >
       <span class="bg-bg text-accent border-border flex size-12 items-center justify-center rounded-2xl border">
-        <Icon name="lucide:image-up" size="24" />
+        <Icon
+          name="lucide:image-up"
+          size="24"
+        />
       </span>
+
       <span class="font-body text-body text-ink font-semibold">Drop treadmill photos here</span>
+
       <span class="font-body text-body-sm text-ink-muted">or click to choose; multiple at once is fine</span>
-      <input ref="fileInput" type="file" accept="image/*" multiple class="hidden" @change="onPick" />
+
+      <input
+        ref="fileInput"
+        type="file"
+        accept="image/*"
+        multiple
+        class="hidden"
+        @change="onPick"
+      />
     </button>
 
     <!-- ─── Per-photo cards ───────────────────────────────────────────────────────────────────────── -->
-    <ContainmentCard v-for="item in items" :key="item.id" as="article" pad="md" class="flex flex-col gap-5">
+    <ContainmentCard
+      v-for="item in items"
+      :key="item.id"
+      as="article"
+      pad="md"
+      class="flex flex-col gap-5"
+    >
       <!-- Header: thumbnail, filename, status, remove -->
       <div class="flex items-center gap-4">
-        <img :src="item.previewUrl" :alt="item.fileName" class="border-border size-16 rounded-xl border object-cover" />
+        <img
+          :src="item.previewUrl"
+          :alt="item.fileName"
+          class="border-border size-16 rounded-xl border object-cover"
+        />
+
         <div class="min-w-0 flex-1">
           <p class="font-body text-body-sm text-ink truncate font-semibold">{{ item.fileName }}</p>
+
           <span
             class="text-caption mt-1 inline-flex items-center rounded-full px-2.5 py-0.5 font-mono font-medium"
             :class="statusClass(item.status)"
@@ -263,19 +288,27 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
             {{ STATUS_LABEL[item.status] }}
           </span>
         </div>
+
         <button
           type="button"
           class="text-ink-subtle hover:text-terra-600 transition-colors"
           aria-label="Remove photo"
           @click="removeItem(item.id)"
         >
-          <Icon name="lucide:x" size="18" />
+          <Icon
+            name="lucide:x"
+            size="18"
+          />
         </button>
       </div>
 
       <!-- Stepper -->
       <ol class="flex items-center gap-2">
-        <li v-for="(label, index) in steps" :key="label" class="flex flex-1 items-center gap-2">
+        <li
+          v-for="(label, index) in steps"
+          :key="label"
+          class="flex flex-1 items-center gap-2"
+        >
           <span
             class="text-caption flex size-6 shrink-0 items-center justify-center rounded-full font-mono font-semibold"
             :class="
@@ -284,10 +317,18 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
           >
             {{ index + 1 }}
           </span>
-          <span class="text-caption font-mono" :class="stageOf(item.status) >= index ? 'text-ink' : 'text-ink-subtle'">
+
+          <span
+            class="text-caption font-mono"
+            :class="stageOf(item.status) >= index ? 'text-ink' : 'text-ink-subtle'"
+          >
             {{ label }}
           </span>
-          <span v-if="index < steps.length - 1" class="bg-border ml-1 h-px flex-1" />
+
+          <span
+            v-if="index < steps.length - 1"
+            class="bg-border ml-1 h-px flex-1"
+          />
         </li>
       </ol>
 
@@ -297,9 +338,15 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
         class="border-terra-600/30 bg-terra-600/5 flex flex-col gap-3 rounded-xl border p-4"
       >
         <p class="font-body text-body-sm text-ink flex items-start gap-2">
-          <Icon name="lucide:triangle-alert" size="16" class="text-terra-600 mt-0.5 shrink-0" />
+          <Icon
+            name="lucide:triangle-alert"
+            size="16"
+            class="text-terra-600 mt-0.5 shrink-0"
+          />
+
           <span>{{ item.error }}</span>
         </p>
+
         <button
           type="button"
           class="border-border text-body-sm text-ink-muted hover:border-accent hover:text-accent w-fit rounded-full border px-3.5 py-1 font-medium transition-colors"
@@ -310,16 +357,27 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
       </div>
 
       <!-- Reading -->
-      <p v-else-if="item.status === 'reading'" class="font-body text-body-sm text-ink-muted flex items-center gap-2">
-        <Icon name="lucide:loader-circle" size="16" class="animate-spin" />
+      <p
+        v-else-if="item.status === 'reading'"
+        class="font-body text-body-sm text-ink-muted flex items-center gap-2"
+      >
+        <Icon
+          name="lucide:loader-circle"
+          size="16"
+          class="animate-spin"
+        />
         Reading photo metadata…
       </p>
 
       <!-- Stage 0; identify run + elevation -->
-      <div v-else-if="stageOf(item.status) === 0" class="flex flex-col gap-4">
+      <div
+        v-else-if="stageOf(item.status) === 0"
+        class="flex flex-col gap-4"
+      >
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="flex flex-col gap-1.5">
             <span class="text-caption text-ink-muted font-mono tracking-wide uppercase">Photo taken</span>
+
             <input
               type="datetime-local"
               :value="toLocalInput(item.capturedAt)"
@@ -327,8 +385,10 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
               @change="onCapturedAt(item.id, $event)"
             />
           </label>
+
           <label class="flex flex-col gap-1.5">
             <span class="text-caption text-ink-muted font-mono tracking-wide uppercase">Elevation gain (ft)</span>
+
             <input
               type="number"
               min="0"
@@ -341,8 +401,15 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
           </label>
         </div>
 
-        <p v-if="!item.capturedAt" class="font-body text-body-sm text-ink-muted flex items-start gap-2">
-          <Icon name="lucide:info" size="15" class="text-accent mt-0.5 shrink-0" />
+        <p
+          v-if="!item.capturedAt"
+          class="font-body text-body-sm text-ink-muted flex items-start gap-2"
+        >
+          <Icon
+            name="lucide:info"
+            size="15"
+            class="text-accent mt-0.5 shrink-0"
+          />
           No timestamp in this photo's metadata (often stripped from exported or screenshotted copies); set the date
           above to search for the run.
         </p>
@@ -362,8 +429,12 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
         </button>
 
         <!-- Candidate list -->
-        <div v-if="item.candidates.length" class="flex flex-col gap-2">
+        <div
+          v-if="item.candidates.length"
+          class="flex flex-col gap-2"
+        >
           <p class="text-caption text-ink-muted font-mono tracking-wide uppercase">Pick the matching run</p>
+
           <button
             v-for="candidate in item.candidates"
             :key="candidate.id"
@@ -378,10 +449,13 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
           >
             <span class="min-w-0">
               <span class="font-body text-body-sm text-ink block truncate font-semibold">{{ candidate.name }}</span>
+
               <span class="text-caption text-ink-muted font-mono">{{ dateTime(candidate.startDate) }}</span>
             </span>
+
             <span class="text-caption text-ink-muted shrink-0 text-right font-mono">
               {{ milesFmt(candidate.distanceMeters) }} · {{ duration(candidate.movingTimeSeconds) }}<br />
+
               <span class="text-ink-subtle">now {{ feet(candidate.elevationGainMeters) }}</span>
             </span>
           </button>
@@ -405,15 +479,26 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
       </div>
 
       <!-- Stage 1; manual delete + upload -->
-      <div v-else-if="stageOf(item.status) === 1 && item.prepared" class="flex flex-col gap-4">
+      <div
+        v-else-if="stageOf(item.status) === 1 && item.prepared"
+        class="flex flex-col gap-4"
+      >
         <div class="border-border bg-bg flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border p-4">
           <span class="font-body text-body-sm text-ink font-semibold">{{ item.prepared.summary.name }}</span>
+
           <span class="text-caption text-ink-muted font-mono">{{
             milesFmt(item.prepared.summary.distanceMeters)
           }}</span>
+
           <span class="text-caption font-mono">
             <span class="text-ink-subtle line-through">{{ item.prepared.summary.currentElevationFeet }} ft</span>
-            <Icon name="lucide:arrow-right" size="12" class="text-ink-subtle mx-1 inline" />
+
+            <Icon
+              name="lucide:arrow-right"
+              size="12"
+              class="text-ink-subtle mx-1 inline"
+            />
+
             <span class="text-accent font-semibold">{{ item.prepared.summary.targetElevationFeet }} ft</span>
           </span>
         </div>
@@ -424,10 +509,12 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
               class="bg-surface text-ink-subtle text-caption mt-0.5 flex size-5 items-center justify-center rounded-full font-mono"
               >1</span
             >
+
             <div class="flex flex-col items-start gap-1.5">
               <p class="font-body text-body-sm text-ink">
                 Delete the original on Strava (the API can't do this for you).
               </p>
+
               <div class="flex flex-wrap gap-2">
                 <a
                   :href="item.prepared.stravaUrl"
@@ -435,27 +522,37 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
                   rel="noopener noreferrer"
                   class="border-border text-body-sm text-ink-muted hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-full border px-3.5 py-1 font-medium transition-colors"
                 >
-                  <Icon name="lucide:external-link" size="14" />
+                  <Icon
+                    name="lucide:external-link"
+                    size="14"
+                  />
                   Open on Strava
                 </a>
+
                 <button
                   type="button"
                   class="border-border text-body-sm text-ink-muted hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-full border px-3.5 py-1 font-medium transition-colors"
                   @click="downloadBackup(item.id)"
                 >
-                  <Icon name="lucide:download" size="14" />
+                  <Icon
+                    name="lucide:download"
+                    size="14"
+                  />
                   Backup .tcx
                 </button>
               </div>
             </div>
           </li>
+
           <li class="flex items-start gap-3">
             <span
               class="bg-surface text-ink-subtle text-caption mt-0.5 flex size-5 items-center justify-center rounded-full font-mono"
               >2</span
             >
+
             <div class="flex flex-col items-start gap-1.5">
               <p class="font-body text-body-sm text-ink">Once it's gone, upload the corrected activity.</p>
+
               <button
                 type="button"
                 class="bg-accent text-bg flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-40"
@@ -480,15 +577,24 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
         class="border-accent-secondary/30 bg-accent-secondary/5 flex flex-col gap-2 rounded-xl border p-4"
       >
         <p class="font-body text-body-sm text-ink flex items-center gap-2 font-semibold">
-          <Icon name="lucide:circle-check" size="16" class="text-accent-secondary" />
+          <Icon
+            name="lucide:circle-check"
+            size="16"
+            class="text-accent-secondary"
+          />
           Elevation restored.
         </p>
+
         <p class="font-body text-body-sm text-ink-muted">
           New activity now reads {{ item.result.validation.actualElevationFeet }} ft.
-          <span v-if="!item.result.validation.valid" class="text-terra-600">
+          <span
+            v-if="!item.result.validation.valid"
+            class="text-terra-600"
+          >
             Heads up; it's outside the expected tolerance; double-check on Strava.
           </span>
         </p>
+
         <a
           :href="`https://www.strava.com/activities/${item.result.replacementActivityId}`"
           target="_blank"
@@ -496,13 +602,19 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
           class="text-body-sm text-accent inline-flex w-fit items-center gap-1.5 font-semibold"
         >
           View on Strava
-          <Icon name="lucide:arrow-up-right" size="14" />
+          <Icon
+            name="lucide:arrow-up-right"
+            size="14"
+          />
         </a>
       </div>
     </ContainmentCard>
 
     <!-- ─── Footer ────────────────────────────────────────────────────────────────────────────────── -->
-    <div v-if="items.length" class="flex justify-end">
+    <div
+      v-if="items.length"
+      class="flex justify-end"
+    >
       <button
         type="button"
         class="text-body-sm text-ink-subtle hover:text-terra-600 font-medium transition-colors"

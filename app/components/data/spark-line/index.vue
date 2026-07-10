@@ -2,42 +2,78 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ▀▀        ▀▀                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████████████████ #components/data/spark-line/index.vue ████████████████████████████████████
+ * ███████████████████████████████████████ #components/data/spark-line/index.vue ███████████████████████████████████████
  *
  * A tiny dependency-free sparkline: an inline SVG polyline (with a faint area fill and an end-point dot) plotting a
- * short numeric series. Auto-scales to the series' own min/max so flat, low-variance data still reads as a trend.
- * Colour comes from `currentColor`, so callers set it with a Tailwind text-* class.
+ * short numeric series. Auto-scales to the series' own min/max so flat, low-variance data still reads as a trend. Color
+ * comes from `currentColor`, so callers set it with a Tailwind text-* class.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
  * <DataSparkLine :points="cpuSeries" class="text-accent-secondary" />
  *
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • points
+ *     - Description: The numeric series to plot; fewer than two points renders a placeholder glyph instead
+ *     - Type: number[]
+ *     - Required: true
+ *   • width
+ *     - Description: The rendered SVG width in pixels
+ *     - Type: number
+ *     - Required: false
+ *     - Default: 88
+ *   • height
+ *     - Description: The rendered SVG height in pixels
+ *     - Type: number
+ *     - Required: false
+ *     - Default: 24
+ *   • fill
+ *     - Description: Whether to render the faint area fill beneath the line
+ *     - Type: boolean
+ *     - Required: false
+ *     - Default: true
+ *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { TPropsWithDefaults } from '@jens-johnson/style-guide/types/vue';
 
-const props = withDefaults(
-  defineProps<{
-    points: number[];
-    width?: number;
-    height?: number;
-    fill?: boolean;
-  }>(),
-  {
-    width: 88,
-    height: 24,
-    fill: true,
-  },
-);
+/**
+ * The props accepted by the sparkline; the series is required while the sizing and area fill are optional tuning knobs
+ * @internal
+ * @interface
+ */
+interface Props {
+  /* The numeric series to plot; fewer than two points renders a placeholder glyph instead */
+  points: number[];
+  /* The rendered SVG width in pixels */
+  width?: number;
+  /* The rendered SVG height in pixels */
+  height?: number;
+  /* Whether to render the faint area fill beneath the line */
+  fill?: boolean;
+}
+
+/**
+ * Component props; the numeric series to plot plus optional sizing and area-fill tuning
+ * @internal
+ * @constant
+ */
+const props: TPropsWithDefaults<Props, 'width' | 'height' | 'fill'> = withDefaults(defineProps<Props>(), {
+  width: 88,
+  height: 24,
+  fill: true,
+});
 
 const PAD = 2;
 
@@ -76,10 +112,40 @@ const geom = computed(() => {
 </script>
 
 <template>
-  <svg v-if="geom" :width="width" :height="height" :viewBox="`0 0 ${width} ${height}`" fill="none" aria-hidden="true">
-    <path v-if="fill" :d="geom.area" fill="currentColor" class="opacity-10" />
-    <path :d="geom.line" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-    <circle :cx="geom.end[0]" :cy="geom.end[1]" r="1.7" fill="currentColor" />
+  <svg
+    v-if="geom"
+    :width="width"
+    :height="height"
+    :viewBox="`0 0 ${width} ${height}`"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      v-if="fill"
+      :d="geom.area"
+      fill="currentColor"
+      class="opacity-10"
+    />
+
+    <path
+      :d="geom.line"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <circle
+      :cx="geom.end[0]"
+      :cy="geom.end[1]"
+      r="1.7"
+      fill="currentColor"
+    />
   </svg>
-  <span v-else class="text-ink-subtle font-mono text-[10px]">; </span>
+
+  <span
+    v-else
+    class="text-ink-subtle font-mono text-[10px]"
+    >;
+  </span>
 </template>

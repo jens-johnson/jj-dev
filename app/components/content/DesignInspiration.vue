@@ -220,6 +220,7 @@ function preview(t: TTheme): void {
                 class="border-border bg-bg text-ink-muted pointer-events-none absolute -top-12 left-1/2 z-10 -translate-x-1/2 rounded-md border px-2 py-1 font-mono text-[10px] whitespace-nowrap opacity-0 transition-opacity group-hover/sw:opacity-100"
               >
                 <span class="font-medium">{{ swatch.hex }}</span>
+
                 <span class="text-ink-subtle ml-1.5">{{ swatch.token }}</span>
               </div>
             </div>
@@ -237,8 +238,17 @@ function preview(t: TTheme): void {
             :disabled="theme === card.theme"
             @click="preview(card.theme)"
           >
-            <Icon v-if="theme === card.theme" name="lucide:check" size="13" />
-            <Icon v-else name="lucide:eye" size="13" />
+            <Icon
+              v-if="theme === card.theme"
+              name="lucide:check"
+              size="13"
+            />
+
+            <Icon
+              v-else
+              name="lucide:eye"
+              size="13"
+            />
             {{ theme === card.theme ? 'Previewing' : 'Preview theme' }}
           </button>
         </div>
@@ -248,9 +258,11 @@ function preview(t: TTheme): void {
     <!-- Footnote / lineage explanation -->
     <p class="font-body text-body-sm text-ink-muted mt-6 leading-relaxed">
       Each palette feeds the same set of semantic design tokens:
-      <code class="text-caption text-accent font-mono">--color-bg</code>,
-      <code class="text-caption text-accent font-mono">--color-accent</code>, etc. The themes themselves are nothing
-      more than a single CSS attribute swap on <code class="text-caption text-accent font-mono">&lt;html&gt;</code>.
+      <code class="text-caption text-accent font-mono">--color-bg</code>
+      ,
+      <code class="text-caption text-accent font-mono">--color-accent</code>
+      , etc. The themes themselves are nothing more than a single CSS attribute swap on
+      <code class="text-caption text-accent font-mono">&lt;html&gt;</code>.
     </p>
   </div>
 </template>
