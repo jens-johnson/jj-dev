@@ -55,11 +55,12 @@ for (const [k, v] of Object.entries({
   PVE_TOKEN,
   INGEST_URL,
   INGEST_SECRET,
-}))
+})) {
   if (!v) {
     console.error(`Missing env: ${k}`);
     process.exit(1);
   }
+}
 
 const r1 = (n) => Math.round(n * 10) / 10;
 
@@ -97,7 +98,9 @@ const tcpPing = (host, port = 443, timeoutMs = 3000) =>
     const sock = net.connect({ host, port });
     let settled = false;
     const finish = (ms) => {
-      if (settled) return;
+      if (settled) {
+        return;
+      }
       settled = true;
       sock.destroy();
       resolve(ms);
@@ -143,7 +146,9 @@ async function push() {
   };
   const headers = { 'content-type': 'application/json', authorization: `Bearer ${INGEST_SECRET}` };
   // Pass through a protected Vercel preview/staging deploy (Protection Bypass for Automation). No-op when unset.
-  if (BYPASS_TOKEN) headers['x-vercel-protection-bypass'] = BYPASS_TOKEN;
+  if (BYPASS_TOKEN) {
+    headers['x-vercel-protection-bypass'] = BYPASS_TOKEN;
+  }
   const res = await fetch(INGEST_URL, {
     method: 'POST',
     headers,
