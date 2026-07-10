@@ -25,7 +25,7 @@
 
 const { loggedIn, user, session, clear } = useUserSession();
 
-const menuOpen = ref(false);
+const menuOpen: Ref<boolean> = ref(false);
 const root = ref<HTMLElement | null>(null);
 
 /* Close the account menu when clicking anywhere outside it. The toggle button lives inside
@@ -37,18 +37,21 @@ const root = ref<HTMLElement | null>(null);
  * @function
  * @param e - The triggering mouse event
  */
-function onDocumentClick(e: MouseEvent) {
+function onDocumentClick(e: MouseEvent): void {
+  // Close the menu only when the click lands outside the component root
   if (root.value && !root.value.contains(e.target as Node)) {
     menuOpen.value = false;
   }
 }
 
-onMounted(() => document.addEventListener('click', onDocumentClick));
-onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick));
+onMounted((): void => document.addEventListener('click', onDocumentClick));
+onBeforeUnmount((): void => document.removeEventListener('click', onDocumentClick));
 
 /** Two-letter fallback for when the Google avatar is missing or fails to load. */
-const initials = computed(() => {
-  const parts = (user.value?.name ?? '').trim().split(/\s+/);
+const initials: ComputedRef<string> = computed((): string => {
+  // Split the display name into words
+  const parts: string[] = (user.value?.name ?? '').trim().split(/\s+/);
+  // Take the first letter of the first two words, falling back to "?" when the name is empty
   return (
     parts
       .slice(0, 2)
@@ -59,14 +62,15 @@ const initials = computed(() => {
 });
 
 /* Google avatar URLs occasionally 403; fall back to initials if the image errors. */
-const avatarFailed = ref(false);
+const avatarFailed: Ref<boolean> = ref(false);
 
 /**
  * A utility method to sign the user out; clears the server session and closes the account menu
  * @internal
  * @function
  */
-async function signOut() {
+async function signOut(): Promise<void> {
+  // Clear the server session, then close the account menu
   await clear();
   menuOpen.value = false;
 }

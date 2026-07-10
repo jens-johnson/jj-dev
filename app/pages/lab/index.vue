@@ -33,18 +33,20 @@ const { data: devices } = await useAsyncData('lab-substrate-devices', () =>
 /** Overall health for the Substrate card; wires to real metrics once the box reports in. */
 const health = computed(() => {
   const d = devices.value ?? [];
-  if (!d.length)
+  if (!d.length) {
     return {
       label: 'No data',
       dot: 'bg-ink-subtle',
       pulse: false,
     };
-  if (d.some((x) => x.status === 'offline'))
+  }
+  if (d.some((x) => x.status === 'offline')) {
     return {
       label: 'Degraded',
       dot: 'bg-terra-600',
       pulse: true,
     };
+  }
   return {
     label: 'Operational',
     dot: 'bg-accent-secondary',

@@ -43,7 +43,9 @@ const inRange = (x: unknown, lo: number, hi: number): x is number => isNum(x) &&
  * @returns The clean players object, or null when the block is present but malformed
  */
 function cleanPlayers(p: unknown): { online: number; max: number; java: number; bedrock: number } | null {
-  if (!isObj(p) || !isCount(p.online) || !isCount(p.max) || !isCount(p.java) || !isCount(p.bedrock)) return null;
+  if (!isObj(p) || !isCount(p.online) || !isCount(p.max) || !isCount(p.java) || !isCount(p.bedrock)) {
+    return null;
+  }
   return {
     online: p.online,
     max: p.max,
@@ -62,15 +64,21 @@ function cleanPlayers(p: unknown): { online: number; max: number; java: number; 
  */
 function applyNumbers(input: Record<string, unknown>, value: IJenscraftMetricsPayload): boolean {
   if (input.tps !== undefined) {
-    if (!inRange(input.tps, 0, 20)) return false; // Paper caps TPS at 20
+    if (!inRange(input.tps, 0, 20)) {
+      return false;
+    } // Paper caps TPS at 20
     value.tps = Math.round(input.tps * 100) / 100;
   }
   if (input.mspt !== undefined) {
-    if (!inRange(input.mspt, 0, 60_000)) return false;
+    if (!inRange(input.mspt, 0, 60_000)) {
+      return false;
+    }
     value.mspt = Math.round(input.mspt * 100) / 100;
   }
   if (input.uptimeSec !== undefined) {
-    if (!inRange(input.uptimeSec, 0, Number.MAX_SAFE_INTEGER)) return false;
+    if (!inRange(input.uptimeSec, 0, Number.MAX_SAFE_INTEGER)) {
+      return false;
+    }
     value.uptimeSec = Math.round(input.uptimeSec);
   }
   return true;
@@ -85,7 +93,9 @@ function applyNumbers(input: Record<string, unknown>, value: IJenscraftMetricsPa
 export function validateJenscraftPayload(
   input: unknown,
 ): { ok: true; value: IJenscraftMetricsPayload } | { ok: false } {
-  if (!isObj(input) || !isNum(input.v) || typeof input.ts !== 'string' || input.ts.length > 40) return { ok: false };
+  if (!isObj(input) || !isNum(input.v) || typeof input.ts !== 'string' || input.ts.length > 40) {
+    return { ok: false };
+  }
 
   const value: IJenscraftMetricsPayload = { v: input.v, ts: input.ts };
 
@@ -93,10 +103,14 @@ export function validateJenscraftPayload(
   // reading just shows a placeholder on that one tile instead of dropping the whole snapshot.
   if (input.players !== undefined) {
     const players = cleanPlayers(input.players);
-    if (!players) return { ok: false };
+    if (!players) {
+      return { ok: false };
+    }
     value.players = players;
   }
-  if (!applyNumbers(input, value)) return { ok: false };
+  if (!applyNumbers(input, value)) {
+    return { ok: false };
+  }
 
   if (isObj(input.world) && isPct(input.world.exploredPct)) {
     value.world = { exploredPct: Math.round(input.world.exploredPct * 10) / 10 };

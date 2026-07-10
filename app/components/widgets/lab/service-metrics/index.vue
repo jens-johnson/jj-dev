@@ -42,7 +42,9 @@ const isLive = computed(() => !!live && Object.keys(live).length > 0);
 /** Resolve a tile's display value + unit, or null when there's nothing live yet. */
 function valueOf(tile: IServiceMetricTile): string | null {
   const raw = live?.[tile.key];
-  if (raw === undefined || raw === null || raw === '') return null;
+  if (raw === undefined || raw === null || raw === '') {
+    return null;
+  }
   return tile.unit ? `${raw} ${tile.unit}` : String(raw);
 }
 </script>

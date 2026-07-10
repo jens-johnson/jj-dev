@@ -47,11 +47,13 @@ const JSON_HEADERS = { 'Content-Type': 'application/json' };
  * @function
  * @returns The client id, client secret, and refresh token
  */
-function credentials() {
+function credentials(): { clientId: string; clientSecret: string; refreshToken: string } {
+  // Prefer the runtime config values, falling back to bare process.env for Vercel
   const config = useRuntimeConfig();
-  const clientId = config.stravaClientId || process.env.STRAVA_CLIENT_ID;
-  const clientSecret = config.stravaClientSecret || process.env.STRAVA_CLIENT_SECRET;
-  const refreshToken = config.stravaRefreshToken || process.env.STRAVA_REFRESH_TOKEN;
+  const clientId: string | undefined = config.stravaClientId || process.env.STRAVA_CLIENT_ID;
+  const clientSecret: string | undefined = config.stravaClientSecret || process.env.STRAVA_CLIENT_SECRET;
+  const refreshToken: string | undefined = config.stravaRefreshToken || process.env.STRAVA_REFRESH_TOKEN;
+  // Fail loudly when any of the three credentials is missing
   if (!clientId || !clientSecret || !refreshToken) {
     throw createError({
       statusCode: 500,
@@ -76,7 +78,9 @@ let cachedExpiry = 0;
  */
 export async function stravaAccessToken(): Promise<string> {
   const nowSeconds = Math.floor(Date.now() / 1000);
-  if (cachedAccessToken && cachedExpiry > nowSeconds + 60) return cachedAccessToken;
+  if (cachedAccessToken && cachedExpiry > nowSeconds + 60) {
+    return cachedAccessToken;
+  }
 
   const { clientId, clientSecret, refreshToken } = credentials();
   const response = await fetch(OAUTH_TOKEN_URL, {
@@ -116,7 +120,9 @@ async function stravaFetch<T>(path: string, init: RequestInit = {}): Promise<T> 
   if (!response.ok) {
     throw createError({ statusCode: response.status, message: `Strava ${response.status}: ${await response.text()}` });
   }
-  if (response.status === 204) return undefined as T;
+  if (response.status === 204) {
+    return undefined as T;
+  }
   return (await response.json()) as T;
 }
 
@@ -169,7 +175,9 @@ export function getStreams(id: number, keys = 'time,distance,heartrate,cadence')
 export async function activityExists(id: number): Promise<boolean> {
   const token = await stravaAccessToken();
   const response = await fetch(`${API}/activities/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-  if (response.status === 404) return false;
+  if (response.status === 404) {
+    return false;
+  }
   if (!response.ok) {
     throw createError({ statusCode: 502, message: `Could not verify the original activity (${response.status}).` });
   }
@@ -214,8 +222,12 @@ export async function uploadTcx(tcx: string, activity: TUploadActivity): Promise
 export async function pollUpload(uploadId: number, attempts = 20, intervalMs = 1500): Promise<number> {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const upload = await stravaFetch<IStravaUpload>(`/uploads/${uploadId}`);
-    if (upload.error) throw createError({ statusCode: 502, message: upload.error });
-    if (upload.activity_id) return upload.activity_id;
+    if (upload.error) {
+      throw createError({ statusCode: 502, message: upload.error });
+    }
+    if (upload.activity_id) {
+      return upload.activity_id;
+    }
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }
   throw createError({
@@ -252,7 +264,9 @@ export async function validateReplacement(
   let activity: IStravaActivity | null = null;
   for (let attempt = 0; attempt < 10; attempt += 1) {
     activity = await getActivity(id);
-    if (activity.distance > 0) break;
+    if (activity.distance > 0) {
+      break;
+    }
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
   if (!activity) {

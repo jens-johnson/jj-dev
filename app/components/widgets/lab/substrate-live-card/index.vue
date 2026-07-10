@@ -40,7 +40,9 @@ interface ITile {
 const stats = computed<ITile[]>(() => {
   const n = node.value;
   const g = guests.value;
-  if (!n) return [];
+  if (!n) {
+    return [];
+  }
   return [
     {
       label: 'CPU',

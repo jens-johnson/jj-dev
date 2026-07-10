@@ -47,7 +47,7 @@ const goals = [
   },
 ];
 
-const activeIdx = ref(0);
+const activeIdx: Ref<number> = ref(0);
 const scrollContainer = ref<HTMLElement | null>(null);
 
 /**
@@ -57,20 +57,27 @@ const scrollContainer = ref<HTMLElement | null>(null);
  * @function
  * @param i - The zero-based index of the goal card to scroll to
  */
-function scrollTo(i: number) {
+function scrollTo(i: number): void {
+  // Activate the target card's indicator dot immediately
   activeIdx.value = i;
-  if (!scrollContainer.value) return;
-  const target = scrollContainer.value.children[i] as HTMLElement | undefined;
+  if (!scrollContainer.value) {
+    return;
+  }
+  // Smooth-scroll the carousel so the target card snaps into view
+  const target: HTMLElement | undefined = scrollContainer.value.children[i] as HTMLElement | undefined;
   if (target) {
     scrollContainer.value.scrollTo({ left: target.offsetLeft - 16, behavior: 'smooth' });
   }
 }
 
 /** Track scroll position to update activeIdx on mobile swipe. */
-function onScroll() {
-  if (!scrollContainer.value) return;
+function onScroll(): void {
+  if (!scrollContainer.value) {
+    return;
+  }
+  // Derive the visible card index from the scroll offset (each card spans 85% of the container width)
   const { scrollLeft, clientWidth } = scrollContainer.value;
-  const i = Math.round(scrollLeft / (clientWidth * 0.85));
+  const i: number = Math.round(scrollLeft / (clientWidth * 0.85));
   activeIdx.value = Math.min(goals.length - 1, Math.max(0, i));
 }
 </script>

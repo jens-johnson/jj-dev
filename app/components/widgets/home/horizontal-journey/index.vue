@@ -27,8 +27,10 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import type { CSSProperties } from 'vue';
+
 const PANELS = 4;
-const PANEL_NAMES = ['About', 'Projects', 'Writing', 'Connect'];
+const PANEL_NAMES: string[] = ['About', 'Projects', 'Writing', 'Connect'];
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 const { data: posts } = await useAsyncData('journey-posts', () =>
@@ -37,8 +39,8 @@ const { data: posts } = await useAsyncData('journey-posts', () =>
 
 // ── Scroll tracking ───────────────────────────────────────────────────────────
 const outerRef = ref<HTMLElement | null>(null);
-const rawProgress = ref(0);
-const lerpProgress = ref(0);
+const rawProgress: Ref<number> = ref(0);
+const lerpProgress: Ref<number> = ref(0);
 let raf: number;
 
 /**
@@ -50,7 +52,7 @@ let raf: number;
  * @param t - The interpolation factor in the 0..1 range; lower values move more slowly toward the target
  * @returns The value moved from a toward b by factor t
  */
-function lerp(a: number, b: number, t: number) {
+function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
@@ -60,10 +62,13 @@ function lerp(a: number, b: number, t: number) {
  * @internal
  * @function
  */
-function onScroll() {
-  if (!outerRef.value || !import.meta.client) return;
-  const rect = outerRef.value.getBoundingClientRect();
-  const scrollable = rect.height - window.innerHeight;
+function onScroll(): void {
+  if (!outerRef.value || !import.meta.client) {
+    return;
+  }
+  // Convert how far the wrapper has scrolled past the viewport top into clamped 0..1 progress
+  const rect: DOMRect = outerRef.value.getBoundingClientRect();
+  const scrollable: number = rect.height - window.innerHeight;
   rawProgress.value = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
 }
 
@@ -73,31 +78,38 @@ function onScroll() {
  * @internal
  * @function
  */
-function tick() {
+function tick(): void {
+  // Ease the lerped progress toward the raw scroll progress and re-schedule the loop
   lerpProgress.value = lerp(lerpProgress.value, rawProgress.value, 0.09);
   raf = requestAnimationFrame(tick);
 }
 
-onMounted(() => {
+onMounted((): void => {
+  // Track scroll, start the easing loop, and sample the initial position
   window.addEventListener('scroll', onScroll, {
     passive: true,
   });
   raf = requestAnimationFrame(tick);
   onScroll();
 });
-onUnmounted(() => {
+onUnmounted((): void => {
+  // Detach the scroll listener and stop the easing loop
   window.removeEventListener('scroll', onScroll);
   cancelAnimationFrame(raf);
 });
 
 // ── Derived ───────────────────────────────────────────────────────────────────
 /** Translate the track left by (progress × panels-1 × 100vw). */
-const trackStyle = computed(() => ({
-  transform: `translateX(${-lerpProgress.value * (PANELS - 1) * 100}vw)`,
-}));
+const trackStyle: ComputedRef<CSSProperties> = computed(
+  (): CSSProperties => ({
+    transform: `translateX(${-lerpProgress.value * (PANELS - 1) * 100}vw)`,
+  }),
+);
 
 /** Snap-nearest panel index (for indicators). */
-const activePanel = computed(() => Math.min(PANELS - 1, Math.round(rawProgress.value * (PANELS - 1))));
+const activePanel: ComputedRef<number> = computed((): number =>
+  Math.min(PANELS - 1, Math.round(rawProgress.value * (PANELS - 1))),
+);
 
 // ── Navigation click (indicator dots) ────────────────────────────────────────
 /**
@@ -107,11 +119,15 @@ const activePanel = computed(() => Math.min(PANELS - 1, Math.round(rawProgress.v
  * @function
  * @param i - The zero-based index of the panel to scroll to
  */
-function scrollToPanel(i: number) {
-  if (!import.meta.client || !outerRef.value) return;
-  const rect = outerRef.value.getBoundingClientRect();
-  const scrollable = outerRef.value.offsetHeight - window.innerHeight;
-  const target = window.scrollY + rect.top + (i / (PANELS - 1)) * scrollable;
+function scrollToPanel(i: number): void {
+  if (!import.meta.client || !outerRef.value) {
+    return;
+  }
+  // Map the panel index onto the wrapper's scrollable range in document coordinates
+  const rect: DOMRect = outerRef.value.getBoundingClientRect();
+  const scrollable: number = outerRef.value.offsetHeight - window.innerHeight;
+  const target: number = window.scrollY + rect.top + (i / (PANELS - 1)) * scrollable;
+  // Smooth-scroll the window to the computed position
   window.scrollTo({
     top: target,
     behavior: 'smooth',

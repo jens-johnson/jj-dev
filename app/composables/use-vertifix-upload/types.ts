@@ -13,7 +13,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * █████████████████████████████████████ #composables/use-vertifix-upload/types.ts █████████████████████████████████████
  *
- * Type definitions for the Vertifix upload composable.
+ * Type definitions for the Vertifix upload composable: the item/status shapes and the typed return surface.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
@@ -73,4 +73,47 @@ export interface IVertifixItem {
 
   /* The current error message, or null when none */
   error: string | null;
+}
+
+/**
+ * An interface representing the return value from the `useVertifixUpload` composable
+ * @public
+ * @interface
+ */
+export interface IUseVertifixUploadReturn {
+  /* The shared reactive list of items working their way through the flow */
+  readonly items: Ref<IVertifixItem[]>;
+
+  /* Adds dropped or picked image files to the list, reading each photo's EXIF capture time */
+  readonly addFiles: (files: File[] | FileList) => Promise<void>;
+
+  /* Removes an item from the list, revoking its preview object URL */
+  readonly removeItem: (id: string) => void;
+
+  /* Removes every item from the list, revoking each preview object URL */
+  readonly clearAll: () => void;
+
+  /* Sets (or clears) an item's capture time */
+  readonly setCapturedAt: (id: string, capturedAt: string | null) => void;
+
+  /* Sets (or clears) an item's target elevation gain in feet */
+  readonly setElevation: (id: string, elevationFeet: number | null) => void;
+
+  /* Searches Strava for runs near an item's capture time, storing the candidates on success */
+  readonly searchMatches: (id: string) => Promise<void>;
+
+  /* Records which candidate Strava activity the user picked for an item */
+  readonly selectCandidate: (id: string, activityId: number) => void;
+
+  /* Requests a corrected-elevation TCX for an item's selected activity */
+  readonly prepare: (id: string) => Promise<void>;
+
+  /* Offers an item's prepared TCX as a local download before the original is deleted */
+  readonly downloadBackup: (id: string) => void;
+
+  /* Commits an item's re-upload and stores the validation result */
+  readonly commit: (id: string) => Promise<void>;
+
+  /* Steps a failed item back to the furthest stage it can safely resume from */
+  readonly retry: (id: string) => void;
 }

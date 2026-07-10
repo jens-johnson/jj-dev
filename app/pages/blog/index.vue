@@ -42,7 +42,9 @@ const activeTag = computed<string | null>(() => {
 });
 
 const filteredPosts = computed(() => {
-  if (!activeTag.value) return allPosts.value ?? [];
+  if (!activeTag.value) {
+    return allPosts.value ?? [];
+  }
   return (allPosts.value ?? []).filter((p) =>
     (p.tags ?? []).some((t: string) => t.toLowerCase() === activeTag.value!.toLowerCase()),
   );
@@ -55,7 +57,9 @@ const rest = computed(() => filteredPosts.value.slice(1));
 const allTags = computed(() => {
   const set = new Set<string>();
   for (const post of allPosts.value ?? []) {
-    for (const tag of post.tags ?? []) set.add(tag);
+    for (const tag of post.tags ?? []) {
+      set.add(tag);
+    }
   }
   return Array.from(set).sort();
 });
@@ -84,7 +88,7 @@ function formatDate(iso: string): string {
  * @param tag - The tag to filter by
  * @returns The route location object
  */
-function tagHref(tag: string) {
+function tagHref(tag: string): { path: string; query: { tag: string } } {
   return { path: '/blog', query: { tag } };
 }
 

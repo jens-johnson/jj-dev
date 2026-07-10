@@ -179,7 +179,9 @@ function buildWeeklyMiles(activities: IStravaActivity[], numWeeks: number): numb
   const buckets = Array(numWeeks).fill(0);
 
   for (const act of activities) {
-    if (act.type !== 'Run') continue;
+    if (act.type !== 'Run') {
+      continue;
+    }
     const age = now - new Date(act.start_date).getTime();
     const weekIdx = Math.floor(age / msPerWeek);
     if (weekIdx < numWeeks) {

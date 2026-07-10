@@ -52,14 +52,16 @@ const TABS: ReadonlyArray<{ key: string; label: string; soon?: boolean }> = [
   { key: 'services', label: 'Services' },
 ];
 
-const activeView = computed(() => {
+const activeView: ComputedRef<string> = computed((): string => {
+  // Fall back to the overview tab when the query param is missing or not a known tab key
   const v = route.query.view;
-  const key = typeof v === 'string' ? v : 'overview';
+  const key: string = typeof v === 'string' ? v : 'overview';
   return TABS.some((t) => t.key === key) ? key : 'overview';
 });
 
 /** Drop `view` from the URL for the default tab so the canonical link stays clean. */
-function setView(key: string) {
+function setView(key: string): void {
+  // Replace (not push) the query param so tab switches do not pollute the history stack
   router.replace({ query: { ...route.query, view: key === 'overview' ? undefined : key } });
 }
 

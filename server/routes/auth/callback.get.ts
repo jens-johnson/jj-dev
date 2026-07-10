@@ -82,7 +82,9 @@ function resolveRedirectURL(event: H3Event): string | undefined {
   }
 
   const origin = vercelOrigin();
-  if (origin) return `${origin}/auth/callback`;
+  if (origin) {
+    return `${origin}/auth/callback`;
+  }
 
   const forwardedHost = getRequestHeader(event, 'x-forwarded-host')?.split(',')[0]?.trim();
   if (forwardedHost) {

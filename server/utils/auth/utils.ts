@@ -24,6 +24,8 @@
 
 import type { H3Event } from 'h3';
 
+import type { UserSessionRequired } from '#auth-utils';
+
 /**
  * Determines whether an email belongs to the configured admin account. The allow-list is read from the server-only
  * `adminEmail` runtime config so it never reaches the client bundle. The comparison is trimmed and case-insensitive
@@ -31,7 +33,9 @@ import type { H3Event } from 'h3';
  * @returns True when the email matches the configured admin account
  */
 export function isAdminEmail(email: string | null | undefined): boolean {
-  if (!email) return false;
+  if (!email) {
+    return false;
+  }
   const { adminEmail } = useRuntimeConfig();
   return email.trim().toLowerCase() === String(adminEmail).trim().toLowerCase();
 }
@@ -42,8 +46,10 @@ export function isAdminEmail(email: string | null | undefined): boolean {
  * @param event - The H3 request event
  * @returns The verified session, so handlers can read `user` from it
  */
-export async function requireAdmin(event: H3Event) {
-  const session = await requireUserSession(event);
+export async function requireAdmin(event: H3Event): Promise<UserSessionRequired> {
+  // Require an authenticated session first; this throws a 401 when the request is anonymous
+  const session: UserSessionRequired = await requireUserSession(event);
+  // Reject authenticated sessions that are not on the admin allow-list
   if (!session.isAdmin) {
     throw createError({
       statusCode: 403,

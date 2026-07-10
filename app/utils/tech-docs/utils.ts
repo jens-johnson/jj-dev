@@ -92,6 +92,8 @@ function normalizeTech(name: string): string {
  * @returns The docs URL, or undefined when the name is not in the registry
  */
 export function techDocHref(name: string | undefined | null): string | undefined {
-  if (!name) return undefined;
+  if (!name) {
+    return undefined;
+  }
   return TECH_DOCS[normalizeTech(name)];
 }

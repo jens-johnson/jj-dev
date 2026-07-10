@@ -28,6 +28,7 @@
  */
 
 import type { ISubstrateDevice } from '~/types/substrate';
+import type { ISubstrateInternet, ISubstrateMetricsNode } from '~/types/substrate-metrics';
 
 const props = defineProps<{
   device: ISubstrateDevice | null;
@@ -37,8 +38,10 @@ const props = defineProps<{
 
 /* ─── Connection resolution ───────────────────────────────────────────────────────────────────────────────────────── */
 
-const byId = computed(() => new Map(props.devices.map((d) => [d.nodeId, d])));
-const titleOf = (id: string) => byId.value.get(id)?.title ?? id;
+const byId: ComputedRef<Map<string, ISubstrateDevice>> = computed(
+  (): Map<string, ISubstrateDevice> => new Map(props.devices.map((d) => [d.nodeId, d])),
+);
+const titleOf = (id: string): string => byId.value.get(id)?.title ?? id;
 
 const CONN_ICON: Record<string, string> = {
   uplink: 'lucide:arrow-up-right',
@@ -47,7 +50,7 @@ const CONN_ICON: Record<string, string> = {
   power: 'lucide:zap',
 };
 const FALLBACK_CONN_ICON = 'lucide:share-2';
-const connIcon = (kind?: string) => CONN_ICON[kind ?? 'network'] ?? FALLBACK_CONN_ICON;
+const connIcon = (kind?: string): string => CONN_ICON[kind ?? 'network'] ?? FALLBACK_CONN_ICON;
 
 const CONN_LABEL: Record<string, string> = {
   uplink: 'Uplink',
@@ -55,19 +58,19 @@ const CONN_LABEL: Record<string, string> = {
   data: 'Data',
   power: 'Power',
 };
-const connLabel = (kind?: string) => CONN_LABEL[kind ?? 'network'] ?? 'Link';
+const connLabel = (kind?: string): string => CONN_LABEL[kind ?? 'network'] ?? 'Link';
 
-const vendorModel = computed(() =>
+const vendorModel: ComputedRef<string> = computed((): string =>
   props.device ? [props.device.vendor, props.device.model].filter(Boolean).join(' · ') : '',
 );
 
 /* ─── Live metrics (shown only for the live Proxmox host) ──────────────────────────────────────────────────────────── */
 
 const { data: liveData, state: liveState, updatedLabel: liveUpdated } = useSubstrateMetrics();
-const liveNode = computed(() =>
+const liveNode: ComputedRef<ISubstrateMetricsNode | null> = computed((): ISubstrateMetricsNode | null =>
   props.device?.kind === 'hypervisor' && liveState.value !== 'offline' ? (liveData.value?.node ?? null) : null,
 );
-const liveInternet = computed(() =>
+const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubstrateInternet | null =>
   props.device?.kind === 'internet' && liveState.value !== 'offline' ? (liveData.value?.internet ?? null) : null,
 );
 </script>

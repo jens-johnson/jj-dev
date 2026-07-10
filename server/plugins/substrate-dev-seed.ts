@@ -19,10 +19,29 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ISubstrateMetricsPayload, ISubstrateMetricsSample } from '../utils/substrate-metrics';
+import type {
+  IStoredSubstrateMetrics,
+  ISubstrateMetricsPayload,
+  ISubstrateMetricsSample,
+} from '../utils/substrate-metrics';
 
-const round1 = (n: number) => Math.round(n * 10) / 10;
-const round2 = (n: number) => Math.round(n * 100) / 100;
+/**
+ * Rounds a number to one decimal place
+ * @internal
+ * @function
+ * @param n - The number to round
+ * @returns The rounded number
+ */
+const round1 = (n: number): number => Math.round(n * 10) / 10;
+
+/**
+ * Rounds a number to two decimal places
+ * @internal
+ * @function
+ * @param n - The number to round
+ * @returns The rounded number
+ */
+const round2 = (n: number): number => Math.round(n * 100) / 100;
 
 /**
  * Builds a plausible mock Substrate metrics payload, lightly randomized so each reseed looks like fresh live data
@@ -53,7 +72,8 @@ function mockPayload(): ISubstrateMetricsPayload {
 
 /** A plausible ~15 min CPU/RAM history so the sparklines aren't empty on first paint in dev. */
 function mockHistory(points = 30, stepMs = 30_000): ISubstrateMetricsSample[] {
-  const now = Date.now();
+  // Anchor the series at now and walk backwards one step per point
+  const now: number = Date.now();
   return Array.from({ length: points }, (_, i) => ({
     t: now - (points - 1 - i) * stepMs,
     cpu: round1(8 + Math.sin(i / 3) * 4 + Math.random() * 3),
@@ -61,20 +81,29 @@ function mockHistory(points = 30, stepMs = 30_000): ISubstrateMetricsSample[] {
   }));
 }
 
-export default defineNitroPlugin(() => {
-  if (!import.meta.dev) return;
+export default defineNitroPlugin((): void => {
+  if (!import.meta.dev) {
+    return;
+  }
   // Seed mock data, but back off as soon as a real push arrives so a local publisher can take over.
-  const seedIfStale = async () => {
-    const latest = await readLatestMetrics();
-    if (latest && Date.now() - latest.receivedAt < 100_000) return;
+  const seedIfStale = async (): Promise<void> => {
+    // Read the latest stored payload; a fresh real push (< ~100s old) means a local publisher owns the feed
+    const latest: IStoredSubstrateMetrics | null = await readLatestMetrics();
+    if (latest && Date.now() - latest.receivedAt < 100_000) {
+      return;
+    }
+    // Overwrite the stored payload with a fresh mock snapshot
     await writeLatestMetrics(mockPayload());
   };
   // Pre-fill the rolling history once so sparklines render right away; real pushes append from there.
-  const seedHistory = async () => {
-    if ((await readHistory()).length >= 8) return;
+  const seedHistory = async (): Promise<void> => {
+    // Skip when the history already holds enough points to draw the sparklines
+    if ((await readHistory()).length >= 8) {
+      return;
+    }
     await setHistory(mockHistory());
   };
   void seedHistory();
   void seedIfStale();
-  setInterval(() => void seedIfStale(), 20_000);
+  setInterval((): void => void seedIfStale(), 20_000);
 });

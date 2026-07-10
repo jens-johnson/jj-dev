@@ -138,10 +138,14 @@ export function splitDeviceMentions(text: string): ITextSegment[] {
   let last = 0;
   for (const m of text.matchAll(DEVICE_ID_REGEX)) {
     const start = m.index ?? 0;
-    if (start > last) segments.push({ text: text.slice(last, start) });
+    if (start > last) {
+      segments.push({ text: text.slice(last, start) });
+    }
     segments.push({ text: m[0], href: `/lab/substrate/${m[0].toLowerCase()}` });
     last = start + m[0].length;
   }
-  if (last < text.length) segments.push({ text: text.slice(last) });
+  if (last < text.length) {
+    segments.push({ text: text.slice(last) });
+  }
   return segments;
 }

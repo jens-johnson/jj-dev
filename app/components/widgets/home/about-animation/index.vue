@@ -48,12 +48,12 @@ let W = 0;
 let H = 0;
 let t = 0;
 
-const mouseX = ref(-1);
-const mouseY = ref(-1);
-const mouseActive = ref(false);
+const mouseX: Ref<number> = ref(-1);
+const mouseY: Ref<number> = ref(-1);
+const mouseActive: Ref<boolean> = ref(false);
 /** Smoothed mouse position used in the draw loop (lerped toward actual mouse). */
-const smoothMX = ref(-1);
-const smoothMY = ref(-1);
+const smoothMX: Ref<number> = ref(-1);
+const smoothMY: Ref<number> = ref(-1);
 
 /* ─── Setup ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -63,13 +63,19 @@ const smoothMY = ref(-1);
  * @internal
  * @function
  */
-function resize() {
-  const canvas = canvasRef.value;
-  if (!canvas) return;
-  const dpr = window.devicePixelRatio || 1;
+function resize(): void {
+  const canvas: HTMLCanvasElement | null = canvasRef.value;
+  if (!canvas) {
+    return;
+  }
+  // Measure the rendered size; a zero dimension means the canvas is not laid out yet
+  const dpr: number = window.devicePixelRatio || 1;
   W = canvas.offsetWidth;
   H = canvas.offsetHeight;
-  if (W === 0 || H === 0) return;
+  if (W === 0 || H === 0) {
+    return;
+  }
+  // Scale the backing store by the device pixel ratio and refresh the cached context
   canvas.width = Math.round(W * dpr);
   canvas.height = Math.round(H * dpr);
   ctx = canvas.getContext('2d');
@@ -79,31 +85,38 @@ function resize() {
 /* ─── Draw helpers ───────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /** Lerp smoothed mouse position one step toward the raw mouse position. */
-function lerpMouse() {
-  if (!mouseActive.value) return;
-  const snap = smoothMX.value < 0;
+function lerpMouse(): void {
+  if (!mouseActive.value) {
+    return;
+  }
+  // Snap on first entry (no stale position to ease from), otherwise ease toward the raw position
+  const snap: boolean = smoothMX.value < 0;
   smoothMX.value = snap ? mouseX.value : smoothMX.value + (mouseX.value - smoothMX.value) * 0.08;
   smoothMY.value = snap ? mouseY.value : smoothMY.value + (mouseY.value - smoothMY.value) * 0.08;
 }
 
 /** Gaussian mountain displacement at (x, baseY) for a mouse at (mx, my). */
 function computePeak(x: number, baseY: number, mx: number, my: number): number {
-  const dx = x - mx;
-  const dy = baseY - my;
-  const bump = PEAK_HEIGHT * Math.exp(-(dx * dx + dy * dy) / PEAK_SIGMA);
+  // Gaussian falloff by squared distance from the cursor
+  const dx: number = x - mx;
+  const dy: number = baseY - my;
+  const bump: number = PEAK_HEIGHT * Math.exp(-(dx * dx + dy * dy) / PEAK_SIGMA);
+  // Lines above the cursor push up, lines below push down
   return (baseY < my ? -1 : 1) * bump;
 }
 
 /** Trace a single contour path onto ctx (call beginPath before, stroke after). */
-function traceContour(baseY: number, phase: number, mx: number, my: number, active: boolean) {
+function traceContour(baseY: number, phase: number, mx: number, my: number, active: boolean): void {
   for (let x = 0; x <= W; x += 3) {
-    const wave =
+    // Sum layered sine waves for organic terrain, then add the mouse peak displacement
+    const wave: number =
       Math.sin(x * 0.0075 + t * 0.9 + phase) * 26 +
       Math.sin(x * 0.014 - t * 0.65 + phase * 1.6) * 15 +
       Math.sin(x * 0.024 + t * 1.2 + phase * 0.7) * 7 +
       Math.cos(x * 0.0046 + t * 0.45 - phase * 0.4) * 11;
-    const peak = active ? computePeak(x, baseY, mx, my) : 0;
-    const y = baseY + wave + peak;
+    const peak: number = active ? computePeak(x, baseY, mx, my) : 0;
+    const y: number = baseY + wave + peak;
+    // Start the path on the first sample, extend it on every following one
     if (x === 0) {
       ctx!.moveTo(x, y);
     } else {
@@ -113,11 +126,13 @@ function traceContour(baseY: number, phase: number, mx: number, my: number, acti
 }
 
 /** Draw a soft radial glow centred on the cursor. */
-function drawGlow(mx: number, my: number) {
-  const grad = ctx!.createRadialGradient(mx, my, 0, mx, my, 180);
+function drawGlow(mx: number, my: number): void {
+  // Build a radial gradient that fades the accent out to transparent
+  const grad: CanvasGradient = ctx!.createRadialGradient(mx, my, 0, mx, my, 180);
   grad.addColorStop(0, `rgba(${ACCENT_RGB}, 0.07)`);
   grad.addColorStop(0.5, `rgba(${ACCENT_RGB}, 0.025)`);
   grad.addColorStop(1, `rgba(${ACCENT_RGB}, 0)`);
+  // Flood the full canvas; the gradient itself limits the visible halo
   ctx!.fillStyle = grad;
   ctx!.fillRect(0, 0, W, H);
 }
@@ -130,26 +145,31 @@ function drawGlow(mx: number, my: number) {
  * @internal
  * @function
  */
-function draw() {
+function draw(): void {
+  // Re-schedule first so the loop survives early returns
   raf = requestAnimationFrame(draw);
-  if (!ctx || W === 0 || H === 0) return;
+  if (!ctx || W === 0 || H === 0) {
+    return;
+  }
 
+  // Clear the frame, advance the animation clock, and ease the mouse position
   ctx.clearRect(0, 0, W, H);
   t += SPEED;
   lerpMouse();
 
-  const mx = smoothMX.value;
-  const my = smoothMY.value;
-  const active = mouseActive.value && mx >= 0;
+  const mx: number = smoothMX.value;
+  const my: number = smoothMY.value;
+  const active: boolean = mouseActive.value && mx >= 0;
 
+  // Stroke each contour with proximity-weighted opacity and width
   for (let i = 0; i < NUM_LINES; i++) {
-    const frac = i / (NUM_LINES - 1); // 0 → 1 top to bottom
-    const baseY = frac * H;
-    const phase = i * 0.38; // per-line phase offset
+    const frac: number = i / (NUM_LINES - 1); // 0 → 1 top to bottom
+    const baseY: number = frac * H;
+    const phase: number = i * 0.38; // per-line phase offset
 
-    const proximity = active ? Math.exp(-((baseY - my) ** 2) / 18_000) : 0;
-    const midBoost = 1 - Math.abs(frac - 0.5) * 2; // peaks at vertical centre
-    const baseOpacity = 0.06 + midBoost * 0.14 + proximity * 0.28;
+    const proximity: number = active ? Math.exp(-((baseY - my) ** 2) / 18_000) : 0;
+    const midBoost: number = 1 - Math.abs(frac - 0.5) * 2; // peaks at vertical centre
+    const baseOpacity: number = 0.06 + midBoost * 0.14 + proximity * 0.28;
 
     ctx.beginPath();
     ctx.strokeStyle = `rgba(${ACCENT_RGB}, ${Math.min(baseOpacity, 0.55)})`;
@@ -158,6 +178,7 @@ function draw() {
     ctx.stroke();
   }
 
+  // Overlay the cursor glow while the mouse is active
   if (active) {
     drawGlow(mx, my);
   }
@@ -172,10 +193,13 @@ function draw() {
  * @function
  * @param e - The triggering mouse event
  */
-function onMove(e: MouseEvent) {
-  const canvas = canvasRef.value;
-  if (!canvas) return;
-  const r = canvas.getBoundingClientRect();
+function onMove(e: MouseEvent): void {
+  const canvas: HTMLCanvasElement | null = canvasRef.value;
+  if (!canvas) {
+    return;
+  }
+  // Translate the viewport cursor position into canvas coordinates and activate the peak
+  const r: DOMRect = canvas.getBoundingClientRect();
   mouseX.value = e.clientX - r.left;
   mouseY.value = e.clientY - r.top;
   mouseActive.value = true;
@@ -187,7 +211,8 @@ function onMove(e: MouseEvent) {
  * @internal
  * @function
  */
-function onLeave() {
+function onLeave(): void {
+  // Deactivate the peak and reset the smoothed position so the next entry snaps to the cursor
   mouseActive.value = false;
   smoothMX.value = -1;
   smoothMY.value = -1;
@@ -195,17 +220,20 @@ function onLeave() {
 
 /* ─── Lifecycle ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-onMounted(() => {
-  nextTick(() => {
+onMounted((): void => {
+  // Size the canvas once it is laid out, then start the render loop
+  nextTick((): void => {
     resize();
     raf = requestAnimationFrame(draw);
   });
+  // Keep the backing store in sync with the rendered size
   window.addEventListener('resize', resize, {
     passive: true,
   });
 });
 
-onUnmounted(() => {
+onUnmounted((): void => {
+  // Stop the render loop and detach the window listener
   cancelAnimationFrame(raf);
   window.removeEventListener('resize', resize);
 });

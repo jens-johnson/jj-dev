@@ -44,7 +44,9 @@ const maxWeeklyContributions = computed(() => Math.max(...weeklyContributions.va
  * @returns The CSS height value for the sparkline bar
  */
 function ghBarHeight(count: number): string {
-  if (count === 0) return '3px';
+  if (count === 0) {
+    return '3px';
+  }
   const pct = count / maxWeeklyContributions.value;
   return `${Math.max(6, Math.round(pct * 52))}px`;
 }
@@ -62,7 +64,9 @@ const maxWeeklyMiles = computed(() => Math.max(...(data.value?.strava.weeklyMile
  * @returns The CSS height value for the sparkline bar
  */
 function barHeight(miles: number): string {
-  if (!maxWeeklyMiles.value) return '4px';
+  if (!maxWeeklyMiles.value) {
+    return '4px';
+  }
   const pct = miles / maxWeeklyMiles.value;
   // Clamp between 4px (empty week) and 100% of available height
   return miles === 0 ? '3px' : `${Math.max(12, Math.round(pct * 52))}px`;

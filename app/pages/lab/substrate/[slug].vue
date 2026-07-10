@@ -20,15 +20,22 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import type { SubstrateCollectionItem } from '@nuxt/content';
+
+import type { ISubstrateDevice } from '~/types/substrate';
+import type { ISubstrateInternet } from '~/types/substrate-metrics';
+
 const route = useRoute();
-const slug = computed(() => String(route.params.slug ?? ''));
+const slug: ComputedRef<string> = computed((): string => String(route.params.slug ?? ''));
 
 /* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 const { data: devices } = await useAsyncData('substrate-devices-all', () => queryCollection('substrate').all());
 
 /** Raw queried doc (carries the markdown body) for ContentRenderer. */
-const rawDoc = computed(() => (devices.value ?? []).find((d) => d.nodeId === slug.value) ?? null);
+const rawDoc: ComputedRef<SubstrateCollectionItem | null> = computed(
+  (): SubstrateCollectionItem | null => (devices.value ?? []).find((d) => d.nodeId === slug.value) ?? null,
+);
 
 if (!rawDoc.value) {
   throw createError({
@@ -38,16 +45,19 @@ if (!rawDoc.value) {
   });
 }
 
-const list = computed(() => normalizeDevices(devices.value ?? []));
-const device = computed(() => list.value.find((d) => d.nodeId === slug.value) ?? null);
+const list: ComputedRef<ISubstrateDevice[]> = computed((): ISubstrateDevice[] => normalizeDevices(devices.value ?? []));
+const device: ComputedRef<ISubstrateDevice | null> = computed(
+  (): ISubstrateDevice | null => list.value.find((d) => d.nodeId === slug.value) ?? null,
+);
 
-const vendorModel = computed(() =>
+const vendorModel: ComputedRef<string> = computed((): string =>
   device.value ? [device.value.vendor, device.value.model].filter(Boolean).join(' · ') : '',
 );
-const titleOf = (id: string) => list.value.find((d) => d.nodeId === id)?.title ?? id;
+const titleOf = (id: string): string => list.value.find((d) => d.nodeId === id)?.title ?? id;
 
-const hasNotes = computed(() => {
-  const value = (rawDoc.value?.body as unknown as { value?: unknown[] } | undefined)?.value;
+const hasNotes: ComputedRef<boolean> = computed((): boolean => {
+  // Reach into the raw minimark body and require at least one content node
+  const value: unknown[] | undefined = (rawDoc.value?.body as unknown as { value?: unknown[] } | undefined)?.value;
   return Array.isArray(value) && value.length > 0;
 });
 
@@ -57,12 +67,12 @@ const CONN_LABEL: Record<string, string> = {
   data: 'Data',
   power: 'Power',
 };
-const connLabel = (kind?: string) => CONN_LABEL[kind ?? 'network'] ?? 'Link';
+const connLabel = (kind?: string): string => CONN_LABEL[kind ?? 'network'] ?? 'Link';
 
 /* ─── Live internet (WAN node only) ───────────────────────────────────────────────────────────────────────────────── */
 
 const { data: liveData, state: liveState, updatedLabel: liveUpdated } = useSubstrateMetrics();
-const liveInternet = computed(() =>
+const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubstrateInternet | null =>
   device.value?.kind === 'internet' && liveState.value !== 'offline' ? (liveData.value?.internet ?? null) : null,
 );
 

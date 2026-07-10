@@ -37,6 +37,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import type { CSSProperties } from 'vue';
+
 /**
  * The props accepted by the parallax primitive; both tune the feel of the effect and are optional
  * @internal
@@ -55,11 +57,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const rootEl = useTemplateRef<HTMLElement>('root');
 
-const rawX = ref(0);
-const rawY = ref(0);
-const smoothX = ref(0);
-const smoothY = ref(0);
-const scrollY = ref(0);
+const rawX: Ref<number> = ref(0);
+const rawY: Ref<number> = ref(0);
+const smoothX: Ref<number> = ref(0);
+const smoothY: Ref<number> = ref(0);
+const scrollY: Ref<number> = ref(0);
 let raf: number;
 
 /**
@@ -71,7 +73,7 @@ let raf: number;
  * @param t - The interpolation factor in the 0..1 range; lower values move more slowly toward the target
  * @returns The value moved from a toward b by factor t
  */
-function lerpFn(a: number, b: number, t: number) {
+function lerpFn(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
@@ -82,8 +84,11 @@ function lerpFn(a: number, b: number, t: number) {
  * @function
  * @param e - The triggering mouse event
  */
-function onMouseMove(e: MouseEvent) {
-  if (!rootEl.value) return;
+function onMouseMove(e: MouseEvent): void {
+  if (!rootEl.value) {
+    return;
+  }
+  // Normalize the cursor position to the -1..+1 range relative to the element center
   const { left, top, width, height } = rootEl.value.getBoundingClientRect();
   rawX.value = ((e.clientX - left) / width - 0.5) * 2;
   rawY.value = ((e.clientY - top) / height - 0.5) * 2;
@@ -95,10 +100,12 @@ function onMouseMove(e: MouseEvent) {
  * @internal
  * @function
  */
-function tick() {
+function tick(): void {
+  // Ease the smoothed mouse values toward the raw values and sample the scroll offset
   smoothX.value = lerpFn(smoothX.value, rawX.value, props.lerp);
   smoothY.value = lerpFn(smoothY.value, rawY.value, props.lerp);
   scrollY.value = window.scrollY;
+  // Re-schedule the loop for the next frame
   raf = requestAnimationFrame(tick);
 }
 
@@ -111,7 +118,7 @@ function tick() {
  * @param sy - The scroll multiplier (i.e. 0.3 moves the layer at 30% of scroll speed); defaults to 0
  * @returns The style object with the computed translate transform
  */
-function layerStyle(mx: number, my: number, sy = 0) {
+function layerStyle(mx: number, my: number, sy = 0): CSSProperties {
   return {
     transform: `translate(${smoothX.value * mx}px, ${smoothY.value * my + scrollY.value * sy}px)`,
   };
@@ -124,13 +131,15 @@ function layerStyle(mx: number, my: number, sy = 0) {
  * @function
  * @returns The style object with the computed transform, opacity, and transition
  */
-function markStyle() {
-  const heroH = import.meta.client ? window.innerHeight * props.heroFraction : 800;
-  const p = Math.min(scrollY.value / heroH, 1);
-  const opacity = 0.02 + p * 0.22;
-  const scale = 0.84 + p * 0.16;
-  const tx = smoothX.value * 68;
-  const ty = smoothY.value * 52 + scrollY.value * -0.4;
+function markStyle(): CSSProperties {
+  // Convert the scroll offset into a clamped 0..1 progress through the hero
+  const heroH: number = import.meta.client ? window.innerHeight * props.heroFraction : 800;
+  const p: number = Math.min(scrollY.value / heroH, 1);
+  // Fade in and scale up with progress while drifting with the lerped mouse position
+  const opacity: number = 0.02 + p * 0.22;
+  const scale: number = 0.84 + p * 0.16;
+  const tx: number = smoothX.value * 68;
+  const ty: number = smoothY.value * 52 + scrollY.value * -0.4;
   return {
     transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
     opacity,
@@ -138,11 +147,12 @@ function markStyle() {
   };
 }
 
-onMounted(() => {
+onMounted((): void => {
+  // Start the per-frame loop and keep the scroll offset fresh between frames
   raf = requestAnimationFrame(tick);
   window.addEventListener(
     'scroll',
-    () => {
+    (): void => {
       scrollY.value = window.scrollY;
     },
     {
@@ -150,7 +160,7 @@ onMounted(() => {
     },
   );
 });
-onUnmounted(() => cancelAnimationFrame(raf));
+onUnmounted((): void => cancelAnimationFrame(raf));
 </script>
 
 <template>

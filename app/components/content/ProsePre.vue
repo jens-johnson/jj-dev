@@ -9,7 +9,7 @@ const props = defineProps<{
   filename?: string;
 }>();
 
-const copied = ref(false);
+const copied: Ref<boolean> = ref(false);
 
 /**
  * A utility method to copy the code block's raw source to the clipboard and flash the copied state for 1.8 seconds;
@@ -17,12 +17,16 @@ const copied = ref(false);
  * @internal
  * @function
  */
-async function copy() {
-  if (!props.code || !import.meta.client) return;
+async function copy(): Promise<void> {
+  // No-op when there is nothing to copy or we are not running in the browser
+  if (!props.code || !import.meta.client) {
+    return;
+  }
   try {
+    // Write the raw source to the clipboard, then flash the copied state for 1.8 seconds
     await navigator.clipboard.writeText(props.code);
     copied.value = true;
-    setTimeout(() => {
+    setTimeout((): void => {
       copied.value = false;
     }, 1800);
   } catch {

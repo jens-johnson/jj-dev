@@ -147,7 +147,7 @@ const cards: IInspirationCard[] = [
  * @function
  * @param t - The theme to activate
  */
-function preview(t: TTheme) {
+function preview(t: TTheme): void {
   setTheme(t);
 }
 </script>

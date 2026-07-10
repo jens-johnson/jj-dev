@@ -29,7 +29,9 @@ import upstashDriver from 'unstorage/drivers/upstash';
 
 export default defineNitroPlugin(() => {
   // Local dev keeps the default in-memory mount so an ingest→read round-trip works without any external service.
-  if (import.meta.dev) return;
+  if (import.meta.dev) {
+    return;
+  }
 
   // Vercel's Upstash integration injects UPSTASH_REDIS_REST_*; JENSCRAFT_* is an explicit override, KV_* a fallback.
   const url = process.env.JENSCRAFT_REDIS_REST_URL ?? process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
@@ -37,7 +39,9 @@ export default defineNitroPlugin(() => {
     process.env.JENSCRAFT_REDIS_REST_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
 
   // No credentials wired yet → leave the default memory mount; the feed simply reads as offline until they exist.
-  if (!url || !token) return;
+  if (!url || !token) {
+    return;
+  }
 
   useStorage().mount(
     'jenscraft',

@@ -19,21 +19,27 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { TTheme } from './types';
+import type { IUseThemeReturn, TTheme } from './types';
 
 // The ordered theme rotation, the localStorage key, and the default applied before any stored preference loads.
 const THEMES: TTheme[] = ['day', 'sunset', 'night'];
-const STORAGE_KEY = 'jj-theme';
+const STORAGE_KEY: string = 'jj-theme';
 const DEFAULT_THEME: TTheme = 'day';
 
 /**
  * A composable exposing the active site theme plus helpers to set, cycle, and initialise it
+ * @public
+ * @function
  * @returns The reactive theme ref, the setter/cycler/initialiser functions, and the ordered theme list
  */
-export function useTheme() {
-  // useState is keyed by 'theme' so it is shared across all callers; it must live inside the function to have
-  // access to the Nuxt instance.
-  const theme = useState<TTheme>('theme', () => DEFAULT_THEME);
+export function useTheme(): IUseThemeReturn {
+  /**
+   * The shared reactive theme; useState keys it by 'theme' so every caller shares one source, and it must live inside
+   * the composable function to have access to the Nuxt instance
+   * @internal
+   * @constant
+   */
+  const theme: Ref<TTheme> = useState<TTheme>('theme', (): TTheme => DEFAULT_THEME);
 
   /**
    * A utility method to apply a theme; sets the shared state, stamps `data-theme` on <html>, and persists the choice
@@ -42,8 +48,11 @@ export function useTheme() {
    * @function
    * @param next - The theme to apply
    */
-  function setTheme(next: TTheme) {
+  function setTheme(next: TTheme): void {
+    // Set the shared state so every caller sees the new theme
     theme.value = next;
+
+    // Stamp the attribute and persist the preference; both are client-only concerns
     if (import.meta.client) {
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem(STORAGE_KEY, next);
@@ -55,9 +64,12 @@ export function useTheme() {
    * @internal
    * @function
    */
-  function cycleTheme() {
-    const currentIndex = THEMES.indexOf(theme.value);
-    const next = THEMES[(currentIndex + 1) % THEMES.length] as TTheme;
+  function cycleTheme(): void {
+    // Find the active theme's position in the rotation
+    const currentIndex: number = THEMES.indexOf(theme.value);
+
+    // Advance one step, wrapping back to the start of the rotation
+    const next: TTheme = THEMES[(currentIndex + 1) % THEMES.length] as TTheme;
     setTheme(next);
   }
 
@@ -67,10 +79,15 @@ export function useTheme() {
    * @internal
    * @function
    */
-  function initTheme() {
-    if (!import.meta.client) return;
-    const stored = localStorage.getItem(STORAGE_KEY) as TTheme | null;
-    const preferred = stored && THEMES.includes(stored) ? stored : DEFAULT_THEME;
+  function initTheme(): void {
+    // Server renders have no persisted preference to read
+    if (!import.meta.client) {
+      return;
+    }
+
+    // Apply the stored preference when it names a known theme; otherwise fall back to the default
+    const stored: TTheme | null = localStorage.getItem(STORAGE_KEY) as TTheme | null;
+    const preferred: TTheme = stored && THEMES.includes(stored) ? stored : DEFAULT_THEME;
     setTheme(preferred);
   }
 

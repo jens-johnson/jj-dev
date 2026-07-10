@@ -22,19 +22,25 @@
  */
 
 import type { ISubstrateDevice } from '~/types/substrate';
+import type { ISubstrateMetricsNode, ISubstrateMetricsView } from '~/types/substrate-metrics';
 
 const props = defineProps<{ devices: ISubstrateDevice[] }>();
 
 const { data, state, cpuSeries, memSeries, updatedLabel } = useSubstrateMetrics();
-const node = computed(() => data.value?.node ?? null);
-const guests = computed(() => data.value?.guests ?? null);
+const node: ComputedRef<ISubstrateMetricsNode | null> = computed(
+  (): ISubstrateMetricsNode | null => data.value?.node ?? null,
+);
+const guests: ComputedRef<ISubstrateMetricsView['guests']> = computed(
+  (): ISubstrateMetricsView['guests'] => data.value?.guests ?? null,
+);
 
-const open = ref(false);
+const open: Ref<boolean> = ref(false);
 
 /* ─── Summary counts (the collapsed surface) ──────────────────────────────────────────────────────────────────────── */
 
-const summary = computed(() => {
-  const l = props.devices;
+const summary: ComputedRef<{ label: string; value: number }[]> = computed((): { label: string; value: number }[] => {
+  // Roll the inventory up into the three collapsed-surface counters
+  const l: ISubstrateDevice[] = props.devices;
   return [
     { label: 'Nodes', value: l.length },
     { label: 'Online', value: l.filter((d) => d.status === 'online').length },
@@ -44,16 +50,18 @@ const summary = computed(() => {
 
 /* ─── Per-device rows, sorted by topology order ───────────────────────────────────────────────────────────────────── */
 
-const rows = computed(() =>
+const rows: ComputedRef<ISubstrateDevice[]> = computed((): ISubstrateDevice[] =>
   [...props.devices].sort((a, b) => (a.order ?? 100) - (b.order ?? 100) || a.title.localeCompare(b.title)),
 );
 
 /** The one device the live feed describes today (the hypervisor); telemetry only renders on its row. */
-const liveId = computed(() => props.devices.find((d) => d.kind === 'hypervisor')?.nodeId ?? null);
-const isLive = (d: ISubstrateDevice) => d.nodeId === liveId.value && state.value !== 'offline' && !!node.value;
+const liveId: ComputedRef<string | null> = computed(
+  (): string | null => props.devices.find((d) => d.kind === 'hypervisor')?.nodeId ?? null,
+);
+const isLive = (d: ISubstrateDevice): boolean => d.nodeId === liveId.value && state.value !== 'offline' && !!node.value;
 
 /** Gauge + sparkline tone: cools to the live accent, warms to terra under pressure. */
-function tone(pct: number) {
+function tone(pct: number): { bar: string; text: string } {
   return pct >= 92
     ? { bar: 'bg-terra-400', text: 'text-terra-400' }
     : { bar: 'bg-accent-secondary', text: 'text-accent-secondary' };

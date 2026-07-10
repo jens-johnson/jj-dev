@@ -29,7 +29,9 @@ import type { RouterConfig } from '@nuxt/schema';
 export default <RouterConfig>{
   scrollBehavior(to, from, savedPosition) {
     // Back/forward navigation; restore the previous scroll position.
-    if (savedPosition) return savedPosition;
+    if (savedPosition) {
+      return savedPosition;
+    }
 
     // Anchor link; scroll to the target with a small offset for the sticky nav.
     if (to.hash) {

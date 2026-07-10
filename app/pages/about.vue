@@ -29,7 +29,7 @@ useSeoMeta({
 
 /* ─── Typewriter ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const TYPEWRITER_WORDS = [
+const TYPEWRITER_WORDS: string[] = [
   'Engineer',
   'Builder',
   'Tinkerer',
@@ -41,10 +41,10 @@ const TYPEWRITER_WORDS = [
   'Sushi Enthusiast',
 ];
 
-const typeText = ref('');
-const typeWordIdx = ref(0);
-const typeIsDeleting = ref(false);
-const typeTimer = ref<ReturnType<typeof setTimeout> | null>(null);
+const typeText: Ref<string> = ref('');
+const typeWordIdx: Ref<number> = ref(0);
+const typeIsDeleting: Ref<boolean> = ref(false);
+const typeTimer: Ref<ReturnType<typeof setTimeout> | null> = ref<ReturnType<typeof setTimeout> | null>(null);
 
 /**
  * Advances the hero typewriter by one character; types the current word out, pauses, deletes it, then moves to the
@@ -52,10 +52,14 @@ const typeTimer = ref<ReturnType<typeof setTimeout> | null>(null);
  * @internal
  * @function
  */
-function typeStep() {
-  const word = TYPEWRITER_WORDS[typeWordIdx.value];
-  if (!word) return;
+function typeStep(): void {
+  // Grab the word currently being typed; bail if the index is somehow out of range
+  const word: string | undefined = TYPEWRITER_WORDS[typeWordIdx.value];
+  if (!word) {
+    return;
+  }
   if (typeIsDeleting.value) {
+    // Delete one character; once the word is empty, advance to the next one and pause before typing resumes
     typeText.value = word.slice(0, typeText.value.length - 1);
     if (typeText.value.length === 0) {
       typeIsDeleting.value = false;
@@ -65,6 +69,7 @@ function typeStep() {
     }
     typeTimer.value = setTimeout(typeStep, 45);
   } else {
+    // Type one character; once the word is complete, dwell on it before deleting
     typeText.value = word.slice(0, typeText.value.length + 1);
     if (typeText.value === word) {
       typeIsDeleting.value = true;
@@ -199,7 +204,7 @@ const experience = [
 
 /* ─── Hero background carousel ───────────────────────────────────────────────────────────────────────────────────── */
 
-const heroBgImages = [
+const heroBgImages: { src: string; alt: string }[] = [
   {
     src: '/images/jens-images/paragliding.jpg',
     alt: 'Paragliding in the Swiss Alps',
@@ -218,8 +223,8 @@ const heroBgImages = [
   },
 ];
 
-const heroBgIdx = ref(0);
-const heroBgFading = ref(false);
+const heroBgIdx: Ref<number> = ref(0);
+const heroBgFading: Ref<boolean> = ref(false);
 let heroBgTimer: ReturnType<typeof setInterval> | null = null;
 
 /**
@@ -227,9 +232,11 @@ let heroBgTimer: ReturnType<typeof setInterval> | null = null;
  * @internal
  * @function
  */
-function advanceHeroBg() {
+function advanceHeroBg(): void {
+  // Start the cross-fade out
   heroBgFading.value = true;
-  setTimeout(() => {
+  // Once the fade lands, swap to the next image and fade back in
+  setTimeout((): void => {
     heroBgIdx.value = (heroBgIdx.value + 1) % heroBgImages.length;
     heroBgFading.value = false;
   }, 1000);
@@ -237,18 +244,25 @@ function advanceHeroBg() {
 
 /* ─── Entrance animation ──────────────────────────────────────────────────────────────────────────────────────────── */
 
-const revealed = ref(false);
-onMounted(() => {
-  setTimeout(() => {
+const revealed: Ref<boolean> = ref(false);
+onMounted((): void => {
+  // Reveal the page content just after mount so the entrance transitions play
+  setTimeout((): void => {
     revealed.value = true;
   }, 80);
+  // Kick off the typewriter and the background carousel on their own cadences
   typeTimer.value = setTimeout(typeStep, 900);
   heroBgTimer = setInterval(advanceHeroBg, 5500);
 });
 
-onUnmounted(() => {
-  if (typeTimer.value) clearTimeout(typeTimer.value);
-  if (heroBgTimer) clearInterval(heroBgTimer);
+onUnmounted((): void => {
+  // Tear both timers down so they cannot fire after the page unmounts
+  if (typeTimer.value) {
+    clearTimeout(typeTimer.value);
+  }
+  if (heroBgTimer) {
+    clearInterval(heroBgTimer);
+  }
 });
 </script>
 

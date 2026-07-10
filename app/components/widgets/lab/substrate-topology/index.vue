@@ -28,6 +28,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import type { CSSProperties } from 'vue';
+
 import type { ISubstrateDevice } from '~/types/substrate';
 
 const props = defineProps<{ devices: ISubstrateDevice[] }>();
@@ -37,10 +39,10 @@ const selectedId = defineModel<string | null>('selectedId', { default: null });
 
 /* ─── Interaction state ───────────────────────────────────────────────────────────────────────────────────────────── */
 
-const hoveredId = ref<string | null>(null);
+const hoveredId: Ref<string | null> = ref<string | null>(null);
 
 /** Hover wins over selection for the spotlight, so the diagram feels responsive before you commit a click. */
-const activeId = computed(() => hoveredId.value ?? selectedId.value);
+const activeId: ComputedRef<string | null> = computed((): string | null => hoveredId.value ?? selectedId.value);
 
 /* ─── Layout ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -48,32 +50,38 @@ const activeId = computed(() => hoveredId.value ?? selectedId.value);
 const LAYER_ORDER = ['edge', 'network', 'compute', 'storage', 'service', 'client', 'power'] as const;
 
 /** Fixed SVG coordinate space. HTML nodes map onto it by percentage. */
-const VB = { w: 1000, h: 620 };
-const PAD = { top: 64, bottom: 64 };
+const VB: { w: number; h: number } = { w: 1000, h: 620 };
+const PAD: { top: number; bottom: number } = { top: 64, bottom: 64 };
 
 /** Only render bands that actually contain a device. */
-const activeLayers = computed(() => LAYER_ORDER.filter((l) => props.devices.some((d) => d.layer === l)));
+const activeLayers: ComputedRef<(typeof LAYER_ORDER)[number][]> = computed((): (typeof LAYER_ORDER)[number][] =>
+  LAYER_ORDER.filter((l) => props.devices.some((d) => d.layer === l)),
+);
 
 /** id → centre point in viewBox units. */
-const layout = computed(() => {
-  const map = new Map<string, { x: number; y: number }>();
-  const rows = activeLayers.value;
-  const usableH = VB.h - PAD.top - PAD.bottom;
-  const rowGap = rows.length > 1 ? usableH / (rows.length - 1) : 0;
+const layout: ComputedRef<Map<string, { x: number; y: number }>> = computed(
+  (): Map<string, { x: number; y: number }> => {
+    // Derive the vertical spacing from the number of populated bands
+    const map: Map<string, { x: number; y: number }> = new Map<string, { x: number; y: number }>();
+    const rows: (typeof LAYER_ORDER)[number][] = activeLayers.value;
+    const usableH: number = VB.h - PAD.top - PAD.bottom;
+    const rowGap: number = rows.length > 1 ? usableH / (rows.length - 1) : 0;
 
-  rows.forEach((layer, ri) => {
-    const y = rows.length > 1 ? PAD.top + ri * rowGap : VB.h / 2;
-    const inRow = props.devices
-      .filter((d) => d.layer === layer)
-      .sort((a, b) => (a.order ?? 100) - (b.order ?? 100) || a.title.localeCompare(b.title));
+    rows.forEach((layer, ri) => {
+      // Place each band's devices in a stable order, spread evenly across the row width
+      const y: number = rows.length > 1 ? PAD.top + ri * rowGap : VB.h / 2;
+      const inRow: ISubstrateDevice[] = props.devices
+        .filter((d) => d.layer === layer)
+        .sort((a, b) => (a.order ?? 100) - (b.order ?? 100) || a.title.localeCompare(b.title));
 
-    inRow.forEach((d, ci) => {
-      map.set(d.nodeId, { x: (VB.w * (ci + 1)) / (inRow.length + 1), y });
+      inRow.forEach((d, ci) => {
+        map.set(d.nodeId, { x: (VB.w * (ci + 1)) / (inRow.length + 1), y });
+      });
     });
-  });
 
-  return map;
-});
+    return map;
+  },
+);
 
 /**
  * A drawable wire between two placed nodes, flattened from the device connection lists
@@ -88,11 +96,14 @@ interface IEdge {
 }
 
 /** Flatten every device's connections into drawable edges, dropping any that reference a missing node. */
-const edges = computed<IEdge[]>(() => {
+const edges: ComputedRef<IEdge[]> = computed((): IEdge[] => {
+  // Walk every device's connection list, skipping wires whose endpoints were never placed
   const out: IEdge[] = [];
   for (const d of props.devices) {
     for (const c of d.connections ?? []) {
-      if (!layout.value.has(d.nodeId) || !layout.value.has(c.to)) continue;
+      if (!layout.value.has(d.nodeId) || !layout.value.has(c.to)) {
+        continue;
+      }
       out.push({
         from: d.nodeId,
         to: c.to,
@@ -106,43 +117,59 @@ const edges = computed<IEdge[]>(() => {
 
 /** Cubic-bezier wire between two node centres; eases along x when near-horizontal, along y otherwise. */
 function edgePath(e: IEdge): string {
-  const a = layout.value.get(e.from);
-  const b = layout.value.get(e.to);
-  if (!a || !b) return '';
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
+  // Resolve both endpoints; an unplaced endpoint yields no path
+  const a: { x: number; y: number } | undefined = layout.value.get(e.from);
+  const b: { x: number; y: number } | undefined = layout.value.get(e.to);
+  if (!a || !b) {
+    return '';
+  }
+  const dx: number = b.x - a.x;
+  const dy: number = b.y - a.y;
 
+  // Near-horizontal wires ease along x; everything else eases along y
   if (Math.abs(dy) < 60) {
     return `M ${a.x} ${a.y} C ${a.x + dx * 0.4} ${a.y}, ${b.x - dx * 0.4} ${b.y}, ${b.x} ${b.y}`;
   }
-  const k = Math.abs(dy) * 0.5 * (dy > 0 ? 1 : -1);
+  const k: number = Math.abs(dy) * 0.5 * (dy > 0 ? 1 : -1);
   return `M ${a.x} ${a.y} C ${a.x} ${a.y + k}, ${b.x} ${b.y - k}, ${b.x} ${b.y}`;
 }
 
 /** Absolute-position style for a node card, centred on its layout point. */
-function nodeStyle(id: string) {
-  const p = layout.value.get(id);
-  if (!p) return {};
+function nodeStyle(id: string): CSSProperties {
+  // Resolve the node's layout point; an unplaced node gets no positioning
+  const p: { x: number; y: number } | undefined = layout.value.get(id);
+  if (!p) {
+    return {};
+  }
+  // Convert viewBox units to percentages so the HTML card tracks the SVG wires at any scale
   return { left: `${(p.x / VB.w) * 100}%`, top: `${(p.y / VB.h) * 100}%` };
 }
 
 /* ─── Spotlight ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /** Ids directly wired to the active node (either direction). */
-const connectedIds = computed(() => {
-  const set = new Set<string>();
-  const id = activeId.value;
-  if (!id) return set;
+const connectedIds: ComputedRef<Set<string>> = computed((): Set<string> => {
+  // Nothing is spotlighted when no node is active
+  const set: Set<string> = new Set<string>();
+  const id: string | null = activeId.value;
+  if (!id) {
+    return set;
+  }
+  // Collect the far end of every edge touching the active node
   for (const e of edges.value) {
-    if (e.from === id) set.add(e.to);
-    if (e.to === id) set.add(e.from);
+    if (e.from === id) {
+      set.add(e.to);
+    }
+    if (e.to === id) {
+      set.add(e.from);
+    }
   }
   return set;
 });
 
-const edgeActive = (e: IEdge) => !!activeId.value && (e.from === activeId.value || e.to === activeId.value);
-const edgeDimmed = (e: IEdge) => !!activeId.value && !edgeActive(e);
-const nodeDimmed = (id: string) => !!activeId.value && id !== activeId.value && !connectedIds.value.has(id);
+const edgeActive = (e: IEdge): boolean => !!activeId.value && (e.from === activeId.value || e.to === activeId.value);
+const edgeDimmed = (e: IEdge): boolean => !!activeId.value && !edgeActive(e);
+const nodeDimmed = (id: string): boolean => !!activeId.value && id !== activeId.value && !connectedIds.value.has(id);
 
 /* ─── Visual maps ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -165,7 +192,7 @@ const EDGE_BASE: Record<string, string> = {
  * @param e - The edge being drawn
  * @returns The Tailwind stroke class for the static wire
  */
-function edgeBaseClass(e: IEdge) {
+function edgeBaseClass(e: IEdge): string {
   return edgeActive(e) ? STROKE_ACCENT : (EDGE_BASE[e.kind] ?? STROKE_MUTED);
 }
 /**
@@ -176,9 +203,14 @@ function edgeBaseClass(e: IEdge) {
  * @param e - The edge being drawn
  * @returns The Tailwind opacity class for the static wire
  */
-function edgeBaseOpacity(e: IEdge) {
-  if (edgeActive(e)) return 'opacity-100';
-  if (edgeDimmed(e)) return 'opacity-10';
+function edgeBaseOpacity(e: IEdge): string {
+  // Spotlighted and dimmed states win before the resting per-kind level applies
+  if (edgeActive(e)) {
+    return 'opacity-100';
+  }
+  if (edgeDimmed(e)) {
+    return 'opacity-10';
+  }
   return e.kind === 'power' ? 'opacity-25' : 'opacity-60';
 }
 /**
@@ -188,7 +220,7 @@ function edgeBaseOpacity(e: IEdge) {
  * @param e - The edge being drawn
  * @returns The Tailwind stroke class for the flow dashes
  */
-function edgeFlowClass(e: IEdge) {
+function edgeFlowClass(e: IEdge): string {
   return edgeActive(e) ? STROKE_ACCENT : e.kind === 'data' ? STROKE_DATA : STROKE_ACCENT;
 }
 
@@ -196,7 +228,7 @@ function edgeFlowClass(e: IEdge) {
 // shared with the inspector panel so a node looks identical wherever it appears.
 
 /** Toggle selection; clicking the selected node again clears the inspector. */
-function toggle(id: string) {
+function toggle(id: string): void {
   selectedId.value = selectedId.value === id ? null : id;
 }
 </script>

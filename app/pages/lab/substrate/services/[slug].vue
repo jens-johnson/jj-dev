@@ -46,7 +46,9 @@ const service = computed(() => normalizeServices(services.value ?? []).find((s) 
 const { data: devices } = await useAsyncData('services-host-devices', () => queryCollection('substrate').all());
 const hostTitle = computed(() => {
   const id = service.value?.host;
-  if (!id) return null;
+  if (!id) {
+    return null;
+  }
   return (devices.value ?? []).find((d) => d.nodeId === id)?.title ?? id;
 });
 
@@ -86,30 +88,38 @@ const linkItems = computed(() =>
 /* ─── Plugins (split server / client) ─────────────────────────────────────────────────────────────────────────────── */
 
 /** Distinct plugin categories (for the filter bar), sorted, derived from whatever the service actually declares. */
-const pluginCategories = computed<string[]>(() => {
+const pluginCategories: ComputedRef<string[]> = computed((): string[] => {
+  // Collect the distinct categories across the declared plugins, then sort them for a stable filter bar
   const set = new Set<string>();
-  for (const p of service.value?.plugins ?? []) set.add(p.category);
+  for (const p of service.value?.plugins ?? []) {
+    set.add(p.category);
+  }
   return Array.from(set).sort();
 });
 
 /** Active category filter; null = show all. Clicking a chip filters the list; clicking it again (or "All") resets. */
-const activeCategory = ref<string | null>(null);
+const activeCategory: Ref<string | null> = ref<string | null>(null);
 /**
  * Toggles the active plugin-category filter; clicking the already-active chip clears the filter back to "all"
  * @internal
  * @function
  * @param category - The category chip that was clicked
  */
-function toggleCategory(category: string) {
+function toggleCategory(category: string): void {
+  // Clicking the active chip clears the filter; any other chip becomes the new filter
   activeCategory.value = activeCategory.value === category ? null : category;
 }
 
-const visiblePlugins = computed<IServicePlugin[]>(() =>
+const visiblePlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
   (service.value?.plugins ?? []).filter((p) => !activeCategory.value || p.category === activeCategory.value),
 );
 
-const serverPlugins = computed<IServicePlugin[]>(() => visiblePlugins.value.filter((p) => p.side === 'server'));
-const clientPlugins = computed<IServicePlugin[]>(() => visiblePlugins.value.filter((p) => p.side === 'client'));
+const serverPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
+  visiblePlugins.value.filter((p) => p.side === 'server'),
+);
+const clientPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
+  visiblePlugins.value.filter((p) => p.side === 'client'),
+);
 
 /* ─── Body ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 

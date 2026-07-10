@@ -98,8 +98,12 @@ export function buildTcx(activity: ITcxSourceActivity, streams: TTcxStreams, ele
         `<AltitudeMeters>${altitude.toFixed(2)}</AltitudeMeters>`,
         `<DistanceMeters>${distance.toFixed(2)}</DistanceMeters>`,
       ];
-      if (heartRate) parts.push(`<HeartRateBpm><Value>${Math.round(heartRate)}</Value></HeartRateBpm>`);
-      if (cadence) parts.push(`<Cadence>${Math.round(cadence)}</Cadence>`);
+      if (heartRate) {
+        parts.push(`<HeartRateBpm><Value>${Math.round(heartRate)}</Value></HeartRateBpm>`);
+      }
+      if (cadence) {
+        parts.push(`<Cadence>${Math.round(cadence)}</Cadence>`);
+      }
       parts.push('</Trackpoint>');
 
       return parts.join('');

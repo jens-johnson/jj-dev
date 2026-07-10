@@ -45,18 +45,30 @@ const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object
  * @returns An ok result with the clean value, or `{ ok: false }` on any shape/range violation
  */
 export function validateMetricsPayload(input: unknown): { ok: true; value: ISubstrateMetricsPayload } | { ok: false } {
-  if (!isObj(input) || !isNum(input.v) || typeof input.ts !== 'string' || input.ts.length > 40) return { ok: false };
+  if (!isObj(input) || !isNum(input.v) || typeof input.ts !== 'string' || input.ts.length > 40) {
+    return { ok: false };
+  }
 
   const node = input.node;
   const guests = input.guests;
-  if (!isObj(node) || !isObj(guests)) return { ok: false };
+  if (!isObj(node) || !isObj(guests)) {
+    return { ok: false };
+  }
 
   const mem = node.mem;
   const la = node.loadAvg;
-  if (!isObj(mem) || !Array.isArray(la) || la.length !== 3 || !la.every(isNum)) return { ok: false };
-  if (!isNum(node.uptimeSec) || node.uptimeSec < 0 || !isPct(node.cpuPct)) return { ok: false };
-  if (!isPct(mem.usedPct) || !isNum(mem.totalGiB) || mem.totalGiB <= 0) return { ok: false };
-  if (!isCount(guests.vms) || !isCount(guests.cts) || !isCount(guests.running)) return { ok: false };
+  if (!isObj(mem) || !Array.isArray(la) || la.length !== 3 || !la.every(isNum)) {
+    return { ok: false };
+  }
+  if (!isNum(node.uptimeSec) || node.uptimeSec < 0 || !isPct(node.cpuPct)) {
+    return { ok: false };
+  }
+  if (!isPct(mem.usedPct) || !isNum(mem.totalGiB) || mem.totalGiB <= 0) {
+    return { ok: false };
+  }
+  if (!isCount(guests.vms) || !isCount(guests.cts) || !isCount(guests.running)) {
+    return { ok: false };
+  }
 
   const value: ISubstrateMetricsPayload = {
     v: input.v,
@@ -74,8 +86,12 @@ export function validateMetricsPayload(input: unknown): { ok: true; value: ISubs
     },
   };
 
-  if (isObj(node.swap) && isPct(node.swap.usedPct)) value.node.swap = { usedPct: node.swap.usedPct };
-  if (isObj(input.storage) && isPct(input.storage.usedPct)) value.storage = { usedPct: input.storage.usedPct };
+  if (isObj(node.swap) && isPct(node.swap.usedPct)) {
+    value.node.swap = { usedPct: node.swap.usedPct };
+  }
+  if (isObj(input.storage) && isPct(input.storage.usedPct)) {
+    value.storage = { usedPct: input.storage.usedPct };
+  }
 
   const net = input.internet;
   if (isObj(net) && typeof net.reachable === 'boolean') {

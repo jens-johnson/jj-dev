@@ -36,7 +36,7 @@ const {
   retry,
 } = useVertifixUpload();
 
-const dragging = ref(false);
+const dragging: Ref<boolean> = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 
 const steps = ['Identify run', 'Replace on Strava', 'Done'] as const;
@@ -61,8 +61,13 @@ const STATUS_LABEL: Record<TVertifixStatus, string> = {
  * @returns The zero-based index of the stepper stage the status belongs to
  */
 function stageOf(status: TVertifixStatus): number {
-  if (status === 'done') return 2;
-  if (status === 'prepared' || status === 'committing') return 1;
+  // Work backwards from the terminal state; everything before "prepared" is still identifying the run
+  if (status === 'done') {
+    return 2;
+  }
+  if (status === 'prepared' || status === 'committing') {
+    return 1;
+  }
   return 0;
 }
 
@@ -74,16 +79,23 @@ function stageOf(status: TVertifixStatus): number {
  * @returns The Tailwind background/text classes for the status badge
  */
 function statusClass(status: TVertifixStatus): string {
-  if (status === 'done') return 'bg-accent-secondary/15 text-accent-secondary';
-  if (status === 'error') return 'bg-terra-600/15 text-terra-600';
-  if (status === 'prepared') return 'bg-accent/10 text-accent';
+  // Match the badge tone to the status severity, falling back to the neutral surface
+  if (status === 'done') {
+    return 'bg-accent-secondary/15 text-accent-secondary';
+  }
+  if (status === 'error') {
+    return 'bg-terra-600/15 text-terra-600';
+  }
+  if (status === 'prepared') {
+    return 'bg-accent/10 text-accent';
+  }
   return 'bg-surface text-ink-subtle';
 }
 
 /* ─── Formatters ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const milesFmt = (metres: number) => `${(metres / 1609.344).toFixed(2)} mi`;
-const feet = (metres: number) => `${Math.round(metres * 3.28084).toLocaleString()} ft`;
+const milesFmt = (metres: number): string => `${(metres / 1609.344).toFixed(2)} mi`;
+const feet = (metres: number): string => `${Math.round(metres * 3.28084).toLocaleString()} ft`;
 
 /**
  * A utility method to format a duration in seconds as hours and minutes (i.e. `1h 24m`, or `42m` under an hour)
@@ -93,8 +105,9 @@ const feet = (metres: number) => `${Math.round(metres * 3.28084).toLocaleString(
  * @returns The human-readable duration string
  */
 function duration(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.round((seconds % 3600) / 60);
+  // Split the duration into whole hours and remaining minutes
+  const h: number = Math.floor(seconds / 3600);
+  const m: number = Math.round((seconds % 3600) / 60);
   return h ? `${h}h ${m}m` : `${m}m`;
 }
 
@@ -119,9 +132,12 @@ function dateTime(iso: string): string {
  * @returns The datetime-local input value, or an empty string when the timestamp is null
  */
 function toLocalInput(iso: string | null): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
+  if (!iso) {
+    return '';
+  }
+  // Rebuild the timestamp from its local date parts, zero-padded to the input's expected shape
+  const d: Date = new Date(iso);
+  const pad = (n: number): string => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
@@ -133,8 +149,11 @@ function toLocalInput(iso: string | null): string {
  * @returns The ISO timestamp, or null when the value is empty or unparsable
  */
 function fromLocalInput(value: string): string | null {
-  if (!value) return null;
-  const d = new Date(value);
+  if (!value) {
+    return null;
+  }
+  // Parse the local value and reject anything the Date constructor could not make sense of
+  const d: Date = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
 
@@ -146,9 +165,12 @@ function fromLocalInput(value: string): string | null {
  * @function
  * @param event - The triggering drag event
  */
-function onDrop(event: DragEvent) {
+function onDrop(event: DragEvent): void {
+  // Clear the drag highlight, then hand any dropped files to the upload composable
   dragging.value = false;
-  if (event.dataTransfer?.files?.length) addFiles(event.dataTransfer.files);
+  if (event.dataTransfer?.files?.length) {
+    addFiles(event.dataTransfer.files);
+  }
 }
 
 /**
@@ -158,9 +180,13 @@ function onDrop(event: DragEvent) {
  * @function
  * @param event - The triggering change event from the file input
  */
-function onPick(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (input.files?.length) addFiles(input.files);
+function onPick(event: Event): void {
+  // Add the chosen files to the queue
+  const input: HTMLInputElement = event.target as HTMLInputElement;
+  if (input.files?.length) {
+    addFiles(input.files);
+  }
+  // Reset the input so re-picking the same file fires another change event
   input.value = '';
 }
 
@@ -171,7 +197,7 @@ function onPick(event: Event) {
  * @param id - The unique id of the item being edited
  * @param event - The triggering change event from the datetime-local input
  */
-function onCapturedAt(id: string, event: Event) {
+function onCapturedAt(id: string, event: Event): void {
   setCapturedAt(id, fromLocalInput((event.target as HTMLInputElement).value));
 }
 
@@ -183,8 +209,9 @@ function onCapturedAt(id: string, event: Event) {
  * @param id - The unique id of the item being edited
  * @param event - The triggering input event from the number field
  */
-function onElevation(id: string, event: Event) {
-  const value = (event.target as HTMLInputElement).value;
+function onElevation(id: string, event: Event): void {
+  // Store the numeric value, treating an empty field as cleared
+  const value: string = (event.target as HTMLInputElement).value;
   setElevation(id, value === '' ? null : Number(value));
 }
 
