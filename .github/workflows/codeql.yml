@@ -19,12 +19,12 @@
 
 name: 🔐 CodeQL
 
-# Run on pushes + PRs to main, 06:00 UTC every Monday
+# Run on pushes + PRs to main and staging, 06:00 UTC every Monday
 on:
   push:
-    branches: [main]
+    branches: [main, staging]
   pull_request:
-    branches: [main]
+    branches: [main, staging]
   schedule:
     - cron: '0 6 * * 1'
 

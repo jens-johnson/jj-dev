@@ -13,19 +13,19 @@
 # █████████████████████████████████████████████ .github/workflows/ci.yml ██████████████████████████████████████████████
 #
 # Continuous integration GitHub action; runs lint (eslint + prettier + stylelint), typecheck, and test, then build.
-# Runs on every PR targeting main and on pushes to main; mirrors the local `pnpm check` gate. Vercel handles deploys
+# Runs on PRs and pushes targeting main and staging; mirrors the local `pnpm check` gate. Vercel handles deploys
 # via its GitHub integration; no deploy step needed here.
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
 name: 🔀 CI
 
-# Run on pushes + PRs to main
+# Run on pushes + PRs to main and staging (feature PRs target staging; the promotion PR targets main)
 on:
   push:
-    branches: [main]
+    branches: [main, staging]
   pull_request:
-    branches: [main]
+    branches: [main, staging]
   workflow_dispatch:
 
 # Cancel in-flight runs for the same PR if a new commit lands.
