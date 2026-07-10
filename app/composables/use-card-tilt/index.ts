@@ -18,8 +18,5 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import { useCardTilt } from './composable';
-
-export { useCardTilt };
-export default useCardTilt;
+export * from './composable';
 export * from './types';

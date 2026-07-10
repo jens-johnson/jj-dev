@@ -73,7 +73,7 @@
     "vue-router": "^5.0.6"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.0.1",
+    "@commitlint/cli": "^21.2.1",
     "@jens-johnson/style-guide": "github:jens-johnson/jens-johnson#v0.3.1",
     "@nuxt/content": "^3.14.0",
     "@nuxt/eslint": "latest",

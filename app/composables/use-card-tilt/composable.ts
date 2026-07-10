@@ -166,6 +166,3 @@ export function useCardTilt(options: ICardTiltOptions = {}): IUseCardTiltReturn 
     onMouseLeave,
   };
 }
-
-// Default export
-export default useCardTilt;
