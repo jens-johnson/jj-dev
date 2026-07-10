@@ -77,7 +77,12 @@ header line with `# ` (or just `#` for empty logo lines):
 **Rules:**
 
 - The filename in the banner uses the path from the project root (e.g. `.editorconfig`) OR the
-  Nuxt alias-prefixed path for app source files (e.g. `#pages/index.vue`, `#components/layout/app-nav/index.vue`).
+  alias-prefixed path for Nuxt source files: `#pages/...`, `#components/...`, `#composables/...`, `#utils/...` for
+  app files and `#server/...` for everything under `server/` (e.g. `#server/api/lab/vertifix/commit.post.ts`).
+- API handlers (`server/api/**`, `server/routes/**`) use the generator's `api` kind and document their full
+  request/response contract: USAGE (method + route), AUTH, PARAMS, QUERY, BODY, RETURNS, THROWS
+  (`<status> when <condition>`), and SIDE EFFECTS. Regenerate via `pnpm header --spec <json> --write` whenever the
+  contract changes; `server/api/lab/vertifix/commit.post.ts` is the exemplar.
 - USAGE and SEE sections are optional; omit if not needed.
 - 120-char line limit applies to description and section content lines (the `█` separator lines
   are a fixed-width design element and may exceed 120).
