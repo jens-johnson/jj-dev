@@ -11,7 +11,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████████████████ server/utils/strava/utils.ts ████████████████████████████████████████████
+ * ███████████████████████████████████████████ #server/utils/strava/utils.ts ███████████████████████████████████████████
  *
  * Reusable, server-only Strava client for the Vertifix lab feature. Exchanges the env refresh token for a short-lived
  * access token (cached on the warm instance), then exposes the activity reads, multipart TCX upload, status polling,

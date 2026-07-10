@@ -11,7 +11,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████████████ server/utils/jenscraft-metrics/types.ts ██████████████████████████████████████
+ * █████████████████████████████████████ #server/utils/jenscraft-metrics/types.ts ██████████████████████████████████████
  *
  * Type definitions for the Jenscraft live-metrics server payload and storage record.
  *

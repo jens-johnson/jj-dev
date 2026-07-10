@@ -11,7 +11,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████████████████████████ server/utils/tcx/utils.ts █████████████████████████████████████████████
+ * ████████████████████████████████████████████ #server/utils/tcx/utils.ts █████████████████████████████████████████████
  *
  * Pure builder that re-renders a Strava activity as a Garmin TCX file with a corrected elevation gain, preserving the
  * original time, distance, heart-rate, and cadence streams. Treadmill runs sync to Strava with zero vertical gain;
