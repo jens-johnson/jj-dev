@@ -11,55 +11,27 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████████████████████████ commitlint.config.js ██████████████████████████████████████████████████
+ * ████████████████████████████████████████████████ prettier.config.mjs ████████████████████████████████████████████████
  *
- * The commitlint configuration for this project: the shared @jens-johnson/style-guide factory with jj-dev's scope
- * enum. Runs as a commit-msg hook and enforces `type(scope): subject` (Conventional Commits, lowercase subjects).
+ * Prettier config: the shared @jens-johnson/style-guide baseline plus the Tailwind class-sorting plugin (a Nuxt +
+ * Tailwind repo needs the plugin locally, so the shared JSON is spread rather than referenced).
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • https://conventionalcommits.org
- * • https://github.com/jens-johnson/jens-johnson/blob/main/docs/style-guide/conventions/git-workflow.md
+ * • https://github.com/jens-johnson/jens-johnson/blob/main/docs/style-guide/conventions/formatting.md
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import { createCommitlintConfig } from '@jens-johnson/style-guide/commitlint';
+import styleGuidePrettierConfig from '@jens-johnson/style-guide/prettier' with { type: 'json' };
 
 /**
- * The commitlint configuration for this project
+ * This project's Prettier config: the shared baseline with Tailwind class sorting layered on
  * @public
  * @default
  * @constant
  */
-export default createCommitlintConfig({
-  scopes: [
-    'app',
-    'assets',
-    'auth',
-    'blog',
-    'ci',
-    'components',
-    'composables',
-    'config',
-    'content',
-    'deps',
-    'design',
-    'docs',
-    'eslint',
-    'lab',
-    'layouts',
-    'pages',
-    'projects',
-    'public',
-    'release',
-    'server',
-    'seo',
-    'styles',
-    'tailwind',
-    'tests',
-    'types',
-    'uses',
-    'work',
-  ],
-});
+export default {
+  ...styleGuidePrettierConfig,
+  plugins: ['prettier-plugin-tailwindcss'],
+};
