@@ -43,8 +43,8 @@ importers:
         specifier: ^21.0.1
         version: 21.0.2(@types/node@25.9.3)(conventional-commits-parser@6.4.0)(typescript@6.0.3)
       '@jens-johnson/style-guide':
-        specifier: github:jens-johnson/jens-johnson#v0.3.0
-        version: https://codeload.github.com/jens-johnson/jens-johnson/tar.gz/8554ebd96d40cd4149c39c4835ce5968e3c8016b(@typescript-eslint/utils@8.63.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(postcss-html@1.8.1)(prettier@3.8.4)(stylelint@17.13.0(typescript@6.0.3))(typescript@6.0.3)
+        specifier: github:jens-johnson/jens-johnson#v0.3.1
+        version: https://codeload.github.com/jens-johnson/jens-johnson/tar.gz/2c247a11fa5cb43b3a5a3d71c423ce533b747b46(@typescript-eslint/utils@8.63.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(postcss-html@1.8.1)(prettier@3.8.4)(stylelint@17.13.0(typescript@6.0.3))(typescript@6.0.3)
       '@nuxt/content':
         specifier: ^3.14.0
         version: 3.14.0(@valibot/to-json-schema@1.7.1(valibot@1.4.1(typescript@6.0.3)))(better-sqlite3@12.10.0)(magicast@0.5.3)(valibot@1.4.1(typescript@6.0.3))
@@ -98,7 +98,7 @@ importers:
         version: 10.5.0(jiti@2.7.0)
       eslint-plugin-vue:
         specifier: ^10.8.0
-        version: 10.9.2(@stylistic/eslint-plugin@5.10.0(eslint@10.5.0(jiti@2.7.0)))(@typescript-eslint/parser@8.63.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(vue-eslint-parser@10.4.1(eslint@10.5.0(jiti@2.7.0)))
+        version: 10.9.2(@stylistic/eslint-plugin@5.10.0(eslint@10.5.0(jiti@2.7.0)))(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(vue-eslint-parser@10.4.1(eslint@10.5.0(jiti@2.7.0)))
       globals:
         specifier: ^17.4.0
         version: 17.6.0
@@ -1126,9 +1126,9 @@ packages:
     resolution: {integrity: sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w==}
     engines: {node: '>=18.0.0'}
 
-  '@jens-johnson/style-guide@https://codeload.github.com/jens-johnson/jens-johnson/tar.gz/8554ebd96d40cd4149c39c4835ce5968e3c8016b':
-    resolution: {tarball: https://codeload.github.com/jens-johnson/jens-johnson/tar.gz/8554ebd96d40cd4149c39c4835ce5968e3c8016b}
-    version: 0.3.0
+  '@jens-johnson/style-guide@https://codeload.github.com/jens-johnson/jens-johnson/tar.gz/2c247a11fa5cb43b3a5a3d71c423ce533b747b46':
+    resolution: {tarball: https://codeload.github.com/jens-johnson/jens-johnson/tar.gz/2c247a11fa5cb43b3a5a3d71c423ce533b747b46}
+    version: 0.3.1
     engines: {node: '>=20'}
     hasBin: true
     peerDependencies:
@@ -8825,7 +8825,7 @@ snapshots:
     dependencies:
       minipass: 7.1.3
 
-  '@jens-johnson/style-guide@https://codeload.github.com/jens-johnson/jens-johnson/tar.gz/8554ebd96d40cd4149c39c4835ce5968e3c8016b(@typescript-eslint/utils@8.63.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(postcss-html@1.8.1)(prettier@3.8.4)(stylelint@17.13.0(typescript@6.0.3))(typescript@6.0.3)':
+  '@jens-johnson/style-guide@https://codeload.github.com/jens-johnson/jens-johnson/tar.gz/2c247a11fa5cb43b3a5a3d71c423ce533b747b46(@typescript-eslint/utils@8.63.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(postcss-html@1.8.1)(prettier@3.8.4)(stylelint@17.13.0(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
       '@commitlint/config-conventional': 21.2.0
       '@eslint/js': 9.39.4
@@ -12533,20 +12533,6 @@ snapshots:
     optionalDependencies:
       '@stylistic/eslint-plugin': 5.10.0(eslint@10.5.0(jiti@2.7.0))
       '@typescript-eslint/parser': 8.61.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3)
-
-  eslint-plugin-vue@10.9.2(@stylistic/eslint-plugin@5.10.0(eslint@10.5.0(jiti@2.7.0)))(@typescript-eslint/parser@8.63.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(vue-eslint-parser@10.4.1(eslint@10.5.0(jiti@2.7.0))):
-    dependencies:
-      '@eslint-community/eslint-utils': 4.9.1(eslint@10.5.0(jiti@2.7.0))
-      eslint: 10.5.0(jiti@2.7.0)
-      natural-compare: 1.4.0
-      nth-check: 2.1.1
-      postcss-selector-parser: 7.1.1
-      semver: 7.8.1
-      vue-eslint-parser: 10.4.1(eslint@10.5.0(jiti@2.7.0))
-      xml-name-validator: 4.0.0
-    optionalDependencies:
-      '@stylistic/eslint-plugin': 5.10.0(eslint@10.5.0(jiti@2.7.0))
-      '@typescript-eslint/parser': 8.63.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3)
 
   eslint-processor-vue-blocks@2.0.0(@vue/compiler-sfc@3.5.38)(eslint@10.5.0(jiti@2.7.0)):
     dependencies:
