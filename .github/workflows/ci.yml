@@ -12,9 +12,9 @@
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 # █████████████████████████████████████████████ .github/workflows/ci.yml ██████████████████████████████████████████████
 #
-# Continuous integration GitHub action; runs lint (eslint + prettier + stylelint), typecheck, and build. Runs on every
-# PR targeting main and on pushes to main. Cheap gates (lint, typecheck) run in parallel; build runs after both pass.
-# Vercel handles deploys via its GitHub integration; no deploy step needed here.
+# Continuous integration GitHub action; runs lint (eslint + prettier + stylelint), typecheck, and test, then build.
+# Runs on every PR targeting main and on pushes to main; mirrors the local `pnpm check` gate. Vercel handles deploys
+# via its GitHub integration; no deploy step needed here.
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
@@ -39,9 +39,9 @@ env:
 
 # Jobs to be run
 jobs:
-  # Lint and Typecheck project files
+  # Lint, typecheck, and test project files
   lint:
-    name: 🧹☑️ Lint & Typecheck
+    name: 🧹☑️ Lint, Typecheck & Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -55,6 +55,8 @@ jobs:
         run: pnpm lint
       - name: ☑️ Typecheck
         run: pnpm typecheck
+      - name: 🧪 Test (vitest)
+        run: pnpm test
 
   # Build the project with Nuxt
   build:
