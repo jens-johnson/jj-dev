@@ -12,25 +12,27 @@
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 # ████████████████████████████████████████████ .github/workflows/codeql.yml ███████████████████████████████████████████
 #
-# CodeQL; GitHub-native static analysis. Findings land in the Security tab. Runs on PRs (changed files only; fast)
-# and on a weekly schedule (full sweep).
+# CodeQL workflow to perform GitHub-native static analysis. Findings land in the Security tab. Runs on PRs (changed
+# files only; fast) and on a weekly schedule (full sweep).
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
-name: CodeQL
+name: 🔐 CodeQL
 
+# Run on pushes + PRs to main, 06:00 UTC every Monday
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
   schedule:
-    # Mondays at 06:00 UTC.
     - cron: '0 6 * * 1'
 
+# Jobs to be run
 jobs:
+  # Analyze project JS/TS files
   analyze:
-    name: Analyze ${{ matrix.language }}
+    name: 🔎 Analyze ${{ matrix.language }}
     runs-on: ubuntu-latest
     permissions:
       actions: read
