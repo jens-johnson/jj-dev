@@ -90,7 +90,7 @@ components/
 ├── data/           display: status-badge, spark-line
 ├── feedback/       indicators: scroll-progress
 ├── layout/         shell: app-nav, app-footer, auth-button
-├── primitives/     base behaviours: base-hero, base-parallax
+├── primitives/     base behaviors: base-hero, base-parallax
 └── widgets/        page sections that compose primitives (home, blog, lab)
 ```
 

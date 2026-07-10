@@ -146,7 +146,7 @@ components/
 ├── data/           # display: status-badge
 ├── feedback/       # indicators: scroll-progress
 ├── layout/         # shell: app-nav, app-footer
-├── primitives/     # base behaviours: base-hero, base-parallax
+├── primitives/     # base behaviors: base-hero, base-parallax
 └── widgets/        # page sections (compose primitives)
     └── home/       # home-specific: hero-parallax, horizontal-journey
 ```
