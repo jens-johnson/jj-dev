@@ -118,7 +118,7 @@ describe('normalizeService', () => {
   it('coerces an unrecognized plugin side to server', () => {
     const service = normalizeService({ plugins: [{ name: 'p', side: 'sideways' as 'server' }] });
 
-    expect(service.plugins[0]?.side).toBe('server');
+    expect(service.plugins?.[0]?.side).toBe('server');
   });
 });
 
