@@ -226,8 +226,9 @@ Full guide: [.claude/context-and-memory/code-comments.md](.claude/context-and-me
   `corepack enable && pnpm install`. Lockfile is `pnpm-lock.yaml`; no `package-lock.json`.
 - **Lint:** `pnpm lint` runs ESLint + Prettier + Stylelint in parallel. `pnpm lint:fix` autofixes all three.
 - **Typecheck:** `pnpm typecheck` (vue-tsc via Nuxt).
-- **Test:** `pnpm test` (Vitest, single run; `pnpm test:watch` for watch mode). Tests live in `test/unit/` as
-  `<subject>.test.ts`; pure cores land with tests.
+- **Test:** `pnpm test` (Vitest, single run; `pnpm test:watch` for watch mode). Unit tests live in band:
+  `<file>.test.ts` beside the file it exercises (i.e. `utils.ts` → `utils.test.ts`), imported from the sibling file,
+  never the barrel. `test/` is reserved for E2E. Pure cores land with tests.
 - **Full local CI gate:** `pnpm check`; runs lint → typecheck → test → build sequentially.
 - **Headers:** `pnpm header -f <path> -d "<description>" --write` runs the `file-header-generator` bin from the
   style-guide package against [`file-header.config.json`](./file-header.config.json).

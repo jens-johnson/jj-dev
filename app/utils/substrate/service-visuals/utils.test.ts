@@ -11,7 +11,7 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████████████████████ test/unit/service-visuals.test.ts █████████████████████████████████████████
+ * ██████████████████████████████████ #utils/substrate/service-visuals/utils.test.ts ███████████████████████████████████
  *
  * Unit tests for the service-visuals pure core: status/kind lookups with fallbacks, the doc normalizer's schema
  * defaults and filtering, ordering, and device-mention link splitting.
@@ -21,7 +21,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { IRawServiceDoc } from '../../app/utils/substrate/service-visuals';
+import type { IRawServiceDoc } from './types';
 import {
   normalizeService,
   normalizeServices,
@@ -29,7 +29,7 @@ import {
   serviceKindLabel,
   serviceStatusOf,
   splitDeviceMentions,
-} from '../../app/utils/substrate/service-visuals';
+} from './utils';
 
 /* ─── Fixtures ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 

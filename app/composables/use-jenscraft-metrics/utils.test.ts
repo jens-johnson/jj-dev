@@ -11,7 +11,7 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████████████ test/unit/jenscraft-metrics.test.ts ████████████████████████████████████████
+ * █████████████████████████████████ #composables/use-jenscraft-metrics/utils.test.ts ██████████████████████████████████
  *
  * Unit tests for the jenscraft-metrics pure core: tile-key mapping, human formatting, and the offline/empty null
  * contract.
@@ -21,8 +21,9 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { buildJenscraftLiveMetrics } from '../../app/composables/use-jenscraft-metrics/utils';
-import type { IJenscraftMetricsView } from '../../app/types/jenscraft-metrics';
+import type { IJenscraftMetricsView } from '~/types/jenscraft-metrics';
+
+import { buildJenscraftLiveMetrics } from './utils';
 
 /* ─── Fixtures ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
