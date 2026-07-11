@@ -26,14 +26,34 @@ import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-met
 import type { ISubstrateDevice } from '~/types/substrate';
 import type { ISubstrateInternet } from '~/types/substrate-metrics';
 
+/**
+ * The current route; its slug param selects the device
+ * @internal
+ * @constant
+ */
 const route = useRoute();
+
+/**
+ * The device slug from the route params
+ * @internal
+ * @constant
+ */
 const slug: ComputedRef<string> = computed((): string => String(route.params.slug ?? ''));
 
-/* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The raw substrate device docs from the content collection
+ * @internal
+ * @constant
+ */
 const { data: devices } = await useAsyncData('substrate-devices-all', () => queryCollection('substrate').all());
 
-/** Raw queried doc (carries the markdown body) for ContentRenderer. */
+/**
+ * Raw queried doc (carries the markdown body) for ContentRenderer
+ * @internal
+ * @constant
+ */
 const rawDoc: ComputedRef<SubstrateCollectionItem | null> = computed(
   (): SubstrateCollectionItem | null => (devices.value ?? []).find((d) => d.nodeId === slug.value) ?? null,
 );
@@ -46,37 +66,90 @@ if (!rawDoc.value) {
   });
 }
 
+/**
+ * Clean, fully-populated devices; resolves this device and its connection neighbours' titles
+ * @internal
+ * @constant
+ */
 const list: ComputedRef<ISubstrateDevice[]> = computed((): ISubstrateDevice[] => normalizeDevices(devices.value ?? []));
+
+/**
+ * The normalized device for the current slug; null flips the template off (the guard above already 404ed)
+ * @internal
+ * @constant
+ */
 const device: ComputedRef<ISubstrateDevice | null> = computed(
   (): ISubstrateDevice | null => list.value.find((d) => d.nodeId === slug.value) ?? null,
 );
 
+/**
+ * The vendor and model joined for the header subtitle; empty when the device declares neither
+ * @internal
+ * @constant
+ */
 const vendorModel: ComputedRef<string> = computed((): string =>
   device.value ? [device.value.vendor, device.value.model].filter(Boolean).join(' · ') : '',
 );
+
+/**
+ * Resolves a device id to its display title, falling back to the id for unknown neighbours
+ * @internal
+ * @function
+ * @param id - The device node id to resolve
+ * @returns The device title, or the id itself when unknown
+ */
 const titleOf = (id: string): string => list.value.find((d) => d.nodeId === id)?.title ?? id;
 
+/**
+ * Whether the raw doc's minimark body has at least one content node; gates the runbook section
+ * @internal
+ * @constant
+ */
 const hasNotes: ComputedRef<boolean> = computed((): boolean => {
   // Reach into the raw minimark body and require at least one content node
   const value: unknown[] | undefined = (rawDoc.value?.body as unknown as { value?: unknown[] } | undefined)?.value;
   return Array.isArray(value) && value.length > 0;
 });
 
+/**
+ * The display label per connection kind, for the connection pills
+ * @internal
+ * @constant
+ */
 const CONN_LABEL: Record<string, string> = {
   uplink: 'Uplink',
   network: 'Network',
   data: 'Data',
   power: 'Power',
 };
+
+/**
+ * Resolves a connection kind to its display label, defaulting unknown kinds to a generic link
+ * @internal
+ * @function
+ * @param kind - The connection kind declared on the edge, if any
+ * @returns The display label for the connection pill
+ */
 const connLabel = (kind?: string): string => CONN_LABEL[kind ?? 'network'] ?? 'Link';
 
-/* ─── Live internet (WAN node only) ───────────────────────────────────────────────────────────────────────────────── */
+/* ─── LIVE INTERNET ──────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The live substrate metrics feed; the data payload, the feed state, and a friendly updated label
+ * @internal
+ * @constant
+ */
 const {
   data: liveData,
   state: liveState,
   updatedLabel: liveUpdated,
 }: IUseSubstrateMetricsReturn = useSubstrateMetrics();
+
+/**
+ * The live internet-edge metrics; populated only for the WAN node while the feed is online, null otherwise
+ * @internal
+ * @constant
+ */
 const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubstrateInternet | null =>
   device.value?.kind === 'internet' && liveState.value !== 'offline' ? (liveData.value?.internet ?? null) : null,
 );

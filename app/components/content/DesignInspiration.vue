@@ -26,6 +26,11 @@
 
 import type { IUseThemeReturn, TTheme } from '~/composables/use-theme';
 
+/**
+ * The active site theme and the setter backing the live preview CTA on each card
+ * @internal
+ * @constant
+ */
 const { theme, setTheme }: IUseThemeReturn = useTheme();
 
 /**
@@ -35,13 +40,27 @@ const { theme, setTheme }: IUseThemeReturn = useTheme();
  * @interface
  */
 interface IInspirationCard {
+  /* The site theme this card previews */
   theme: TTheme;
+
+  /* The card title; the theme's display name */
   title: string;
+
+  /* The one-line mood description of the source photograph */
   vibe: string;
+
+  /* The source photograph: its public src, alt text, and photographer credit */
   image: { src: string; alt: string; credit: string };
+
+  /* The dominant palette extracted from the photo, mapped onto the design tokens it feeds */
   palette: { name: string; hex: string; token: string }[];
 }
 
+/**
+ * The three inspiration cards: one per site theme (day / sunset / night), each traced back to its source photo
+ * @internal
+ * @constant
+ */
 const cards: IInspirationCard[] = [
   {
     theme: 'day',

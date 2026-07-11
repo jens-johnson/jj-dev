@@ -12,7 +12,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████ #components/widgets/lab/substrate-overview/index.vue ██████████████████████████████████████
+ * ███████████████████████████████ #components/widgets/lab/substrate-overview/index.vue ████████████████████████████████
  *
  * The Overview tab of Substrate; a design brief for the homelab project. A short narrative on what it is and why,
  * a current-focus callout, and a phased roadmap timeline. Static, hand-authored content (no live data yet).
@@ -20,15 +20,16 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-/**
- *
- */
-interface IPhase {
-  title: string;
-  desc: string;
-  status: 'progress' | 'next' | 'planned' | 'future';
-}
+import { PHASE_STATUS_VISUALS } from './constants';
+import type { IPhase } from './types';
 
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The hand-authored roadmap phases, in timeline order
+ * @internal
+ * @constant
+ */
 const phases: IPhase[] = [
   {
     title: 'Network & edge',
@@ -56,34 +57,6 @@ const phases: IPhase[] = [
     status: 'future',
   },
 ];
-
-const STATUS: Record<IPhase['status'], { label: string; dot: string; text: string; tint: string }> = {
-  // In progress reads as the green/success state; Up next keeps the bronze accent so the two stay distinct.
-  progress: {
-    label: 'In progress',
-    dot: 'bg-accent-secondary',
-    text: 'text-accent-secondary',
-    tint: 'bg-accent-secondary/10',
-  },
-  next: {
-    label: 'Up next',
-    dot: 'bg-accent',
-    text: 'text-accent',
-    tint: 'bg-accent/10',
-  },
-  planned: {
-    label: 'Planned',
-    dot: 'bg-ink-subtle',
-    text: 'text-ink-subtle',
-    tint: 'bg-ink-subtle/10',
-  },
-  future: {
-    label: 'Future',
-    dot: 'bg-ink-subtle',
-    text: 'text-ink-subtle',
-    tint: 'bg-ink-subtle/10',
-  },
-};
 </script>
 
 <template>
@@ -184,14 +157,14 @@ const STATUS: Record<IPhase['status'], { label: string; dot: string; text: strin
 
               <span
                 class="text-caption inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono font-medium"
-                :class="STATUS[p.status].tint"
+                :class="PHASE_STATUS_VISUALS[p.status].tint"
               >
                 <span
                   class="size-1.5 rounded-full"
-                  :class="STATUS[p.status].dot"
+                  :class="PHASE_STATUS_VISUALS[p.status].dot"
                 />
 
-                <span :class="STATUS[p.status].text">{{ STATUS[p.status].label }}</span>
+                <span :class="PHASE_STATUS_VISUALS[p.status].text">{{ PHASE_STATUS_VISUALS[p.status].label }}</span>
               </span>
             </div>
 

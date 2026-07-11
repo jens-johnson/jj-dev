@@ -25,17 +25,35 @@
  */
 
 /**
- *
+ * One layer of the tech-stack visualization: its ordinal, identity, summary copy, and optional reference links
+ * @internal
+ * @interface
  */
 interface IStackLayer {
+  /* The two-digit ordinal rendered in the layer's number chip */
   num: string;
+
+  /* The layer title */
   title: string;
+
+  /* The lucide icon name rendered beside the title */
   icon: string;
+
+  /* The one-line summary shown in the collapsed header */
   tagline: string;
+
+  /* The body copy revealed when the layer is expanded */
   body: string;
+
+  /* Optional reference links rendered as pills beneath the body copy */
   links?: { label: string; href: string }[];
 }
 
+/**
+ * The five stack layers rendered bottom-of-stack first (infrastructure up to developer/agent experience)
+ * @internal
+ * @constant
+ */
 const stack: IStackLayer[] = [
   {
     num: '01',
@@ -81,6 +99,11 @@ const stack: IStackLayer[] = [
   },
 ];
 
+/**
+ * The index of the currently expanded layer; -1 when every layer is collapsed. Defaults to the top layer open
+ * @internal
+ * @constant
+ */
 const expandedIdx = ref(0);
 </script>
 

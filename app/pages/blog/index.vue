@@ -20,6 +20,11 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+/**
+ * The current route; carries the optional `?tag=` filter query param
+ * @internal
+ * @constant
+ */
 const route = useRoute();
 
 useSeoMeta({
@@ -30,17 +35,32 @@ useSeoMeta({
   ogDescription: 'Notes on craft, code, and the occasional rabbit hole.',
 });
 
-/* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * All published posts from the blog content collection, newest first
+ * @internal
+ * @constant
+ */
 const { data: allPosts } = await useAsyncData('blog-index', () =>
   queryCollection('blog').where('draft', '=', false).order('publishedAt', 'DESC').all(),
 );
 
+/**
+ * The active tag filter from the `?tag=` query param; null when unfiltered
+ * @internal
+ * @constant
+ */
 const activeTag = computed<string | null>(() => {
   const t = route.query.tag;
   return typeof t === 'string' && t.length > 0 ? t : null;
 });
 
+/**
+ * The posts surfaced by the current tag filter; every published post when no tag is active
+ * @internal
+ * @constant
+ */
 const filteredPosts = computed(() => {
   if (!activeTag.value) {
     return allPosts.value ?? [];
@@ -50,10 +70,25 @@ const filteredPosts = computed(() => {
   );
 });
 
+/**
+ * The newest matching post, featured at the top of the page
+ * @internal
+ * @constant
+ */
 const featured = computed(() => filteredPosts.value[0] ?? null);
+
+/**
+ * The remaining matching posts, rendered as the vertical timeline
+ * @internal
+ * @constant
+ */
 const rest = computed(() => filteredPosts.value.slice(1));
 
-/* All distinct tags across all posts, sorted alphabetically. */
+/**
+ * All distinct tags across all posts, sorted alphabetically; drives the tag filter pill row
+ * @internal
+ * @constant
+ */
 const allTags = computed(() => {
   const set = new Set<string>();
   for (const post of allPosts.value ?? []) {
@@ -64,7 +99,7 @@ const allTags = computed(() => {
   return Array.from(set).sort();
 });
 
-/* ─── Formatting helpers ──────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── HELPERS ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * Formats an ISO date string as a long en-US date (i.e. "July 9, 2026") for the post metadata rows
@@ -92,9 +127,15 @@ function tagHref(tag: string): { path: string; query: { tag: string } } {
   return { path: '/blog', query: { tag } };
 }
 
-/* ─── Entrance animation ──────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── ENTRANCE ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Whether the entrance animations have been triggered; flips true shortly after mount
+ * @internal
+ * @constant
+ */
 const revealed = ref(false);
+
 onMounted(() => {
   setTimeout(() => {
     revealed.value = true;

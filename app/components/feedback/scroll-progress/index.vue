@@ -19,6 +19,11 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+/**
+ * The 0..1 ratio of how far the user has scrolled through the document; drives the bar's scaleX transform
+ * @internal
+ * @constant
+ */
 const progress: Ref<number> = ref(0);
 
 /**

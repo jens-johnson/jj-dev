@@ -12,7 +12,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████ #components/widgets/lab/substrate-status-bar/index.vue ██████████████████████████████████████████
+ * ██████████████████████████████ #components/widgets/lab/substrate-status-bar/index.vue ███████████████████████████████
  *
  * Aggregate live-status bar for Substrate: a single rolled-up health pill (healthy | degraded | stale | offline) for
  * all metric-reporting nodes, the count reporting, headline CPU / RAM / internet latency, and an "updated Ns ago"
@@ -20,15 +20,45 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-metrics';
+import type { IStateVisual, IUseSubstrateMetricsReturn } from '~/composables/use-substrate-metrics';
+import type { ISubstrateMetricsNode } from '~/types/substrate-metrics';
 
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The shared live-metrics feed: current snapshot, feed state, rolled-up health, internet sample, reporting count, and
+ * a human-readable freshness label
+ * @internal
+ * @constant
+ */
 const { data, state, health, internet, reportingCount, updatedLabel }: IUseSubstrateMetricsReturn =
   useSubstrateMetrics();
-const node = computed(() => data.value?.node ?? null);
-const vis = computed(() => METRIC_HEALTH[health.value]);
 
-const reportingLabel = computed(() => {
-  const n = reportingCount.value;
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The live node snapshot, or null while the feed has nothing yet
+ * @internal
+ * @constant
+ */
+const node: ComputedRef<ISubstrateMetricsNode | null> = computed(
+  (): ISubstrateMetricsNode | null => data.value?.node ?? null,
+);
+
+/**
+ * The visual treatment (dot, pulse, label) for the rolled-up health state
+ * @internal
+ * @constant
+ */
+const vis: ComputedRef<IStateVisual> = computed((): IStateVisual => METRIC_HEALTH[health.value]);
+
+/**
+ * The pluralized "N nodes reporting" caption
+ * @internal
+ * @constant
+ */
+const reportingLabel: ComputedRef<string> = computed((): string => {
+  const n: number = reportingCount.value;
   return n === 1 ? '1 node reporting' : `${n} nodes reporting`;
 });
 </script>

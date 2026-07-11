@@ -21,18 +21,33 @@
  */
 
 import type { IMetricsResponse } from '../../../../server/api/metrics.get';
+import { SPARKLINE_EMPTY_BAR_HEIGHT, SPARKLINE_MAX_BAR_HEIGHT_PX, SPARKLINE_WEEK_COUNT } from './constants';
 
-/* ─── Data fetch ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── DATA FETCH ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The combined GitHub/Strava metrics payload and its fetch status; drives the skeleton, error, and loaded states
+ * @internal
+ * @constant
+ */
 const { data, status } = await useFetch<IMetricsResponse>('/api/metrics');
 
-/* ─── GitHub sparkline ────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── GITHUB SPARKLINE ───────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Sum day-level counts into weekly totals, last 16 weeks to match the Strava sparkline. */
+/**
+ * Day-level contribution counts summed into weekly totals, sliced to the trailing weeks matching the Strava sparkline
+ * @internal
+ * @constant
+ */
 const weeklyContributions = computed<number[]>(() =>
-  (data.value?.github.weeks ?? []).slice(-16).map((w) => w.days.reduce((sum, d) => sum + d.count, 0)),
+  (data.value?.github.weeks ?? []).slice(-SPARKLINE_WEEK_COUNT).map((w) => w.days.reduce((sum, d) => sum + d.count, 0)),
 );
 
+/**
+ * The busiest week's contribution total (floored at 1); the scale ceiling for the GitHub bars
+ * @internal
+ * @constant
+ */
 const maxWeeklyContributions = computed(() => Math.max(...weeklyContributions.value, 1));
 
 /**
@@ -45,14 +60,19 @@ const maxWeeklyContributions = computed(() => Math.max(...weeklyContributions.va
  */
 function ghBarHeight(count: number): string {
   if (count === 0) {
-    return '3px';
+    return SPARKLINE_EMPTY_BAR_HEIGHT;
   }
   const pct = count / maxWeeklyContributions.value;
-  return `${Math.max(6, Math.round(pct * 52))}px`;
+  return `${Math.max(6, Math.round(pct * SPARKLINE_MAX_BAR_HEIGHT_PX))}px`;
 }
 
-/* ─── Strava sparkline ────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── STRAVA SPARKLINE ───────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The highest-mileage week (defaulting to 1 while data is absent); the scale ceiling for the Strava bars
+ * @internal
+ * @constant
+ */
 const maxWeeklyMiles = computed(() => Math.max(...(data.value?.strava.weeklyMiles ?? [1])));
 
 /**
@@ -68,8 +88,8 @@ function barHeight(miles: number): string {
     return '4px';
   }
   const pct = miles / maxWeeklyMiles.value;
-  // Clamp between 4px (empty week) and 100% of available height
-  return miles === 0 ? '3px' : `${Math.max(12, Math.round(pct * 52))}px`;
+  // Clamp between the empty-week stub and 100% of the available height
+  return miles === 0 ? SPARKLINE_EMPTY_BAR_HEIGHT : `${Math.max(12, Math.round(pct * SPARKLINE_MAX_BAR_HEIGHT_PX))}px`;
 }
 </script>
 

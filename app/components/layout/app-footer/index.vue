@@ -19,9 +19,19 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-const year = new Date().getFullYear();
+/**
+ * The current year rendered in the copyright line
+ * @internal
+ * @constant
+ */
+const year: number = new Date().getFullYear();
 
-const socials = [
+/**
+ * The social icon links rendered on the right side of the footer
+ * @internal
+ * @constant
+ */
+const socials: { label: string; href: string; icon: string }[] = [
   {
     label: 'GitHub',
     href: 'https://github.com/jens-johnson',

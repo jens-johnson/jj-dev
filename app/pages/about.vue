@@ -27,8 +27,13 @@ useSeoMeta({
   ogDescription: 'Full-stack software engineer based in San Diego, CA.',
 });
 
-/* ─── Typewriter ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── TYPEWRITER ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The rotating identity words the hero typewriter cycles through
+ * @internal
+ * @constant
+ */
 const TYPEWRITER_WORDS: string[] = [
   'Engineer',
   'Builder',
@@ -41,9 +46,32 @@ const TYPEWRITER_WORDS: string[] = [
   'Sushi Enthusiast',
 ];
 
+/**
+ * The currently rendered slice of the active typewriter word
+ * @internal
+ * @constant
+ */
 const typeText: Ref<string> = ref('');
+
+/**
+ * The index of the typewriter word currently being typed
+ * @internal
+ * @constant
+ */
 const typeWordIdx: Ref<number> = ref(0);
+
+/**
+ * Whether the typewriter is in its deleting phase (vs typing)
+ * @internal
+ * @constant
+ */
 const typeIsDeleting: Ref<boolean> = ref(false);
+
+/**
+ * The pending typewriter timeout; held so unmount can cancel it
+ * @internal
+ * @constant
+ */
 const typeTimer: Ref<ReturnType<typeof setTimeout> | null> = ref<ReturnType<typeof setTimeout> | null>(null);
 
 /**
@@ -80,8 +108,13 @@ function typeStep(): void {
   }
 }
 
-/* ─── Stack ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── STACK ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The technology stack groups rendered in the Stack section
+ * @internal
+ * @constant
+ */
 const stack = [
   {
     category: 'Languages',
@@ -134,8 +167,13 @@ const stack = [
   },
 ];
 
-/* ─── Experience ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── EXPERIENCE ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The experience timeline; one entry per role, newest first
+ * @internal
+ * @constant
+ */
 const experience = [
   {
     title: 'Senior Software Engineer',
@@ -202,8 +240,13 @@ const experience = [
   },
 ];
 
-/* ─── Hero background carousel ───────────────────────────────────────────────────────────────────────────────────── */
+/* ─── HERO CAROUSEL ──────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The hero background carousel images, cross-faded on a fixed cadence
+ * @internal
+ * @constant
+ */
 const heroBgImages: { src: string; alt: string }[] = [
   {
     src: '/images/jens-images/paragliding.jpg',
@@ -223,8 +266,24 @@ const heroBgImages: { src: string; alt: string }[] = [
   },
 ];
 
+/**
+ * The index of the hero background image currently shown
+ * @internal
+ * @constant
+ */
 const heroBgIdx: Ref<number> = ref(0);
+
+/**
+ * Whether the hero background is mid cross-fade (fully transparent, safe to swap the image)
+ * @internal
+ * @constant
+ */
 const heroBgFading: Ref<boolean> = ref(false);
+
+/**
+ * The hero carousel interval; held so unmount can cancel it
+ * @internal
+ */
 let heroBgTimer: ReturnType<typeof setInterval> | null = null;
 
 /**
@@ -242,9 +301,15 @@ function advanceHeroBg(): void {
   }, 1000);
 }
 
-/* ─── Entrance animation ──────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── ENTRANCE ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Whether the entrance animations have been triggered; flips true shortly after mount
+ * @internal
+ * @constant
+ */
 const revealed: Ref<boolean> = ref(false);
+
 onMounted((): void => {
   // Reveal the page content just after mount so the entrance transitions play
   setTimeout((): void => {

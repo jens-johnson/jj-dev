@@ -45,6 +45,18 @@ const props = defineProps<{
   filename?: string;
 }>();
 
+/**
+ * How long the copy button flashes its copied state before reverting, in milliseconds
+ * @internal
+ * @constant
+ */
+const COPIED_FLASH_MS: number = 1800;
+
+/**
+ * Whether the copy button is flashing its copied state
+ * @internal
+ * @constant
+ */
 const copied: Ref<boolean> = ref(false);
 
 /**
@@ -59,12 +71,12 @@ async function copy(): Promise<void> {
     return;
   }
   try {
-    // Write the raw source to the clipboard, then flash the copied state for 1.8 seconds
+    // Write the raw source to the clipboard, then flash the copied state
     await navigator.clipboard.writeText(props.code);
     copied.value = true;
     setTimeout((): void => {
       copied.value = false;
-    }, 1800);
+    }, COPIED_FLASH_MS);
   } catch {
     /* clipboard blocked; no-op */
   }

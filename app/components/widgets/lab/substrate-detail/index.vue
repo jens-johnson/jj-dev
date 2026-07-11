@@ -50,55 +50,100 @@ import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-met
 import type { ISubstrateDevice } from '~/types/substrate';
 import type { ISubstrateInternet, ISubstrateMetricsNode } from '~/types/substrate-metrics';
 
-const props = defineProps<{
-  device: ISubstrateDevice | null;
-  devices: ISubstrateDevice[];
-  hasNotes?: boolean;
-}>();
+import { CONN_ICON_BY_KIND, CONN_LABEL_BY_KIND, FALLBACK_CONN_ICON, FALLBACK_CONN_LABEL } from './constants';
+import type { ISubstrateDetailProps } from './types';
 
-/* ─── Connection resolution ───────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const byId: ComputedRef<Map<string, ISubstrateDevice>> = computed(
-  (): Map<string, ISubstrateDevice> =>
-    new Map(props.devices.map((d: ISubstrateDevice): [string, ISubstrateDevice] => [d.nodeId, d])),
-);
-const titleOf = (id: string): string => byId.value.get(id)?.title ?? id;
+/**
+ * Component props; the device under inspection, the inventory used to resolve connection targets, and the notes-slot
+ * flag
+ * @internal
+ * @constant
+ */
+const props = defineProps<ISubstrateDetailProps>();
 
-const CONN_ICON: Record<string, string> = {
-  uplink: 'lucide:arrow-up-right',
-  network: 'lucide:share-2',
-  data: 'lucide:arrow-left-right',
-  power: 'lucide:zap',
-};
-const FALLBACK_CONN_ICON = 'lucide:share-2';
-const connIcon = (kind?: string): string => CONN_ICON[kind ?? 'network'] ?? FALLBACK_CONN_ICON;
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const CONN_LABEL: Record<string, string> = {
-  uplink: 'Uplink',
-  network: 'Network',
-  data: 'Data',
-  power: 'Power',
-};
-const connLabel = (kind?: string): string => CONN_LABEL[kind ?? 'network'] ?? 'Link';
-
-const vendorModel: ComputedRef<string> = computed((): string =>
-  props.device ? [props.device.vendor, props.device.model].filter(Boolean).join(' · ') : '',
-);
-
-/* ─── Live metrics (shown only for the live Proxmox host) ──────────────────────────────────────────────────────────── */
-
-// The shared live-metrics feed: the current snapshot, its feed state, and a human-readable freshness label
+/**
+ * The shared live-metrics feed: the current snapshot, its feed state, and a human-readable freshness label
+ * @internal
+ * @constant
+ */
 const {
   data: liveData,
   state: liveState,
   updatedLabel: liveUpdated,
 }: IUseSubstrateMetricsReturn = useSubstrateMetrics();
+
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The device inventory indexed by node id, for resolving connection targets to their devices
+ * @internal
+ * @constant
+ */
+const byId: ComputedRef<Map<string, ISubstrateDevice>> = computed(
+  (): Map<string, ISubstrateDevice> =>
+    new Map(props.devices.map((d: ISubstrateDevice): [string, ISubstrateDevice] => [d.nodeId, d])),
+);
+
+/**
+ * The vendor and model joined for the header subtitle; empty when nothing is selected or neither field is set
+ * @internal
+ * @constant
+ */
+const vendorModel: ComputedRef<string> = computed((): string =>
+  props.device ? [props.device.vendor, props.device.model].filter(Boolean).join(' · ') : '',
+);
+
+/**
+ * The live node snapshot; non-null only when the inspected device is the reporting hypervisor and the feed is not
+ * offline
+ * @internal
+ * @constant
+ */
 const liveNode: ComputedRef<ISubstrateMetricsNode | null> = computed((): ISubstrateMetricsNode | null =>
   props.device?.kind === 'hypervisor' && liveState.value !== 'offline' ? (liveData.value?.node ?? null) : null,
 );
+
+/**
+ * The live internet-edge sample; non-null only when the inspected device is the WAN node and the feed is not offline
+ * @internal
+ * @constant
+ */
 const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubstrateInternet | null =>
   props.device?.kind === 'internet' && liveState.value !== 'offline' ? (liveData.value?.internet ?? null) : null,
 );
+
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * A utility method to resolve a connection target id to its device title, falling back to the raw id
+ * @internal
+ * @function
+ * @param id - The node id referenced by a connection
+ * @returns The target device's title, or the id itself when the device is not in the inventory
+ */
+const titleOf = (id: string): string => byId.value.get(id)?.title ?? id;
+
+/**
+ * A utility method to pick the icon for a connection kind, defaulting missing kinds to network
+ * @internal
+ * @function
+ * @param kind - The connection kind, when declared
+ * @returns The icon name for the connection row
+ */
+const connIcon = (kind?: string): string => CONN_ICON_BY_KIND[kind ?? 'network'] ?? FALLBACK_CONN_ICON;
+
+/**
+ * A utility method to pick the chip label for a connection kind, defaulting missing kinds to network
+ * @internal
+ * @function
+ * @param kind - The connection kind, when declared
+ * @returns The chip label for the connection row
+ */
+const connLabel = (kind?: string): string => CONN_LABEL_BY_KIND[kind ?? 'network'] ?? FALLBACK_CONN_LABEL;
 </script>
 
 <template>

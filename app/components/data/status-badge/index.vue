@@ -31,35 +31,28 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import { BADGE_VISUAL_BY_STATUS } from './constants';
+import type { IStatusBadgeProps, IStatusBadgeVisual } from './types';
+
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 /**
- * The props accepted by the status badge; the status value is optional and unknown values fall back to a neutral badge
+ * Component props; the status value is optional and unknown values fall back to a neutral badge
  * @internal
- * @interface
+ * @constant
  */
-interface Props {
-  /* The content status to render; active | wip | archived, or any raw value for the neutral fallback */
-  status?: string;
-}
-const props = defineProps<Props>();
+const props = defineProps<IStatusBadgeProps>();
 
-const config: Record<string, { label: string; cls: string }> = {
-  active: {
-    label: 'Active',
-    cls: 'bg-accent/10 text-accent',
-  },
-  wip: {
-    label: 'In progress',
-    cls: 'bg-earth-300/20 text-earth-500',
-  },
-  archived: {
-    label: 'Archived',
-    cls: 'bg-surface text-ink-subtle',
-  },
-};
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const badge = computed(
-  () =>
-    config[props.status ?? ''] ?? {
+/**
+ * The visual treatment for the current status; unknown statuses fall back to a neutral badge showing the raw value
+ * @internal
+ * @constant
+ */
+const badge: ComputedRef<IStatusBadgeVisual> = computed(
+  (): IStatusBadgeVisual =>
+    BADGE_VISUAL_BY_STATUS[props.status ?? ''] ?? {
       label: props.status ?? '',
       cls: 'bg-surface text-ink-subtle',
     },

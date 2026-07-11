@@ -25,37 +25,83 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-/* ─── Constants ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+import { ACCENT_RGB, NUM_LINES, PEAK_HEIGHT, PEAK_SIGMA, SPEED } from './constants';
 
-/** Number of contour lines drawn across the canvas. */
-const NUM_LINES = 24;
-/** Base accent color (earth brown) as R,G,B components for rgba() composition. */
-const ACCENT_RGB = '139, 101, 52';
-/** Gaussian sigma² controlling how far the mouse peak spreads (px²). */
-const PEAK_SIGMA = 22_000;
-/** Maximum vertical displacement of the mountain peak at cursor centre (px). */
-const PEAK_HEIGHT = 110;
-/** Animation speed multiplier; lower is calmer. */
-const SPEED = 0.0032;
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/* ─── State ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
+/**
+ * The template ref for the canvas element the contour animation draws onto
+ * @internal
+ * @constant
+ */
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvas');
 
+/**
+ * The requestAnimationFrame handle for the render loop; cancelled on unmount
+ * @internal
+ */
 let raf: number;
+
+/**
+ * The cached 2D rendering context; refreshed by resize and null until the canvas is laid out
+ * @internal
+ */
 let ctx: CanvasRenderingContext2D | null = null;
+
+/**
+ * The rendered canvas width in CSS pixels; kept in sync by resize
+ * @internal
+ */
 let W = 0;
+
+/**
+ * The rendered canvas height in CSS pixels; kept in sync by resize
+ * @internal
+ */
 let H = 0;
+
+/**
+ * The animation clock; advanced by SPEED each frame and fed into the contour wave functions
+ * @internal
+ */
 let t = 0;
 
+/**
+ * The raw cursor x position in canvas coordinates; -1 until the mouse first enters
+ * @internal
+ * @constant
+ */
 const mouseX: Ref<number> = ref(-1);
+
+/**
+ * The raw cursor y position in canvas coordinates; -1 until the mouse first enters
+ * @internal
+ * @constant
+ */
 const mouseY: Ref<number> = ref(-1);
+
+/**
+ * Whether the cursor is currently over the canvas; gates the peak displacement and glow
+ * @internal
+ * @constant
+ */
 const mouseActive: Ref<boolean> = ref(false);
-/** Smoothed mouse position used in the draw loop (lerped toward actual mouse). */
+
+/**
+ * The smoothed cursor x position used in the draw loop (lerped toward the raw mouse position)
+ * @internal
+ * @constant
+ */
 const smoothMX: Ref<number> = ref(-1);
+
+/**
+ * The smoothed cursor y position used in the draw loop (lerped toward the raw mouse position)
+ * @internal
+ * @constant
+ */
 const smoothMY: Ref<number> = ref(-1);
 
-/* ─── Setup ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── SETUP ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * A utility method to size the canvas backing store to its rendered dimensions at the device pixel ratio and refresh
@@ -82,9 +128,13 @@ function resize(): void {
   ctx?.scale(dpr, dpr);
 }
 
-/* ─── Draw helpers ───────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── DRAW HELPERS ───────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Lerp smoothed mouse position one step toward the raw mouse position. */
+/**
+ * A utility method to lerp the smoothed mouse position one step toward the raw mouse position
+ * @internal
+ * @function
+ */
 function lerpMouse(): void {
   if (!mouseActive.value) {
     return;
@@ -95,7 +145,16 @@ function lerpMouse(): void {
   smoothMY.value = snap ? mouseY.value : smoothMY.value + (mouseY.value - smoothMY.value) * 0.08;
 }
 
-/** Gaussian mountain displacement at (x, baseY) for a mouse at (mx, my). */
+/**
+ * A utility method to compute the Gaussian mountain displacement at (x, baseY) for a mouse at (mx, my)
+ * @internal
+ * @function
+ * @param x - The sample x position along the contour, in canvas coordinates
+ * @param baseY - The contour's undisplaced y position, in canvas coordinates
+ * @param mx - The smoothed cursor x position, in canvas coordinates
+ * @param my - The smoothed cursor y position, in canvas coordinates
+ * @returns The signed vertical displacement to add to the contour at this sample
+ */
 function computePeak(x: number, baseY: number, mx: number, my: number): number {
   // Gaussian falloff by squared distance from the cursor
   const dx: number = x - mx;
@@ -105,7 +164,16 @@ function computePeak(x: number, baseY: number, mx: number, my: number): number {
   return (baseY < my ? -1 : 1) * bump;
 }
 
-/** Trace a single contour path onto ctx (call beginPath before, stroke after). */
+/**
+ * A utility method to trace a single contour path onto the cached context (call beginPath before, stroke after)
+ * @internal
+ * @function
+ * @param baseY - The contour's undisplaced y position, in canvas coordinates
+ * @param phase - The per-line phase offset applied to the layered sine waves
+ * @param mx - The smoothed cursor x position, in canvas coordinates
+ * @param my - The smoothed cursor y position, in canvas coordinates
+ * @param active - Whether the mouse peak displacement should be applied
+ */
 function traceContour(baseY: number, phase: number, mx: number, my: number, active: boolean): void {
   for (let x = 0; x <= W; x += 3) {
     // Sum layered sine waves for organic terrain, then add the mouse peak displacement
@@ -125,7 +193,13 @@ function traceContour(baseY: number, phase: number, mx: number, my: number, acti
   }
 }
 
-/** Draw a soft radial glow centred on the cursor. */
+/**
+ * A utility method to draw a soft radial glow centred on the cursor
+ * @internal
+ * @function
+ * @param mx - The smoothed cursor x position, in canvas coordinates
+ * @param my - The smoothed cursor y position, in canvas coordinates
+ */
 function drawGlow(mx: number, my: number): void {
   // Build a radial gradient that fades the accent out to transparent
   const grad: CanvasGradient = ctx!.createRadialGradient(mx, my, 0, mx, my, 180);
@@ -137,7 +211,7 @@ function drawGlow(mx: number, my: number): void {
   ctx!.fillRect(0, 0, W, H);
 }
 
-/* ─── Draw ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── DRAW LOOP ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * The main render loop; clears the canvas, advances the animation clock, lerps the mouse, strokes each contour line
@@ -184,7 +258,7 @@ function draw(): void {
   }
 }
 
-/* ─── Mouse handlers ─────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * A utility method to handle mouse move events on the canvas; records the cursor position in canvas coordinates and
@@ -218,7 +292,7 @@ function onLeave(): void {
   smoothMY.value = -1;
 }
 
-/* ─── Lifecycle ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 onMounted((): void => {
   // Size the canvas once it is laid out, then start the render loop

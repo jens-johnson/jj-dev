@@ -24,16 +24,37 @@
  */
 import type { UserSessionComposable } from '#auth-utils';
 
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The auth session state (logged-in flag, user profile, server session) and the clear action for sign-out
+ * @internal
+ * @constant
+ */
 const { loggedIn, user, session, clear }: UserSessionComposable = useUserSession();
 
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the account menu is open
+ * @internal
+ * @constant
+ */
 const menuOpen: Ref<boolean> = ref(false);
+
+/**
+ * The template ref for the component root; document clicks outside it close the account menu
+ * @internal
+ * @constant
+ */
 const root = ref<HTMLElement | null>(null);
 
-/* Close the account menu when clicking anywhere outside it. The toggle button lives inside
-   `root`, so opening it doesn't immediately re-close via this handler. */
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 /**
  * A utility method to handle document-level click events; closes the account menu when the click lands outside the
- * component root
+ * component root. The toggle button lives inside `root`, so opening the menu doesn't immediately re-close it via this
+ * handler
  * @internal
  * @function
  * @param e - The triggering mouse event
@@ -48,7 +69,13 @@ function onDocumentClick(e: MouseEvent): void {
 onMounted((): void => document.addEventListener('click', onDocumentClick));
 onBeforeUnmount((): void => document.removeEventListener('click', onDocumentClick));
 
-/** Two-letter fallback for when the Google avatar is missing or fails to load. */
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The two-letter fallback rendered when the Google avatar is missing or fails to load
+ * @internal
+ * @constant
+ */
 const initials: ComputedRef<string> = computed((): string => {
   // Split the display name into words
   const parts: string[] = (user.value?.name ?? '').trim().split(/\s+/);
@@ -62,7 +89,12 @@ const initials: ComputedRef<string> = computed((): string => {
   );
 });
 
-/* Google avatar URLs occasionally 403; fall back to initials if the image errors. */
+/**
+ * Whether the avatar image failed to load; Google avatar URLs occasionally 403, so the template falls back to the
+ * initials when this flips true
+ * @internal
+ * @constant
+ */
 const avatarFailed: Ref<boolean> = ref(false);
 
 /**

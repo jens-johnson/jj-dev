@@ -22,6 +22,16 @@
 import { METERS_PER_MILE, metersToFeet } from '#shared/utils/units';
 import type { IUseVertifixUploadReturn, TVertifixStatus } from '~/composables/use-vertifix-upload';
 
+import { STATUS_LABEL, STEP_LABELS } from './constants';
+
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The upload workflow: the queued items plus the actions that walk each one through matching, preparing, and the
+ * corrected re-upload
+ * @internal
+ * @constant
+ */
 const {
   items,
   addFiles,
@@ -37,22 +47,21 @@ const {
   retry,
 }: IUseVertifixUploadReturn = useVertifixUpload();
 
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether a drag is currently hovering the dropzone; drives its highlight
+ * @internal
+ * @constant
+ */
 const dragging: Ref<boolean> = ref(false);
+
+/**
+ * The hidden file input behind the dropzone; clicked programmatically to open the picker
+ * @internal
+ * @constant
+ */
 const fileInput = ref<HTMLInputElement | null>(null);
-
-const steps = ['Identify run', 'Replace on Strava', 'Done'] as const;
-
-const STATUS_LABEL: Record<TVertifixStatus, string> = {
-  reading: 'Reading photo',
-  ready: 'Ready',
-  matching: 'Finding runs',
-  matched: 'Select a run',
-  preparing: 'Preparing',
-  prepared: 'Awaiting delete',
-  committing: 'Uploading',
-  done: 'Done',
-  error: 'Needs attention',
-};
 
 /**
  * A utility method to map an item status onto its stepper stage (0 identify run, 1 replace on Strava, 2 done)
@@ -95,7 +104,22 @@ function statusClass(status: TVertifixStatus): string {
 
 /* ─── Formatters ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * A utility method to format a distance in meters as miles (i.e. `3.11 mi`)
+ * @internal
+ * @function
+ * @param meters - The distance in meters
+ * @returns The formatted miles string
+ */
 const milesFmt = (meters: number): string => `${(meters / METERS_PER_MILE).toFixed(2)} mi`;
+
+/**
+ * A utility method to format an elevation in meters as whole feet (i.e. `1,464 ft`)
+ * @internal
+ * @function
+ * @param meters - The elevation in meters
+ * @returns The formatted feet string
+ */
 const feet = (meters: number): string => `${metersToFeet(meters).toLocaleString()} ft`;
 
 /**
@@ -306,7 +330,7 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
       <!-- Stepper -->
       <ol class="flex items-center gap-2">
         <li
-          v-for="(label, index) in steps"
+          v-for="(label, index) in STEP_LABELS"
           :key="label"
           class="flex flex-1 items-center gap-2"
         >
@@ -327,7 +351,7 @@ function canPrepare(elevationFeet: number | null, selectedActivityId: number | n
           </span>
 
           <span
-            v-if="index < steps.length - 1"
+            v-if="index < STEP_LABELS.length - 1"
             class="bg-border ml-1 h-px flex-1"
           />
         </li>

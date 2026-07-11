@@ -20,6 +20,11 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+/**
+ * The three branch/environment rows rendered as cards, in promotion order; the tone picks the accent stripe color
+ * @internal
+ * @constant
+ */
 const rows = [
   {
     branch: 'feat/*',

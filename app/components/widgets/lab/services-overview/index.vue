@@ -26,9 +26,16 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { IHomelabService } from '~/types/services';
+import type { IServicesOverviewProps } from './types';
 
-const { services }: { services: IHomelabService[] } = defineProps<{ services: IHomelabService[] }>();
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Component props; the documented homelab services rendered as cards
+ * @internal
+ * @constant
+ */
+const { services }: IServicesOverviewProps = defineProps<IServicesOverviewProps>();
 </script>
 
 <template>

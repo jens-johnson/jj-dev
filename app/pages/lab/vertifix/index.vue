@@ -27,7 +27,18 @@ useSeoMeta({
   robots: 'noindex, nofollow',
 });
 
+/**
+ * The auth-session state; `loggedIn` gates the sign-in prompt and `session` carries the admin flag
+ * @internal
+ * @constant
+ */
 const { loggedIn, session }: UserSessionComposable = useUserSession();
+
+/**
+ * Whether the resolved session belongs to the admin; gates the upload-flow widget client-side
+ * @internal
+ * @constant
+ */
 const isAdmin = computed(() => session.value?.isAdmin === true);
 </script>
 

@@ -19,12 +19,24 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { REVEAL_DELAY_MS } from './constants';
+
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the staggered entrance reveal has begun; flips true shortly after mount to trigger the CSS transitions
+ * @internal
+ * @constant
+ */
 const revealed = ref(false);
 
+/* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 onMounted(() => {
+  // Kick off the staggered entrance reveal shortly after mount
   setTimeout(() => {
     revealed.value = true;
-  }, 80);
+  }, REVEAL_DELAY_MS);
 });
 </script>
 

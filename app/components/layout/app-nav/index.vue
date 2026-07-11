@@ -25,12 +25,37 @@
  */
 import type { IUseThemeReturn } from '~/composables/use-theme';
 
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The active theme and the cycle action driving the theme toggle button
+ * @internal
+ * @constant
+ */
 const { theme, cycleTheme }: IUseThemeReturn = useTheme();
+
+/**
+ * The current route; used to mark the active link and close the mobile menu on navigation
+ * @internal
+ * @constant
+ */
 const route = useRoute();
 
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the mobile slide-down menu panel is open
+ * @internal
+ * @constant
+ */
 const menuOpen = ref(false);
 
-const links = [
+/**
+ * The primary navigation links rendered in both the desktop bar and the mobile panel
+ * @internal
+ * @constant
+ */
+const links: { label: string; to: string }[] = [
   {
     label: 'Projects',
     to: '/projects',
@@ -49,9 +74,13 @@ const links = [
   },
 ];
 
-/* ─── Theme toggle ────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── THEME TOGGLE ───────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Icon hints at the *next* theme; what you'll switch to. */
+/**
+ * The toggle button icon; hints at the *next* theme, i.e. what you'll switch to
+ * @internal
+ * @constant
+ */
 const themeIcon = computed(
   () =>
     ({
@@ -61,6 +90,11 @@ const themeIcon = computed(
     })[theme.value],
 );
 
+/**
+ * The toggle button aria-label; names the *next* theme, matching the icon hint
+ * @internal
+ * @constant
+ */
 const themeLabel = computed(
   () =>
     ({
@@ -70,9 +104,9 @@ const themeLabel = computed(
     })[theme.value],
 );
 
-/* ─── Mobile menu ─────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── MOBILE MENU ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Close the menu whenever the route changes (link tapped). */
+// Close the menu whenever the route changes (link tapped)
 watch(
   () => route.path,
   () => {

@@ -46,68 +46,95 @@ import type { CSSProperties } from 'vue';
 
 import type { ISubstrateDevice } from '~/types/substrate';
 
-const props = defineProps<{ devices: ISubstrateDevice[] }>();
+import {
+  EDGE_STROKE_BY_KIND,
+  FALLBACK_DEVICE_ORDER,
+  LAYER_ORDER,
+  STROKE_ACCENT,
+  STROKE_DATA,
+  STROKE_MUTED,
+  TOPOLOGY_PAD,
+  TOPOLOGY_VIEW_BOX,
+} from './constants';
+import type { IEdge, ISubstrateTopologyProps, TSubstrateLayer } from './types';
 
-/** Two-way bound selected node id; null when nothing is inspected. */
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Component props; the device inventory to place and wire
+ * @internal
+ * @constant
+ */
+const props = defineProps<ISubstrateTopologyProps>();
+
+/**
+ * Two-way bound selected node id; null when nothing is inspected
+ * @internal
+ * @constant
+ */
 const selectedId = defineModel<string | null>('selectedId', { default: null });
 
 /* ─── Interaction state ───────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The node id currently under the pointer (or holding focus); null when none is
+ * @internal
+ * @constant
+ */
 const hoveredId: Ref<string | null> = ref<string | null>(null);
 
-/** Hover wins over selection for the spotlight, so the diagram feels responsive before you commit a click. */
+/**
+ * The node driving the spotlight. Hover wins over selection, so the diagram feels responsive before you commit a
+ * click
+ * @internal
+ * @constant
+ */
 const activeId: ComputedRef<string | null> = computed((): string | null => hoveredId.value ?? selectedId.value);
 
 /* ─── Layout ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Vertical band order, top (faces the internet) to bottom (power). */
-const LAYER_ORDER = ['edge', 'network', 'compute', 'storage', 'service', 'client', 'power'] as const;
-
-/** Fixed SVG coordinate space. HTML nodes map onto it by percentage. */
-const VB: { w: number; h: number } = { w: 1000, h: 620 };
-const PAD: { top: number; bottom: number } = { top: 64, bottom: 64 };
-
-/** Only render bands that actually contain a device. */
-const activeLayers: ComputedRef<(typeof LAYER_ORDER)[number][]> = computed((): (typeof LAYER_ORDER)[number][] =>
-  LAYER_ORDER.filter((l) => props.devices.some((d) => d.layer === l)),
+/**
+ * The bands that actually contain a device; empty bands are not rendered
+ * @internal
+ * @constant
+ */
+const activeLayers: ComputedRef<TSubstrateLayer[]> = computed((): TSubstrateLayer[] =>
+  LAYER_ORDER.filter((l: TSubstrateLayer): boolean =>
+    props.devices.some((d: ISubstrateDevice): boolean => d.layer === l),
+  ),
 );
 
-/** id → centre point in viewBox units. */
+/**
+ * The id → centre point map, in viewBox units
+ * @internal
+ * @constant
+ */
 const layout: ComputedRef<Map<string, { x: number; y: number }>> = computed(
   (): Map<string, { x: number; y: number }> => {
     // Derive the vertical spacing from the number of populated bands
     const map: Map<string, { x: number; y: number }> = new Map<string, { x: number; y: number }>();
-    const rows: (typeof LAYER_ORDER)[number][] = activeLayers.value;
-    const usableH: number = VB.h - PAD.top - PAD.bottom;
+    const rows: TSubstrateLayer[] = activeLayers.value;
+    const usableH: number = TOPOLOGY_VIEW_BOX.h - TOPOLOGY_PAD.top - TOPOLOGY_PAD.bottom;
     const rowGap: number = rows.length > 1 ? usableH / (rows.length - 1) : 0;
 
     rows.forEach((layer, ri) => {
       // Place each band's devices in a stable order, spread evenly across the row width
-      const y: number = rows.length > 1 ? PAD.top + ri * rowGap : VB.h / 2;
+      const y: number = rows.length > 1 ? TOPOLOGY_PAD.top + ri * rowGap : TOPOLOGY_VIEW_BOX.h / 2;
       const inRow: ISubstrateDevice[] = props.devices
         .filter((d) => d.layer === layer)
-        .sort((a, b) => (a.order ?? 100) - (b.order ?? 100) || a.title.localeCompare(b.title));
+        .sort(
+          (a, b) =>
+            (a.order ?? FALLBACK_DEVICE_ORDER) - (b.order ?? FALLBACK_DEVICE_ORDER) || a.title.localeCompare(b.title),
+        );
 
       inRow.forEach((d, ci) => {
-        map.set(d.nodeId, { x: (VB.w * (ci + 1)) / (inRow.length + 1), y });
+        map.set(d.nodeId, { x: (TOPOLOGY_VIEW_BOX.w * (ci + 1)) / (inRow.length + 1), y });
       });
     });
 
     return map;
   },
 );
-
-/**
- * A drawable wire between two placed nodes, flattened from the device connection lists
- * @internal
- * @interface
- */
-interface IEdge {
-  from: string;
-  to: string;
-  kind: string;
-  label?: string;
-}
 
 /** Flatten every device's connections into drawable edges, dropping any that reference a missing node. */
 const edges: ComputedRef<IEdge[]> = computed((): IEdge[] => {
@@ -156,7 +183,7 @@ function nodeStyle(id: string): CSSProperties {
     return {};
   }
   // Convert viewBox units to percentages so the HTML card tracks the SVG wires at any scale
-  return { left: `${(p.x / VB.w) * 100}%`, top: `${(p.y / VB.h) * 100}%` };
+  return { left: `${(p.x / TOPOLOGY_VIEW_BOX.w) * 100}%`, top: `${(p.y / TOPOLOGY_VIEW_BOX.h) * 100}%` };
 }
 
 /* ─── Spotlight ───────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -181,22 +208,34 @@ const connectedIds: ComputedRef<Set<string>> = computed((): Set<string> => {
   return set;
 });
 
+/**
+ * A utility method to determine whether a wire touches the active node and joins the spotlight
+ * @internal
+ * @function
+ * @param e - The edge being drawn
+ * @returns Whether the edge is spotlighted
+ */
 const edgeActive = (e: IEdge): boolean => !!activeId.value && (e.from === activeId.value || e.to === activeId.value);
+
+/**
+ * A utility method to determine whether a wire dims because another node holds the spotlight
+ * @internal
+ * @function
+ * @param e - The edge being drawn
+ * @returns Whether the edge is dimmed
+ */
 const edgeDimmed = (e: IEdge): boolean => !!activeId.value && !edgeActive(e);
+
+/**
+ * A utility method to determine whether a node card dims; anything neither active nor wired to the active node
+ * @internal
+ * @function
+ * @param id - The node id being rendered
+ * @returns Whether the node card is dimmed
+ */
 const nodeDimmed = (id: string): boolean => !!activeId.value && id !== activeId.value && !connectedIds.value.has(id);
 
 /* ─── Visual maps ─────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-const STROKE_ACCENT = 'stroke-accent';
-const STROKE_MUTED = 'stroke-ink-subtle';
-const STROKE_DATA = 'stroke-accent-secondary';
-
-const EDGE_BASE: Record<string, string> = {
-  uplink: STROKE_ACCENT,
-  network: STROKE_MUTED,
-  data: STROKE_DATA,
-  power: STROKE_MUTED,
-};
 
 /**
  * A utility method to pick the base stroke color class for a wire; the accent when spotlighted, otherwise mapped
@@ -207,7 +246,7 @@ const EDGE_BASE: Record<string, string> = {
  * @returns The Tailwind stroke class for the static wire
  */
 function edgeBaseClass(e: IEdge): string {
-  return edgeActive(e) ? STROKE_ACCENT : (EDGE_BASE[e.kind] ?? STROKE_MUTED);
+  return edgeActive(e) ? STROKE_ACCENT : (EDGE_STROKE_BY_KIND[e.kind] ?? STROKE_MUTED);
 }
 /**
  * A utility method to pick the opacity class for a wire; full when spotlighted, faint when dimmed, and a subtler
@@ -263,7 +302,7 @@ function toggle(id: string): void {
       <!-- Wires (behind the nodes; clicks pass through) -->
       <svg
         class="pointer-events-none absolute inset-0 h-full w-full"
-        :viewBox="`0 0 ${VB.w} ${VB.h}`"
+        :viewBox="`0 0 ${TOPOLOGY_VIEW_BOX.w} ${TOPOLOGY_VIEW_BOX.h}`"
         preserveAspectRatio="xMidYMid meet"
         fill="none"
         aria-hidden="true"

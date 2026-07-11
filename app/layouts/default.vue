@@ -20,7 +20,13 @@
  */
 import type { IUseThemeReturn } from '~/composables/use-theme';
 
+/**
+ * The theme initializer from the theme composable; runs on mount to apply the persisted theme to the document
+ * @internal
+ * @constant
+ */
 const { initTheme }: IUseThemeReturn = useTheme();
+
 onMounted(initTheme);
 </script>
 

@@ -12,35 +12,80 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████ #components/widgets/lab/substrate-live-card/index.vue █████████████████████████████████████████
+ * ███████████████████████████████ #components/widgets/lab/substrate-live-card/index.vue ███████████████████████████████
  *
  * Live node-health card for the Substrate Overview: headline metrics (CPU, RAM, uptime, guests), an expandable
  * secondary row (load, disk, swap), and an "updated Ns ago" stamp. Fed by useSubstrateMetrics.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-metrics';
+import type { IStateVisual, IUseSubstrateMetricsReturn } from '~/composables/use-substrate-metrics';
+import type { ISubstrateMetricsNode, ISubstrateMetricsView } from '~/types/substrate-metrics';
 
-const { data, state, cpuSeries, memSeries, updatedLabel }: IUseSubstrateMetricsReturn = useSubstrateMetrics();
-const node = computed(() => data.value?.node ?? null);
-const guests = computed(() => data.value?.guests ?? null);
-const storage = computed(() => data.value?.storage ?? null);
-const vis = computed(() => METRIC_STATE[state.value]);
-const showMore = ref(false);
+import type { ITile } from './types';
+
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
- *
+ * The shared live-metrics feed: current snapshot, feed state, CPU/RAM history, and a human-readable freshness label
+ * @internal
+ * @constant
  */
-interface ITile {
-  label: string;
-  value: string;
-  sub: string;
-  series?: number[];
-}
+const { data, state, cpuSeries, memSeries, updatedLabel }: IUseSubstrateMetricsReturn = useSubstrateMetrics();
 
-const stats = computed<ITile[]>(() => {
-  const n = node.value;
-  const g = guests.value;
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the secondary metrics row (load, disk, swap) is expanded
+ * @internal
+ * @constant
+ */
+const showMore: Ref<boolean> = ref(false);
+
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The live node snapshot, or null while the feed has nothing yet
+ * @internal
+ * @constant
+ */
+const node: ComputedRef<ISubstrateMetricsNode | null> = computed(
+  (): ISubstrateMetricsNode | null => data.value?.node ?? null,
+);
+
+/**
+ * The live guest counts (VMs + containers), or null while the feed has nothing yet
+ * @internal
+ * @constant
+ */
+const guests: ComputedRef<ISubstrateMetricsView['guests']> = computed(
+  (): ISubstrateMetricsView['guests'] => data.value?.guests ?? null,
+);
+
+/**
+ * The live storage usage, or null while the feed has nothing yet
+ * @internal
+ * @constant
+ */
+const storage: ComputedRef<ISubstrateMetricsView['storage']> = computed(
+  (): ISubstrateMetricsView['storage'] => data.value?.storage ?? null,
+);
+
+/**
+ * The visual treatment (dot, pulse, label) for the current feed state
+ * @internal
+ * @constant
+ */
+const vis: ComputedRef<IStateVisual> = computed((): IStateVisual => METRIC_STATE[state.value]);
+
+/**
+ * The headline metric tiles: CPU and RAM (with sparkline history), uptime, and running services
+ * @internal
+ * @constant
+ */
+const stats: ComputedRef<ITile[]> = computed((): ITile[] => {
+  const n: ISubstrateMetricsNode | null = node.value;
+  const g: ISubstrateMetricsView['guests'] = guests.value;
   if (!n) {
     return [];
   }

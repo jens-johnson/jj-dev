@@ -26,32 +26,72 @@ useSeoMeta({
   description: 'The layer everything runs on; a living, documented map of my homelab hardware and how it is wired.',
 });
 
-/* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The raw substrate device docs (drafts excluded) from the content collection
+ * @internal
+ * @constant
+ */
 const { data: devices } = await useAsyncData('substrate-devices', () =>
   queryCollection('substrate').where('draft', '=', false).all(),
 );
 
-/** Clean, fully-populated devices for the topology + inspector. */
+/**
+ * Clean, fully-populated devices for the topology + inspector
+ * @internal
+ * @constant
+ */
 const list = computed(() => normalizeDevices(devices.value ?? []));
 
-/** Services running on the substrate, for the Services tab. */
+/**
+ * The raw service docs (drafts excluded) backing the Services tab
+ * @internal
+ * @constant
+ */
 const { data: serviceDocs } = await useAsyncData('substrate-services', () =>
   queryCollection('services').where('draft', '=', false).all(),
 );
+
+/**
+ * Clean, fully-populated services running on the substrate, for the Services tab
+ * @internal
+ * @constant
+ */
 const services = computed(() => normalizeServices(serviceDocs.value ?? []));
 
-/* ─── Tabs (query-param driven) ───────────────────────────────────────────────────────────────────────────────────── */
+/* ─── TABS ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The current route; carries the `?view=` tab query param
+ * @internal
+ * @constant
+ */
 const route = useRoute();
+
+/**
+ * The router; used to swap the `?view=` param without polluting the history stack
+ * @internal
+ * @constant
+ */
 const router = useRouter();
 
+/**
+ * The tab definitions for the query-param-driven view switcher
+ * @internal
+ * @constant
+ */
 const TABS: ReadonlyArray<{ key: string; label: string; soon?: boolean }> = [
   { key: 'overview', label: 'Overview' },
   { key: 'topology', label: 'Topology' },
   { key: 'services', label: 'Services' },
 ];
 
+/**
+ * The active tab key, driven by the `?view=` query param
+ * @internal
+ * @constant
+ */
 const activeView: ComputedRef<string> = computed((): string => {
   // Fall back to the overview tab when the query param is missing or not a known tab key
   const v = route.query.view;
@@ -59,37 +99,70 @@ const activeView: ComputedRef<string> = computed((): string => {
   return TABS.some((t) => t.key === key) ? key : 'overview';
 });
 
-/** Drop `view` from the URL for the default tab so the canonical link stays clean. */
+/**
+ * Activates a tab by writing the `?view=` query param; drops `view` from the URL for the default tab so the
+ * canonical link stays clean
+ * @internal
+ * @function
+ * @param key - The tab key to activate
+ */
 function setView(key: string): void {
   // Replace (not push) the query param so tab switches do not pollute the history stack
   router.replace({ query: { ...route.query, view: key === 'overview' ? undefined : key } });
 }
 
-/* ─── Selection (topology inspector) ──────────────────────────────────────────────────────────────────────────────── */
+/* ─── SELECTION ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Default the inspector to the firewall/gateway; the heart of the topology, falling back to the first node. */
+/**
+ * Defaults the topology inspector to the firewall/gateway; the heart of the topology, falling back to the first node
+ * @internal
+ * @function
+ * @returns The initially selected node id, or null when there are no devices
+ */
 function pickInitial(): string | null {
   const l = list.value;
   const gw = l.find((d) => d.kind === 'firewall' || d.kind === 'gateway');
   return gw?.nodeId ?? l[0]?.nodeId ?? null;
 }
 
+/**
+ * The node id selected in the topology inspector
+ * @internal
+ * @constant
+ */
 const selectedId = ref<string | null>(pickInitial());
 
-/** Cleaned device for the inspector's structured fields. */
+/**
+ * Cleaned device for the inspector's structured fields
+ * @internal
+ * @constant
+ */
 const selectedDevice = computed(() => list.value.find((d) => d.nodeId === selectedId.value) ?? null);
 
-/** Original queried doc (carries the markdown body) for ContentRenderer. */
+/**
+ * Original queried doc (carries the markdown body) for ContentRenderer
+ * @internal
+ * @constant
+ */
 const selectedRawDoc = computed(() => (devices.value ?? []).find((d) => d.nodeId === selectedId.value) ?? null);
 
-/** Only surface the Notes section when the selected doc actually has body content (some nodes are frontmatter-only). */
+/**
+ * Only surface the Notes section when the selected doc actually has body content (some nodes are frontmatter-only)
+ * @internal
+ * @constant
+ */
 const hasNotes = computed(() => {
   const value = (selectedRawDoc.value?.body as unknown as { value?: unknown[] } | undefined)?.value;
   return Array.isArray(value) && value.length > 0;
 });
 
-/* ─── Legends ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── LEGENDS ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The device-status legend entries rendered under the topology
+ * @internal
+ * @constant
+ */
 const statusLegend = [
   { label: 'Online', dot: 'bg-accent-secondary' },
   { label: 'Maintenance', dot: 'bg-terra-400' },
@@ -97,6 +170,11 @@ const statusLegend = [
   { label: 'Offline', dot: 'bg-terra-600' },
 ];
 
+/**
+ * The link-kind legend entries rendered under the topology
+ * @internal
+ * @constant
+ */
 const linkLegend = [
   { label: 'Uplink', cls: 'bg-accent' },
   { label: 'Network', cls: 'bg-ink-subtle' },
@@ -104,9 +182,15 @@ const linkLegend = [
   { label: 'Power', cls: 'bg-ink-subtle/50' },
 ];
 
-/* ─── Entrance ────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── ENTRANCE ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Whether the entrance animations have been triggered; flips true shortly after mount
+ * @internal
+ * @constant
+ */
 const revealed = ref(false);
+
 onMounted(() => {
   setTimeout(() => {
     revealed.value = true;

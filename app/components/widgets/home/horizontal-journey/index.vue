@@ -29,18 +29,46 @@
 
 import type { CSSProperties } from 'vue';
 
-const PANELS = 4;
-const PANEL_NAMES: string[] = ['About', 'Projects', 'Writing', 'Connect'];
+import { PANEL_NAMES, PANELS } from './constants';
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The latest published blog posts rendered as bento cards on the Writing panel
+ * @internal
+ * @constant
+ */
 const { data: posts } = await useAsyncData('journey-posts', () =>
   queryCollection('blog').where('draft', '=', false).order('publishedAt', 'DESC').limit(4).all(),
 );
 
-// ── Scroll tracking ───────────────────────────────────────────────────────────
+/* ─── SCROLL TRACKING ────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The template ref for the tall outer wrapper whose scroll-through drives the horizontal sweep
+ * @internal
+ * @constant
+ */
 const outerRef = ref<HTMLElement | null>(null);
+
+/**
+ * The raw 0..1 progress through the wrapper's scrollable range, updated on every scroll event
+ * @internal
+ * @constant
+ */
 const rawProgress: Ref<number> = ref(0);
+
+/**
+ * The eased 0..1 progress lerped toward rawProgress each frame; drives the track translation
+ * @internal
+ * @constant
+ */
 const lerpProgress: Ref<number> = ref(0);
+
+/**
+ * The requestAnimationFrame handle for the easing loop; cancelled on unmount
+ * @internal
+ */
 let raf: number;
 
 /**
@@ -84,6 +112,8 @@ function tick(): void {
   raf = requestAnimationFrame(tick);
 }
 
+/* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 onMounted((): void => {
   // Track scroll, start the easing loop, and sample the initial position
   window.addEventListener('scroll', onScroll, {
@@ -98,20 +128,30 @@ onUnmounted((): void => {
   cancelAnimationFrame(raf);
 });
 
-// ── Derived ───────────────────────────────────────────────────────────────────
-/** Translate the track left by (progress × panels-1 × 100vw). */
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The horizontal track style; translates the track left by (progress × panels-1 × 100vw)
+ * @internal
+ * @constant
+ */
 const trackStyle: ComputedRef<CSSProperties> = computed(
   (): CSSProperties => ({
     transform: `translateX(${-lerpProgress.value * (PANELS - 1) * 100}vw)`,
   }),
 );
 
-/** Snap-nearest panel index (for indicators). */
+/**
+ * The snap-nearest panel index for the indicator dots and per-panel entrance transitions
+ * @internal
+ * @constant
+ */
 const activePanel: ComputedRef<number> = computed((): number =>
   Math.min(PANELS - 1, Math.round(rawProgress.value * (PANELS - 1))),
 );
 
-// ── Navigation click (indicator dots) ────────────────────────────────────────
+/* ─── NAVIGATION ─────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 /**
  * A utility method to smooth-scroll the window to the vertical position mapping to the given panel; used by the
  * indicator dot buttons for direct navigation

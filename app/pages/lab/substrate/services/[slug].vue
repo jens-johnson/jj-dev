@@ -23,14 +23,34 @@
 import type { IUseJenscraftMetricsReturn } from '~/composables/use-jenscraft-metrics';
 import type { IServicePlugin } from '~/types/services';
 
+/**
+ * The current route; its slug param selects the service
+ * @internal
+ * @constant
+ */
 const route = useRoute();
+
+/**
+ * The service slug from the route params
+ * @internal
+ * @constant
+ */
 const slug = computed(() => String(route.params.slug ?? ''));
 
-/* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The raw service docs from the content collection
+ * @internal
+ * @constant
+ */
 const { data: services } = await useAsyncData('services-all', () => queryCollection('services').all());
 
-/** Raw queried doc (carries the markdown body) for ContentRenderer. */
+/**
+ * Raw queried doc (carries the markdown body) for ContentRenderer
+ * @internal
+ * @constant
+ */
 const rawDoc = computed(() => (services.value ?? []).find((s) => s.serviceId === slug.value) ?? null);
 
 if (!rawDoc.value) {
@@ -41,10 +61,25 @@ if (!rawDoc.value) {
   });
 }
 
+/**
+ * The normalized service for the current slug; null flips the template off (the guard above already 404ed)
+ * @internal
+ * @constant
+ */
 const service = computed(() => normalizeServices(services.value ?? []).find((s) => s.serviceId === slug.value) ?? null);
 
-/** Host device title, resolved from the substrate collection, so the host chip reads as a name not an id. */
+/**
+ * The substrate device docs; resolve the host device's display title for the "Runs on" chip
+ * @internal
+ * @constant
+ */
 const { data: devices } = await useAsyncData('services-host-devices', () => queryCollection('substrate').all());
+
+/**
+ * Host device title, resolved from the substrate collection, so the host chip reads as a name not an id
+ * @internal
+ * @constant
+ */
 const hostTitle = computed(() => {
   const id = service.value?.host;
   if (!id) {
@@ -53,19 +88,37 @@ const hostTitle = computed(() => {
   return (devices.value ?? []).find((d) => d.nodeId === id)?.title ?? id;
 });
 
+/**
+ * Whether the service is still planned; switches links to inert pills and mutes the header icon tile
+ * @internal
+ * @constant
+ */
 const isPlanned = computed(() => service.value?.status === 'planned');
 
-/** Description split into plain + device-linked segments (e.g. `srv-01` → its node page), rendered monospace. */
+/**
+ * Description split into plain + device-linked segments (e.g. `srv-01` → its node page), rendered monospace
+ * @internal
+ * @constant
+ */
 const descriptionSegments = computed(() => splitDeviceMentions(service.value?.description ?? ''));
 
-/* ─── Live metrics ────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── LIVE METRICS ───────────────────────────────────────────────────────────────────────────────────────────────── */
 
-// Jenscraft is the only service wired to a live publisher feed today; other service pages stay inert (no fetch) and
-// fall back to the metrics widget's "awaiting feed" state.
+/**
+ * The live metrics feed. Jenscraft is the only service wired to a live publisher feed today; other service pages stay
+ * inert (no fetch) and fall back to the metrics widget's "awaiting feed" state
+ * @internal
+ * @constant
+ */
 const { live: liveMetrics }: IUseJenscraftMetricsReturn = useJenscraftMetrics(slug.value === 'jenscraft');
 
-/* ─── Links ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── LINKS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The display label and icon per known link key; unknown keys fall back to a generic link entry
+ * @internal
+ * @constant
+ */
 const LINK_META: Record<string, { label: string; icon: string }> = {
   live: { label: 'Website', icon: 'lucide:external-link' },
   map: { label: 'View Map', icon: 'lucide:map' },
@@ -73,9 +126,18 @@ const LINK_META: Record<string, { label: string; icon: string }> = {
   docs: { label: 'Docs', icon: 'lucide:book-open' },
 };
 
-/** The public web-map link is hoisted up beside the status indicator, so it's pulled out of the general link row. */
+/**
+ * The public web-map link is hoisted up beside the status indicator, so it's pulled out of the general link row
+ * @internal
+ * @constant
+ */
 const mapLink = computed(() => service.value?.links?.map ?? null);
 
+/**
+ * The general link-row items; every declared link except the hoisted map link, joined with its label/icon metadata
+ * @internal
+ * @constant
+ */
 const linkItems = computed(() =>
   Object.entries(service.value?.links ?? {})
     .filter(([key, url]: [string, string | undefined]): boolean => !!url && key !== 'map')
@@ -86,9 +148,13 @@ const linkItems = computed(() =>
     })),
 );
 
-/* ─── Plugins (split server / client) ─────────────────────────────────────────────────────────────────────────────── */
+/* ─── PLUGINS ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Distinct plugin categories (for the filter bar), sorted, derived from whatever the service actually declares. */
+/**
+ * Distinct plugin categories (for the filter bar), sorted, derived from whatever the service actually declares
+ * @internal
+ * @constant
+ */
 const pluginCategories: ComputedRef<string[]> = computed((): string[] => {
   // Collect the distinct categories across the declared plugins, then sort them for a stable filter bar
   const set = new Set<string>();
@@ -98,8 +164,13 @@ const pluginCategories: ComputedRef<string[]> = computed((): string[] => {
   return Array.from(set).sort();
 });
 
-/** Active category filter; null = show all. Clicking a chip filters the list; clicking it again (or "All") resets. */
+/**
+ * Active category filter; null = show all. Clicking a chip filters the list; clicking it again (or "All") resets
+ * @internal
+ * @constant
+ */
 const activeCategory: Ref<string | null> = ref<string | null>(null);
+
 /**
  * Toggles the active plugin-category filter; clicking the already-active chip clears the filter back to "all"
  * @internal
@@ -111,21 +182,42 @@ function toggleCategory(category: string): void {
   activeCategory.value = activeCategory.value === category ? null : category;
 }
 
+/**
+ * The plugins surfaced by the active category filter; every declared plugin when no filter is active
+ * @internal
+ * @constant
+ */
 const visiblePlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
   (service.value?.plugins ?? []).filter(
     (p: IServicePlugin): boolean => !activeCategory.value || p.category === activeCategory.value,
   ),
 );
 
+/**
+ * The visible plugins that run server-side
+ * @internal
+ * @constant
+ */
 const serverPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
   visiblePlugins.value.filter((p: IServicePlugin): boolean => p.side === 'server'),
 );
+
+/**
+ * The visible plugins recommended client-side
+ * @internal
+ * @constant
+ */
 const clientPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
   visiblePlugins.value.filter((p: IServicePlugin): boolean => p.side === 'client'),
 );
 
-/* ─── Body ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── BODY ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Whether the raw doc's minimark body has at least one content node; gates the write-up section
+ * @internal
+ * @constant
+ */
 const hasNotes = computed(() => {
   const value = (rawDoc.value?.body as unknown as { value?: unknown[] } | undefined)?.value;
   return Array.isArray(value) && value.length > 0;

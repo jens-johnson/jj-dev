@@ -31,23 +31,62 @@ import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-met
 import type { ISubstrateDevice } from '~/types/substrate';
 import type { ISubstrateMetricsNode, ISubstrateMetricsView } from '~/types/substrate-metrics';
 
-const props = defineProps<{ devices: ISubstrateDevice[] }>();
+import { FALLBACK_DEVICE_ORDER, TONE_PRESSURE_THRESHOLD_PCT } from './constants';
+import type { IFleetSummaryStat, IFleetTone, ISubstrateFleetProps } from './types';
 
-// The live Proxmox feed driving the telemetry rows: current snapshot, feed state, CPU/RAM history, freshness label
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Component props; the static device inventory whose rows populate the telemetry table
+ * @internal
+ * @constant
+ */
+const props = defineProps<ISubstrateFleetProps>();
+
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The live Proxmox feed driving the telemetry rows: current snapshot, feed state, CPU/RAM history, freshness label
+ * @internal
+ * @constant
+ */
 const { data, state, cpuSeries, memSeries, updatedLabel }: IUseSubstrateMetricsReturn = useSubstrateMetrics();
+
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the per-device telemetry table is expanded
+ * @internal
+ * @constant
+ */
+const open: Ref<boolean> = ref(false);
+
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The live node snapshot, or null while the feed has nothing yet
+ * @internal
+ * @constant
+ */
 const node: ComputedRef<ISubstrateMetricsNode | null> = computed(
   (): ISubstrateMetricsNode | null => data.value?.node ?? null,
 );
+
+/**
+ * The live guest counts (VMs + containers), or null while the feed has nothing yet
+ * @internal
+ * @constant
+ */
 const guests: ComputedRef<ISubstrateMetricsView['guests']> = computed(
   (): ISubstrateMetricsView['guests'] => data.value?.guests ?? null,
 );
 
-const open: Ref<boolean> = ref(false);
-
-/* ─── Summary counts (the collapsed surface) ──────────────────────────────────────────────────────────────────────── */
-
-const summary: ComputedRef<{ label: string; value: number }[]> = computed((): { label: string; value: number }[] => {
-  // Roll the inventory up into the three collapsed-surface counters
+/**
+ * The inventory rolled up into the three collapsed-surface counters: nodes, online, planned
+ * @internal
+ * @constant
+ */
+const summary: ComputedRef<IFleetSummaryStat[]> = computed((): IFleetSummaryStat[] => {
   const l: ISubstrateDevice[] = props.devices;
   return [
     { label: 'Nodes', value: l.length },
@@ -56,21 +95,46 @@ const summary: ComputedRef<{ label: string; value: number }[]> = computed((): { 
   ];
 });
 
-/* ─── Per-device rows, sorted by topology order ───────────────────────────────────────────────────────────────────── */
-
+/**
+ * The per-device rows, sorted by topology order
+ * @internal
+ * @constant
+ */
 const rows: ComputedRef<ISubstrateDevice[]> = computed((): ISubstrateDevice[] =>
-  [...props.devices].sort((a, b) => (a.order ?? 100) - (b.order ?? 100) || a.title.localeCompare(b.title)),
+  [...props.devices].sort(
+    (a, b) => (a.order ?? FALLBACK_DEVICE_ORDER) - (b.order ?? FALLBACK_DEVICE_ORDER) || a.title.localeCompare(b.title),
+  ),
 );
 
-/** The one device the live feed describes today (the hypervisor); telemetry only renders on its row. */
+/**
+ * The one device the live feed describes today (the hypervisor); telemetry only renders on its row
+ * @internal
+ * @constant
+ */
 const liveId: ComputedRef<string | null> = computed(
   (): string | null => props.devices.find((d) => d.kind === 'hypervisor')?.nodeId ?? null,
 );
+
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * A utility method to determine whether a row renders live telemetry; the reporting host while the feed is up
+ * @internal
+ * @function
+ * @param d - The device on the row being rendered
+ * @returns Whether the row shows live telemetry
+ */
 const isLive = (d: ISubstrateDevice): boolean => d.nodeId === liveId.value && state.value !== 'offline' && !!node.value;
 
-/** Gauge + sparkline tone: cools to the live accent, warms to terra under pressure. */
-function tone(pct: number): { bar: string; text: string } {
-  return pct >= 92
+/**
+ * A utility method to pick the gauge and sparkline tone; cools to the live accent, warms to terra under pressure
+ * @internal
+ * @function
+ * @param pct - The utilization percentage the gauge shows
+ * @returns The Tailwind classes for the gauge bar and sparkline
+ */
+function tone(pct: number): IFleetTone {
+  return pct >= TONE_PRESSURE_THRESHOLD_PCT
     ? { bar: 'bg-terra-400', text: 'text-terra-400' }
     : { bar: 'bg-accent-secondary', text: 'text-accent-secondary' };
 }

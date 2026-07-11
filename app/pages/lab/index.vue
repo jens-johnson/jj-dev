@@ -26,12 +26,22 @@ useSeoMeta({
   description: 'Experiments, demos, and the homelab; things I build to learn. Home of Substrate, my homelab project.',
 });
 
-/** Devices feed the hub card's system-health indicator. No live metrics yet, so this reflects declared status. */
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Devices feed the hub card's system-health indicator. No live metrics yet, so this reflects declared status
+ * @internal
+ * @constant
+ */
 const { data: devices } = await useAsyncData('lab-substrate-devices', () =>
   queryCollection('substrate').where('draft', '=', false).all(),
 );
 
-/** Overall health for the Substrate card; wires to real metrics once the box reports in. */
+/**
+ * Overall health for the Substrate card; wires to real metrics once the box reports in
+ * @internal
+ * @constant
+ */
 const health = computed(() => {
   const d = devices.value ?? [];
   if (!d.length) {
@@ -55,11 +65,31 @@ const health = computed(() => {
   };
 });
 
+/* ─── ADMIN ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The auth-session state; carries the admin flag that gates the Vertifix card
+ * @internal
+ * @constant
+ */
 const { session }: UserSessionComposable = useUserSession();
-/** The Vertifix tool is internal; its card only reveals once an admin session resolves client-side. */
+
+/**
+ * The Vertifix tool is internal; its card only reveals once an admin session resolves client-side
+ * @internal
+ * @constant
+ */
 const isAdmin = computed(() => session.value?.isAdmin === true);
 
+/* ─── ENTRANCE ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the entrance animations have been triggered; flips true shortly after mount
+ * @internal
+ * @constant
+ */
 const revealed = ref(false);
+
 onMounted(() => {
   setTimeout(() => {
     revealed.value = true;

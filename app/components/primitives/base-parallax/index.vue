@@ -48,30 +48,74 @@
 import type { TPropsWithDefaults } from '@jens-johnson/style-guide/types/vue';
 import type { CSSProperties } from 'vue';
 
-/**
- * The props accepted by the parallax primitive; both tune the feel of the effect and are optional
- * @internal
- * @interface
- */
-interface Props {
-  /** Lerp factor; lower = smoother/slower. Default 0.055. */
-  lerp?: number;
-  /** Hero height fraction of viewport for markStyle progress. Default 0.92. */
-  heroFraction?: number;
-}
-const props: TPropsWithDefaults<Props, 'lerp' | 'heroFraction'> = withDefaults(defineProps<Props>(), {
-  lerp: 0.055,
-  heroFraction: 0.92,
-});
+import type { IBaseParallaxProps } from './types';
 
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Component props; tune the lerp feel of the effect and the hero fraction driving markStyle scroll progress
+ * @internal
+ * @constant
+ */
+const props: TPropsWithDefaults<IBaseParallaxProps, 'lerp' | 'heroFraction'> = withDefaults(
+  defineProps<IBaseParallaxProps>(),
+  {
+    lerp: 0.055,
+    heroFraction: 0.92,
+  },
+);
+
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The template ref for the root wrapper element the mouse tracking is measured against
+ * @internal
+ * @constant
+ */
 const rootEl = useTemplateRef<HTMLElement>('root');
 
+/**
+ * The raw cursor x position normalized to the -1..+1 range relative to the root element center
+ * @internal
+ * @constant
+ */
 const rawX: Ref<number> = ref(0);
+
+/**
+ * The raw cursor y position normalized to the -1..+1 range relative to the root element center
+ * @internal
+ * @constant
+ */
 const rawY: Ref<number> = ref(0);
+
+/**
+ * The lerped cursor x position eased toward rawX each frame; exposed to the slot
+ * @internal
+ * @constant
+ */
 const smoothX: Ref<number> = ref(0);
+
+/**
+ * The lerped cursor y position eased toward rawY each frame; exposed to the slot
+ * @internal
+ * @constant
+ */
 const smoothY: Ref<number> = ref(0);
+
+/**
+ * The current window.scrollY, sampled each frame and on scroll; exposed to the slot
+ * @internal
+ * @constant
+ */
 const scrollY: Ref<number> = ref(0);
+
+/**
+ * The requestAnimationFrame handle for the per-frame loop; cancelled on unmount
+ * @internal
+ */
 let raf: number;
+
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * A utility method to linearly interpolate between two values
@@ -118,6 +162,8 @@ function tick(): void {
   raf = requestAnimationFrame(tick);
 }
 
+/* ─── SLOT STYLE FACTORIES ───────────────────────────────────────────────────────────────────────────────────────── */
+
 /**
  * A slot-exposed style factory producing a translate transform driven by the lerped mouse position and scroll offset
  * @internal
@@ -155,6 +201,8 @@ function markStyle(): CSSProperties {
     transition: 'opacity 0.12s linear',
   };
 }
+
+/* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 onMounted((): void => {
   // Start the per-frame loop and keep the scroll offset fresh between frames

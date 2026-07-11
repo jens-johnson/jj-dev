@@ -21,10 +21,20 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+/**
+ * The current route; its path keys the content query for this post
+ * @internal
+ * @constant
+ */
 const route = useRoute();
 
-/* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The queried blog post for the current path; a missing doc 404s before render
+ * @internal
+ * @constant
+ */
 const { data: post } = await useAsyncData(`blog-${route.path}`, () => queryCollection('blog').path(route.path).first());
 
 if (!post.value) {
@@ -43,9 +53,13 @@ useSeoMeta({
   ogImage: post.value.cover?.src,
 });
 
-/* ─── Table of contents ───────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── TABLE OF CONTENTS ──────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Flat list of h2 headings extracted from the rendered body, used for the sidebar TOC. */
+/**
+ * Flat list of h2 headings extracted from the rendered body, used for the sidebar TOC
+ * @internal
+ * @constant
+ */
 const toc = computed<{ id: string; text: string }[]>(() => {
   const links = post.value?.body?.toc?.links ?? [];
   return links.map((link: { id: string; text: string }) => ({
@@ -54,7 +68,7 @@ const toc = computed<{ id: string; text: string }[]>(() => {
   }));
 });
 
-/* ─── Formatting helpers ──────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── HELPERS ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * Formats an ISO date string as a long en-US date (i.e. "July 9, 2026") for the post header metadata
@@ -205,7 +219,7 @@ function formatDate(iso: string): string {
 </template>
 
 <style scoped>
-/* ─── Prose styling for rendered markdown ─────────────────────────────────────────────────────────────────────────── */
+/* ─── Prose styling for rendered markdown ────────────────────────────────────────────────────────────────────────── */
 
 /* Custom rather than @tailwindcss/typography to keep our earth-tone tokens and Syne/Plus Jakarta type system intact. */
 
@@ -213,7 +227,7 @@ function formatDate(iso: string): string {
   counter-reset: section;
 }
 
-/* ─── Headings ─────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── Headings ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 .prose-jj :deep(h2),
 .prose-jj :deep(h3),
@@ -403,7 +417,7 @@ function formatDate(iso: string): string {
   color: var(--color-accent);
 }
 
-/* ─── Code blocks ───────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── Code blocks ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /* ProsePre wraps the <pre> in a `.prose-pre` div. Border + rounding live on the WRAPPER only; the inner <pre>
    is transparent so there's no double-border effect. */

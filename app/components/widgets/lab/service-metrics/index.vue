@@ -39,25 +39,37 @@
  */
 import type { IServiceMetricTile } from '~/types/services';
 
-const {
-  tiles,
-  live = null,
-  label = 'service',
-}: { tiles: IServiceMetricTile[]; live?: Record<string, string | number> | null; label?: string } = defineProps<{
-  /** Declared tiles from the service frontmatter. */
-  tiles: IServiceMetricTile[];
-  /** Live values keyed by tile `key`; null until the metrics publisher reports in. */
-  live?: Record<string, string | number> | null;
-  /** Short noun for the empty-state copy, e.g. "server". */
-  label?: string;
-}>();
+import type { IServiceMetricsProps } from './types';
 
-/** Whether any live value is present; flips the header from "planned" to "live". */
-const isLive = computed(() => !!live && Object.keys(live).length > 0);
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Resolve a tile's display value + unit, or null when there's nothing live yet. */
+/**
+ * Component props; the declared metric tiles, the live values feeding them, and the empty-state noun
+ * @internal
+ * @constant
+ */
+const { tiles, live = null, label = 'service' }: IServiceMetricsProps = defineProps<IServiceMetricsProps>();
+
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether any live value is present; flips the header from "planned" to "live"
+ * @internal
+ * @constant
+ */
+const isLive: ComputedRef<boolean> = computed((): boolean => !!live && Object.keys(live).length > 0);
+
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * A utility method to resolve a tile's display value with its unit appended
+ * @internal
+ * @function
+ * @param tile - The declared metric tile being rendered
+ * @returns The display string, or null when there's nothing live for the tile yet
+ */
 function valueOf(tile: IServiceMetricTile): string | null {
-  const raw = live?.[tile.key];
+  const raw: string | number | undefined = live?.[tile.key];
   if (raw === undefined || raw === null || raw === '') {
     return null;
   }
