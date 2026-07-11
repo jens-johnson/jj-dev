@@ -25,6 +25,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { useEventListener, useRafFn } from '@vueuse/core';
+
 import { ACCENT_RGB, NUM_LINES, PEAK_HEIGHT, PEAK_SIGMA, SPEED } from './constants';
 
 /* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -35,12 +37,6 @@ import { ACCENT_RGB, NUM_LINES, PEAK_HEIGHT, PEAK_SIGMA, SPEED } from './constan
  * @constant
  */
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvas');
-
-/**
- * The requestAnimationFrame handle for the render loop; canceled on unmount
- * @internal
- */
-let raf: number;
 
 /**
  * The cached 2D rendering context; refreshed by resize and null until the canvas is laid out
@@ -215,13 +211,12 @@ function drawGlow(mx: number, my: number): void {
 
 /**
  * The main render loop; clears the canvas, advances the animation clock, lerps the mouse, strokes each contour line
- * with proximity-weighted opacity/width, and overlays the cursor glow while the mouse is active
+ * with proximity-weighted opacity/width, and overlays the cursor glow while the mouse is active. Driven by useRafFn,
+ * which schedules and cancels it with the component lifecycle
  * @internal
  * @function
  */
 function draw(): void {
-  // Re-schedule first so the loop survives early returns
-  raf = requestAnimationFrame(draw);
   if (!ctx || W === 0 || H === 0) {
     return;
   }
@@ -294,22 +289,14 @@ function onLeave(): void {
 
 /* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+// Size the canvas once it is laid out; the render loop and resize listener auto-start client-side and tear down on
+// unmount (useRafFn and useEventListener manage the raf handle and the listener, so no manual cleanup is needed)
 onMounted((): void => {
-  // Size the canvas once it is laid out, then start the render loop
-  nextTick((): void => {
-    resize();
-    raf = requestAnimationFrame(draw);
-  });
-  // Keep the backing store in sync with the rendered size
-  window.addEventListener('resize', resize, {
-    passive: true,
-  });
+  nextTick(resize);
 });
-
-onUnmounted((): void => {
-  // Stop the render loop and detach the window listener
-  cancelAnimationFrame(raf);
-  window.removeEventListener('resize', resize);
+useRafFn(draw);
+useEventListener(window, 'resize', resize, {
+  passive: true,
 });
 </script>
 

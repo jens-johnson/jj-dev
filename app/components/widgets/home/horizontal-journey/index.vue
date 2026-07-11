@@ -27,6 +27,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { useEventListener, useRafFn } from '@vueuse/core';
 import type { CSSProperties } from 'vue';
 
 import { PANEL_NAMES, PANELS } from './constants';
@@ -66,12 +67,6 @@ const rawProgress: Ref<number> = ref(0);
 const lerpProgress: Ref<number> = ref(0);
 
 /**
- * The requestAnimationFrame handle for the easing loop; canceled on unmount
- * @internal
- */
-let raf: number;
-
-/**
  * A utility method to linearly interpolate between two values
  * @internal
  * @function
@@ -101,32 +96,26 @@ function onScroll(): void {
 }
 
 /**
- * The per-frame animation loop; eases the lerped progress toward the raw scroll progress and re-schedules itself via
- * requestAnimationFrame
+ * The per-frame animation loop; eases the lerped progress toward the raw scroll progress. Driven by useRafFn, which
+ * schedules and cancels it with the component lifecycle
  * @internal
  * @function
  */
 function tick(): void {
-  // Ease the lerped progress toward the raw scroll progress and re-schedule the loop
+  // Ease the lerped progress toward the raw scroll progress
   lerpProgress.value = lerp(lerpProgress.value, rawProgress.value, 0.09);
-  raf = requestAnimationFrame(tick);
 }
 
 /* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-onMounted((): void => {
-  // Track scroll, start the easing loop, and sample the initial position
-  window.addEventListener('scroll', onScroll, {
-    passive: true,
-  });
-  raf = requestAnimationFrame(tick);
-  onScroll();
+// Track scroll and run the easing loop; both auto-start client-side and tear down on unmount (useEventListener and
+// useRafFn manage the listener and the raf handle, so no manual cleanup is needed). Sample the initial position on
+// mount, once the outer wrapper is in the DOM
+useEventListener(window, 'scroll', onScroll, {
+  passive: true,
 });
-onUnmounted((): void => {
-  // Detach the scroll listener and stop the easing loop
-  window.removeEventListener('scroll', onScroll);
-  cancelAnimationFrame(raf);
-});
+useRafFn(tick);
+onMounted(onScroll);
 
 /* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 

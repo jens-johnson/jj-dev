@@ -46,6 +46,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 import type { TPropsWithDefaults } from '@jens-johnson/style-guide/types/vue';
+import { useEventListener, useRafFn } from '@vueuse/core';
 import type { CSSProperties } from 'vue';
 
 import type { IBaseParallaxProps } from './types';
@@ -119,12 +120,6 @@ const smoothY: Ref<number> = ref(0);
  */
 const scrollY: Ref<number> = ref(0);
 
-/**
- * The requestAnimationFrame handle for the per-frame loop; canceled on unmount
- * @internal
- */
-let raf: number;
-
 /* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
@@ -158,8 +153,8 @@ function onMouseMove(event: MouseEvent): void {
 }
 
 /**
- * The per-frame animation loop; lerps the smoothed mouse values toward the raw values, samples window.scrollY, and
- * re-schedules itself via requestAnimationFrame
+ * The per-frame animation step; lerps the smoothed mouse values toward the raw values and samples window.scrollY.
+ * Driven by useRafFn, which schedules and cancels it with the component lifecycle
  * @internal
  * @function
  */
@@ -168,8 +163,6 @@ function tick(): void {
   smoothX.value = lerpFn(smoothX.value, rawX.value, props.lerp);
   smoothY.value = lerpFn(smoothY.value, rawY.value, props.lerp);
   scrollY.value = window.scrollY;
-  // Re-schedule the loop for the next frame
-  raf = requestAnimationFrame(tick);
 }
 
 /* ─── SLOT STYLE FACTORIES ───────────────────────────────────────────────────────────────────────────────────────── */
@@ -200,6 +193,7 @@ function markStyle(): CSSProperties {
   // Convert the scroll offset into a clamped 0..1 progress through the hero
   const heroHeight: number = import.meta.client ? window.innerHeight * props.heroFraction : SSR_FALLBACK_HERO_HEIGHT_PX;
   const progress: number = Math.min(scrollY.value / heroHeight, 1);
+
   // Fade in and scale up with progress while drifting with the lerped mouse position
   const opacity: number = 0.02 + progress * 0.22;
   const scale: number = 0.84 + progress * 0.16;
@@ -214,20 +208,19 @@ function markStyle(): CSSProperties {
 
 /* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-onMounted((): void => {
-  // Start the per-frame loop and keep the scroll offset fresh between frames
-  raf = requestAnimationFrame(tick);
-  window.addEventListener(
-    'scroll',
-    (): void => {
-      scrollY.value = window.scrollY;
-    },
-    {
-      passive: true,
-    },
-  );
-});
-onUnmounted((): void => cancelAnimationFrame(raf));
+// Drive the per-frame loop and keep the scroll offset fresh on scroll; both auto-start client-side and tear down on
+// unmount (useRafFn and useEventListener manage the raf handle and the listener, so no manual cleanup is needed)
+useRafFn(tick);
+useEventListener(
+  window,
+  'scroll',
+  (): void => {
+    scrollY.value = window.scrollY;
+  },
+  {
+    passive: true,
+  },
+);
 </script>
 
 <template>
