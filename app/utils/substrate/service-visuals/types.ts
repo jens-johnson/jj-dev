@@ -56,13 +56,65 @@ export interface ITextSegment {
  * An interface representing the configuration for a link in a Substrate raw service document
  * @public
  * @interface
- * @todo - Document these attributes
  */
 export interface IRawServiceDocLinkConfiguration {
+  /* The live/production URL for the service */
   live?: string;
+
+  /* The URL to the service's location on the Substrate topology map */
   map?: string;
+
+  /* The service's source repository URL */
   github?: string;
+
+  /* The service's documentation URL */
   docs?: string;
+}
+
+/**
+ * An interface representing a plugin entry in a Substrate raw service document; every field optional, mirroring how
+ * @nuxt/content widens schema columns to `T | undefined`
+ * @public
+ * @interface
+ */
+export interface IRawServicePlugin {
+  /* The plugin name */
+  name?: string;
+
+  /* Which side the plugin runs on (`client` or `server`) */
+  side?: string;
+
+  /* The plugin category */
+  category?: string;
+
+  /* What the plugin does */
+  purpose?: string;
+
+  /* The plugin's homepage or source URL */
+  url?: string;
+}
+
+/**
+ * An interface representing a metric entry in a Substrate raw service document; every field optional, mirroring how
+ * @nuxt/content widens schema columns to `T | undefined`
+ * @public
+ * @interface
+ */
+export interface IRawServiceMetric {
+  /* The metric's stable key */
+  key?: string;
+
+  /* The metric's human-readable label */
+  label?: string;
+
+  /* An explicit Lucide icon name for the metric */
+  icon?: string;
+
+  /* The metric's unit suffix */
+  unit?: string;
+
+  /* A short explanatory hint */
+  hint?: string;
 }
 
 /**
@@ -71,7 +123,6 @@ export interface IRawServiceDocLinkConfiguration {
  * helpers in this module
  * @public
  * @interface
- * @todo Move the plugins/metrics nested types to standalone types
  */
 export interface IRawServiceDoc {
   /* The stable service id */
@@ -108,10 +159,10 @@ export interface IRawServiceDoc {
   links?: IRawServiceDocLinkConfiguration;
 
   /* The installed plugins / add-ons */
-  plugins?: Array<{ name?: string; side?: string; category?: string; purpose?: string; url?: string }>;
+  plugins?: IRawServicePlugin[];
 
   /* The declared metric tiles */
-  metrics?: Array<{ key?: string; label?: string; icon?: string; unit?: string; hint?: string }>;
+  metrics?: IRawServiceMetric[];
 
   /* The free-form tags */
   tags?: string[];
