@@ -21,19 +21,44 @@
 import type { IVertifixCandidate, IVertifixCommitResult, IVertifixPrepareResult } from '#shared/vertifix';
 
 /**
- * A type representing the stage a Vertifix item is at as it moves through the flow
- * @typedef
+ * An enumeration of the stages a Vertifix item moves through as it works its way through the flow
+ * @public
+ * @enum
  */
-export type TVertifixStatus =
-  | 'reading'
-  | 'ready'
-  | 'matching'
-  | 'matched'
-  | 'preparing'
-  | 'prepared'
-  | 'committing'
-  | 'done'
-  | 'error';
+export enum VertifixStatus {
+  /* The photo's EXIF capture time is being read */
+  reading = 'reading',
+
+  /* Read; ready to search Strava for matching runs */
+  ready = 'ready',
+
+  /* Searching Strava for runs near the capture time */
+  matching = 'matching',
+
+  /* Candidate runs have been returned */
+  matched = 'matched',
+
+  /* Requesting a corrected-elevation TCX for the selected activity */
+  preparing = 'preparing',
+
+  /* The corrected-elevation TCX is ready to commit */
+  prepared = 'prepared',
+
+  /* Posting the prepared TCX to the commit endpoint */
+  committing = 'committing',
+
+  /* The re-upload committed successfully */
+  done = 'done',
+
+  /* The item hit an error and can be retried */
+  error = 'error',
+}
+
+/**
+ * A type representing the stage a Vertifix item is at as it moves through the flow; one of {@link VertifixStatus}
+ * @public
+ */
+export type TVertifixStatus = `${VertifixStatus}`;
 
 /**
  * An interface representing one photo working its way through the flow; the raw File is never kept, only what the UI

@@ -70,7 +70,7 @@ export interface IRawSubstrateDoc {
   /* The idle power draw in watts */
   power?: number;
 
-  /* The labelled spec rows */
+  /* The labeled spec rows */
   specs?: Array<{ label?: string; value?: string }>;
 
   /* The edges to other devices */

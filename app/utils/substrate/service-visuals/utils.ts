@@ -91,23 +91,23 @@ export function normalizeService(doc: IRawServiceDoc): IHomelabService {
     stack: doc.stack ?? [],
     links: doc.links,
     plugins: (doc.plugins ?? [])
-      .map((p) => ({
-        name: p.name ?? '',
-        side: (p.side === 'client' ? 'client' : 'server') as 'server' | 'client',
-        category: p.category ?? 'other',
-        purpose: p.purpose ?? '',
-        url: p.url,
+      .map((plugin) => ({
+        name: plugin.name ?? '',
+        side: (plugin.side === 'client' ? 'client' : 'server') as 'server' | 'client',
+        category: plugin.category ?? 'other',
+        purpose: plugin.purpose ?? '',
+        url: plugin.url,
       }))
-      .filter((p) => p.name),
+      .filter((plugin) => plugin.name),
     metrics: (doc.metrics ?? [])
-      .map((m) => ({
-        key: m.key ?? '',
-        label: m.label ?? '',
-        icon: m.icon,
-        unit: m.unit,
-        hint: m.hint,
+      .map((metric) => ({
+        key: metric.key ?? '',
+        label: metric.label ?? '',
+        icon: metric.icon,
+        unit: metric.unit,
+        hint: metric.hint,
       }))
-      .filter((m) => m.key),
+      .filter((metric) => metric.key),
     tags: doc.tags ?? [],
     order: doc.order ?? 100,
     path: doc.path,
@@ -122,7 +122,9 @@ export function normalizeService(doc: IRawServiceDoc): IHomelabService {
  * @returns The normalized services, sorted by ascending order
  */
 export function normalizeServices(docs: IRawServiceDoc[]): IHomelabService[] {
-  return docs.map(normalizeService).sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
+  return docs
+    .map(normalizeService)
+    .sort((first: IHomelabService, second: IHomelabService): number => (first.order ?? 100) - (second.order ?? 100));
 }
 
 /**

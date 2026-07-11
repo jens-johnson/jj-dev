@@ -28,29 +28,39 @@ import type { IJenscraftMetricsPayload, IStoredJenscraftMetrics } from './types'
 
 /* ─── Validation (no external deps; unknown keys are dropped by construction) ──────────────────────────────────────── */
 
-const isNum = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x);
-const isPct = (x: unknown): x is number => isNum(x) && x >= 0 && x <= 100;
-const isCount = (x: unknown): x is number => isNum(x) && Number.isInteger(x) && x >= 0 && x <= 100_000;
-const isBigCount = (x: unknown): x is number => isNum(x) && Number.isInteger(x) && x >= 0 && x <= 1_000_000_000;
-const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
-const inRange = (x: unknown, lo: number, hi: number): x is number => isNum(x) && x >= lo && x <= hi;
+const isNum = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
+const isPct = (value: unknown): value is number => isNum(value) && value >= 0 && value <= 100;
+const isCount = (value: unknown): value is number =>
+  isNum(value) && Number.isInteger(value) && value >= 0 && value <= 100_000;
+const isBigCount = (value: unknown): value is number =>
+  isNum(value) && Number.isInteger(value) && value >= 0 && value <= 1_000_000_000;
+const isObj = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+const inRange = (value: unknown, low: number, high: number): value is number =>
+  isNum(value) && value >= low && value <= high;
 
 /**
  * Validates the optional players block, rebuilding it from the four known count fields only
  * @internal
  * @function
- * @param p - The untrusted players value from the request body
+ * @param value - The untrusted players value from the request body
  * @returns The clean players object, or null when the block is present but malformed
  */
-function cleanPlayers(p: unknown): { online: number; max: number; java: number; bedrock: number } | null {
-  if (!isObj(p) || !isCount(p.online) || !isCount(p.max) || !isCount(p.java) || !isCount(p.bedrock)) {
+function cleanPlayers(value: unknown): { online: number; max: number; java: number; bedrock: number } | null {
+  if (
+    !isObj(value) ||
+    !isCount(value.online) ||
+    !isCount(value.max) ||
+    !isCount(value.java) ||
+    !isCount(value.bedrock)
+  ) {
     return null;
   }
   return {
-    online: p.online,
-    max: p.max,
-    java: p.java,
-    bedrock: p.bedrock,
+    online: value.online,
+    max: value.max,
+    java: value.java,
+    bedrock: value.bedrock,
   };
 }
 
@@ -128,10 +138,10 @@ const KEY = 'metrics:latest';
 
 /**
  * Persists the latest snapshot, stamping the server receive time used for staleness
- * @param p - The validated payload to store
+ * @param payload - The validated payload to store
  */
-export async function writeLatestJenscraftMetrics(p: IJenscraftMetricsPayload): Promise<void> {
-  await useStorage('jenscraft').setItem(KEY, { ...p, receivedAt: Date.now() } satisfies IStoredJenscraftMetrics);
+export async function writeLatestJenscraftMetrics(payload: IJenscraftMetricsPayload): Promise<void> {
+  await useStorage('jenscraft').setItem(KEY, { ...payload, receivedAt: Date.now() } satisfies IStoredJenscraftMetrics);
 }
 
 /**

@@ -99,13 +99,13 @@ const activeId: ComputedRef<string | null> = computed((): string | null => hover
  * @constant
  */
 const activeLayers: ComputedRef<TSubstrateLayer[]> = computed((): TSubstrateLayer[] =>
-  LAYER_ORDER.filter((l: TSubstrateLayer): boolean =>
-    props.devices.some((d: ISubstrateDevice): boolean => d.layer === l),
+  LAYER_ORDER.filter((layer: TSubstrateLayer): boolean =>
+    props.devices.some((device: ISubstrateDevice): boolean => device.layer === layer),
   ),
 );
 
 /**
- * The id → centre point map, in viewBox units
+ * The id → center point map, in viewBox units
  * @internal
  * @constant
  */
@@ -156,7 +156,7 @@ const edges: ComputedRef<IEdge[]> = computed((): IEdge[] => {
   return out;
 });
 
-/** Cubic-bezier wire between two node centres; eases along x when near-horizontal, along y otherwise. */
+/** Cubic-bezier wire between two node centers; eases along x when near-horizontal, along y otherwise. */
 function edgePath(edge: IEdge): string {
   // Resolve both endpoints; an unplaced endpoint yields no path
   const start: { x: number; y: number } | undefined = layout.value.get(edge.from);
@@ -175,7 +175,7 @@ function edgePath(edge: IEdge): string {
   return `M ${start.x} ${start.y} C ${start.x} ${start.y + curveOffset}, ${end.x} ${end.y - curveOffset}, ${end.x} ${end.y}`;
 }
 
-/** Absolute-position style for a node card, centred on its layout point. */
+/** Absolute-position style for a node card, centered on its layout point. */
 function nodeStyle(id: string): CSSProperties {
   // Resolve the node's layout point; an unplaced node gets no positioning
   const p: { x: number; y: number } | undefined = layout.value.get(id);
@@ -212,19 +212,20 @@ const connectedIds: ComputedRef<Set<string>> = computed((): Set<string> => {
  * A utility method to determine whether a wire touches the active node and joins the spotlight
  * @internal
  * @function
- * @param e - The edge being drawn
+ * @param edge - The edge being drawn
  * @returns Whether the edge is spotlighted
  */
-const edgeActive = (e: IEdge): boolean => !!activeId.value && (e.from === activeId.value || e.to === activeId.value);
+const edgeActive = (edge: IEdge): boolean =>
+  !!activeId.value && (edge.from === activeId.value || edge.to === activeId.value);
 
 /**
  * A utility method to determine whether a wire dims because another node holds the spotlight
  * @internal
  * @function
- * @param e - The edge being drawn
+ * @param edge - The edge being drawn
  * @returns Whether the edge is dimmed
  */
-const edgeDimmed = (e: IEdge): boolean => !!activeId.value && !edgeActive(e);
+const edgeDimmed = (edge: IEdge): boolean => !!activeId.value && !edgeActive(edge);
 
 /**
  * A utility method to determine whether a node card dims; anything neither active nor wired to the active node
@@ -242,39 +243,39 @@ const nodeDimmed = (id: string): boolean => !!activeId.value && id !== activeId.
  * from the connection kind
  * @internal
  * @function
- * @param e - The edge being drawn
+ * @param edge - The edge being drawn
  * @returns The Tailwind stroke class for the static wire
  */
-function edgeBaseClass(e: IEdge): string {
-  return edgeActive(e) ? STROKE_ACCENT : (EDGE_STROKE_BY_KIND[e.kind] ?? STROKE_MUTED);
+function edgeBaseClass(edge: IEdge): string {
+  return edgeActive(edge) ? STROKE_ACCENT : (EDGE_STROKE_BY_KIND[edge.kind] ?? STROKE_MUTED);
 }
 /**
  * A utility method to pick the opacity class for a wire; full when spotlighted, faint when dimmed, and a subtler
  * resting level for power feeds
  * @internal
  * @function
- * @param e - The edge being drawn
+ * @param edge - The edge being drawn
  * @returns The Tailwind opacity class for the static wire
  */
-function edgeBaseOpacity(e: IEdge): string {
+function edgeBaseOpacity(edge: IEdge): string {
   // Spotlighted and dimmed states win before the resting per-kind level applies
-  if (edgeActive(e)) {
+  if (edgeActive(edge)) {
     return 'opacity-100';
   }
-  if (edgeDimmed(e)) {
+  if (edgeDimmed(edge)) {
     return 'opacity-10';
   }
-  return e.kind === 'power' ? 'opacity-25' : 'opacity-60';
+  return edge.kind === 'power' ? 'opacity-25' : 'opacity-60';
 }
 /**
  * A utility method to pick the stroke color class for the animated data-flow overlay on a wire
  * @internal
  * @function
- * @param e - The edge being drawn
+ * @param edge - The edge being drawn
  * @returns The Tailwind stroke class for the flow dashes
  */
-function edgeFlowClass(e: IEdge): string {
-  return edgeActive(e) ? STROKE_ACCENT : e.kind === 'data' ? STROKE_DATA : STROKE_ACCENT;
+function edgeFlowClass(edge: IEdge): string {
+  return edgeActive(edge) ? STROKE_ACCENT : edge.kind === 'data' ? STROKE_DATA : STROKE_ACCENT;
 }
 
 // Status colors + kind icons come from the auto-imported #utils/substrate-visuals (statusOf, kindIcon),

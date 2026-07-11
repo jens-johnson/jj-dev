@@ -12,7 +12,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████ #components/content/StackBlocks.vue ██████████████████████████████████████████████
+ * ███████████████████████████████████████ #components/content/StackBlocks.vue ███████████████████████████████████████
  *
  * MDC component embedded as `::stack-blocks`. Renders the tech stack as five layered blocks; each block is one
  * layer of the platform (Vercel, Nuxt 4, Tailwind, DX tooling, Agentic dev). Clicking a block expands it to reveal
@@ -23,6 +23,8 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * One layer of the tech-stack visualization: its ordinal, identity, summary copy, and optional reference links
@@ -99,12 +101,14 @@ const stack: IStackLayer[] = [
   },
 ];
 
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 /**
  * The index of the currently expanded layer; -1 when every layer is collapsed. Defaults to the top layer open
  * @internal
  * @constant
  */
-const expandedIdx = ref(0);
+const expandedIndex: Ref<number> = ref(0);
 </script>
 
 <template>
@@ -115,11 +119,11 @@ const expandedIdx = ref(0);
         :key="layer.num"
         class="stack-block group bg-surface relative cursor-pointer overflow-hidden rounded-2xl border transition-all duration-500"
         :class="[
-          i === expandedIdx ? 'border-accent z-10 shadow-lg' : 'border-border hover:border-accent/60',
-          i === expandedIdx ? '' : 'hover:-translate-y-1',
+          i === expandedIndex ? 'border-accent z-10 shadow-lg' : 'border-border hover:border-accent/60',
+          i === expandedIndex ? '' : 'hover:-translate-y-1',
         ]"
         :style="{ marginTop: i === 0 ? '0' : '-12px' }"
-        @click="expandedIdx = expandedIdx === i ? -1 : i"
+        @click="expandedIndex = expandedIndex === i ? -1 : i"
       >
         <!-- Collapsed-state header -->
         <div class="flex items-center gap-4 p-5">
@@ -127,7 +131,7 @@ const expandedIdx = ref(0);
           <span
             class="text-caption flex h-10 w-10 shrink-0 items-center justify-center rounded-lg font-mono transition-colors"
             :class="
-              i === expandedIdx
+              i === expandedIndex
                 ? 'bg-accent text-stone-50'
                 : 'bg-bg text-ink-subtle group-hover:bg-accent/15 group-hover:text-accent'
             "
@@ -140,7 +144,7 @@ const expandedIdx = ref(0);
             :name="layer.icon"
             size="22"
             class="shrink-0 transition-colors"
-            :class="i === expandedIdx ? 'text-accent' : 'text-ink-subtle group-hover:text-accent'"
+            :class="i === expandedIndex ? 'text-accent' : 'text-ink-subtle group-hover:text-accent'"
           />
 
           <!-- Title + tagline -->
@@ -159,14 +163,14 @@ const expandedIdx = ref(0);
             name="lucide:chevron-down"
             size="20"
             class="text-ink-subtle shrink-0 transition-transform duration-300"
-            :class="i === expandedIdx ? 'text-accent rotate-180' : ''"
+            :class="i === expandedIndex ? 'text-accent rotate-180' : ''"
           />
         </div>
 
         <!-- Expanded body -->
         <div
           class="grid transition-[grid-template-rows] duration-500 ease-in-out"
-          :style="{ gridTemplateRows: i === expandedIdx ? '1fr' : '0fr' }"
+          :style="{ gridTemplateRows: i === expandedIndex ? '1fr' : '0fr' }"
         >
           <div class="overflow-hidden">
             <div class="border-border border-t px-5 py-4">

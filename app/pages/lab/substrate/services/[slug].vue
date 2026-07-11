@@ -51,7 +51,7 @@ const { data: services } = await useAsyncData('services-all', () => queryCollect
  * @internal
  * @constant
  */
-const rawDoc = computed(() => (services.value ?? []).find((s) => s.serviceId === slug.value) ?? null);
+const rawDoc = computed(() => (services.value ?? []).find((doc) => doc.serviceId === slug.value) ?? null);
 
 if (!rawDoc.value) {
   throw createError({
@@ -66,7 +66,9 @@ if (!rawDoc.value) {
  * @internal
  * @constant
  */
-const service = computed(() => normalizeServices(services.value ?? []).find((s) => s.serviceId === slug.value) ?? null);
+const service = computed(
+  () => normalizeServices(services.value ?? []).find((doc) => doc.serviceId === slug.value) ?? null,
+);
 
 /**
  * The substrate device docs; resolve the host device's display title for the "Runs on" chip
@@ -85,7 +87,7 @@ const hostTitle = computed(() => {
   if (!id) {
     return null;
   }
-  return (devices.value ?? []).find((d) => d.nodeId === id)?.title ?? id;
+  return (devices.value ?? []).find((device) => device.nodeId === id)?.title ?? id;
 });
 
 /**
@@ -158,8 +160,8 @@ const linkItems = computed(() =>
 const pluginCategories: ComputedRef<string[]> = computed((): string[] => {
   // Collect the distinct categories across the declared plugins, then sort them for a stable filter bar
   const set = new Set<string>();
-  for (const p of service.value?.plugins ?? []) {
-    set.add(p.category);
+  for (const plugin of service.value?.plugins ?? []) {
+    set.add(plugin.category);
   }
   return Array.from(set).sort();
 });
@@ -189,7 +191,7 @@ function toggleCategory(category: string): void {
  */
 const visiblePlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
   (service.value?.plugins ?? []).filter(
-    (p: IServicePlugin): boolean => !activeCategory.value || p.category === activeCategory.value,
+    (plugin: IServicePlugin): boolean => !activeCategory.value || plugin.category === activeCategory.value,
   ),
 );
 
@@ -199,7 +201,7 @@ const visiblePlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugi
  * @constant
  */
 const serverPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
-  visiblePlugins.value.filter((p: IServicePlugin): boolean => p.side === 'server'),
+  visiblePlugins.value.filter((plugin: IServicePlugin): boolean => plugin.side === 'server'),
 );
 
 /**
@@ -208,7 +210,7 @@ const serverPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin
  * @constant
  */
 const clientPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
-  visiblePlugins.value.filter((p: IServicePlugin): boolean => p.side === 'client'),
+  visiblePlugins.value.filter((plugin: IServicePlugin): boolean => plugin.side === 'client'),
 );
 
 /* ─── BODY ───────────────────────────────────────────────────────────────────────────────────────────────────────── */

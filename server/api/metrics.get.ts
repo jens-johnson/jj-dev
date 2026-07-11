@@ -161,16 +161,16 @@ let cacheTimestamp = 0;
  * @returns The trailing weeks, each with seven days of counts and intensity levels
  */
 function groupIntoWeeks(contributions: IGhContribution[], numWeeks: number): IMetricsWeek[] {
-  // Pad the contributions array so it starts on a Monday
+  // Keep only the trailing numWeeks weeks of days, then chunk them into fixed seven-day rows
   const result: IMetricsWeek[] = [];
   const days = contributions.slice(-(numWeeks * 7));
 
-  for (let w = 0; w < numWeeks; w++) {
-    const slice = days.slice(w * 7, w * 7 + 7);
+  for (let weekIndex = 0; weekIndex < numWeeks; weekIndex++) {
+    const slice = days.slice(weekIndex * 7, weekIndex * 7 + 7);
     result.push({
-      days: slice.map((d: IGhContribution): { count: number; level: 0 | 1 | 2 | 3 | 4 } => ({
-        count: d.count,
-        level: d.level,
+      days: slice.map((contribution: IGhContribution): { count: number; level: 0 | 1 | 2 | 3 | 4 } => ({
+        count: contribution.count,
+        level: contribution.level,
       })),
     });
   }
@@ -201,7 +201,7 @@ function buildWeeklyMiles(activities: IStravaActivity[], numWeeks: number): numb
     }
   }
 
-  return buckets.map((v: number): number => Math.round(v * 10) / 10);
+  return buckets.map((miles: number): number => Math.round(miles * 10) / 10);
 }
 
 /* ─── Handler ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -238,7 +238,7 @@ export default defineEventHandler(async (): Promise<IMetricsResponse> => {
   // Fetch the current calendar year of contribution activity from the GitHub contributions API
   const ghRes: IGhContributionsResponse = await runUpstream(
     fetch(`https://github-contributions-api.jogruber.de/v4/jens-johnson?y=${year}`).then(
-      (r: Response): Promise<IGhContributionsResponse> => r.json(),
+      (response: Response): Promise<IGhContributionsResponse> => response.json(),
     ),
     'The GitHub contributions fetch failed.',
   );
@@ -249,7 +249,7 @@ export default defineEventHandler(async (): Promise<IMetricsResponse> => {
   // and a naive .slice(-182) would grab months that haven't happened yet.
   const today: string = new Date().toISOString().slice(0, 10);
   const pastContributions: IGhContribution[] = ghRes.contributions.filter(
-    (c: IGhContribution): boolean => c.date <= today,
+    (contribution: IGhContribution): boolean => contribution.date <= today,
   );
   const weeks: IMetricsWeek[] = groupIntoWeeks(pastContributions, 26);
 
@@ -268,7 +268,10 @@ export default defineEventHandler(async (): Promise<IMetricsResponse> => {
         refresh_token: stravaRefreshToken,
         grant_type: 'refresh_token',
       }),
-    }).then((r: Response): Promise<Partial<IStravaTokenResponse> & { errors?: unknown; message?: string }> => r.json()),
+    }).then(
+      (response: Response): Promise<Partial<IStravaTokenResponse> & { errors?: unknown; message?: string }> =>
+        response.json(),
+    ),
     'The Strava token exchange failed.',
   );
 
@@ -289,7 +292,7 @@ export default defineEventHandler(async (): Promise<IMetricsResponse> => {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
-    }).then((r: Response): Promise<{ id?: number }> => r.json()),
+    }).then((response: Response): Promise<{ id?: number }> => response.json()),
     'The Strava athlete lookup failed.',
   );
 
@@ -313,7 +316,7 @@ export default defineEventHandler(async (): Promise<IMetricsResponse> => {
         headers: {
           Authorization: `Bearer ${access_token}`,
         },
-      }).then((r: Response): Promise<IStravaStatsResponse> => r.json()),
+      }).then((response: Response): Promise<IStravaStatsResponse> => response.json()),
       'The Strava stats fetch failed.',
     ),
 
@@ -322,7 +325,7 @@ export default defineEventHandler(async (): Promise<IMetricsResponse> => {
         headers: {
           Authorization: `Bearer ${access_token}`,
         },
-      }).then((r: Response): Promise<IStravaActivity[]> => r.json()),
+      }).then((response: Response): Promise<IStravaActivity[]> => response.json()),
       'The Strava activities fetch failed.',
     ),
   ]);

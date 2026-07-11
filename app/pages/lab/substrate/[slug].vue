@@ -55,7 +55,7 @@ const { data: devices } = await useAsyncData('substrate-devices-all', () => quer
  * @constant
  */
 const rawDoc: ComputedRef<SubstrateCollectionItem | null> = computed(
-  (): SubstrateCollectionItem | null => (devices.value ?? []).find((d) => d.nodeId === slug.value) ?? null,
+  (): SubstrateCollectionItem | null => (devices.value ?? []).find((doc) => doc.nodeId === slug.value) ?? null,
 );
 
 if (!rawDoc.value) {
@@ -79,7 +79,7 @@ const list: ComputedRef<ISubstrateDevice[]> = computed((): ISubstrateDevice[] =>
  * @constant
  */
 const device: ComputedRef<ISubstrateDevice | null> = computed(
-  (): ISubstrateDevice | null => list.value.find((d) => d.nodeId === slug.value) ?? null,
+  (): ISubstrateDevice | null => list.value.find((deviceEntry) => deviceEntry.nodeId === slug.value) ?? null,
 );
 
 /**
@@ -98,7 +98,7 @@ const vendorModel: ComputedRef<string> = computed((): string =>
  * @param id - The device node id to resolve
  * @returns The device title, or the id itself when unknown
  */
-const titleOf = (id: string): string => list.value.find((d) => d.nodeId === id)?.title ?? id;
+const titleOf = (id: string): string => list.value.find((deviceEntry) => deviceEntry.nodeId === id)?.title ?? id;
 
 /**
  * Whether the raw doc's minimark body has at least one content node; gates the runbook section

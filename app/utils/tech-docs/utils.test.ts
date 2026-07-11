@@ -11,44 +11,42 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████ #components/widgets/home/about-animation/constants.ts ███████████████████████████████
+ * ██████████████████████████████████████████ #utils/tech-docs/utils.test.ts ███████████████████████████████████████████
  *
- * Constants tuning the topographic contour-line canvas animation: line density, accent color, peak shape, and speed.
+ * Unit tests for the tech-docs registry: case-insensitive, version-tolerant, alias-aware docs URL resolution and the
+ * plain-text fallback.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-/**
- * The number of contour lines drawn across the canvas
- * @public
- * @constant
- */
-export const NUM_LINES: number = 24;
+import { describe, expect, it } from 'vitest';
 
-/**
- * The base accent color (earth brown) as R,G,B components for rgba() composition
- * @public
- * @constant
- */
-export const ACCENT_RGB: string = '139, 101, 52';
+import { techDocHref } from './utils';
 
-/**
- * The Gaussian sigma-squared controlling how far the mouse peak spreads, in squared pixels
- * @public
- * @constant
- */
-export const PEAK_SIGMA: number = 22_000;
+describe('techDocHref', () => {
+  it('resolves a registered technology to its docs URL', () => {
+    expect(techDocHref('Paper')).toBe('https://docs.papermc.io/');
+  });
 
-/**
- * The maximum vertical displacement of the mountain peak at the cursor center, in pixels
- * @public
- * @constant
- */
-export const PEAK_HEIGHT: number = 110;
+  it('is case-insensitive', () => {
+    expect(techDocHref('LUCKPERMS')).toBe('https://luckperms.net/');
+  });
 
-/**
- * The animation speed multiplier; lower is calmer
- * @public
- * @constant
- */
-export const SPEED: number = 0.0032;
+  it('strips a trailing version so "PaperMC 26.1.2" resolves the same as "Paper"', () => {
+    expect(techDocHref('PaperMC 26.1.2')).toBe('https://docs.papermc.io/');
+  });
+
+  it('resolves aliases to the same destination', () => {
+    expect(techDocHref('multiverse')).toBe(techDocHref('multiverse-core'));
+  });
+
+  it('returns undefined for an unregistered name so callers render plain text', () => {
+    expect(techDocHref('Homegrown thing')).toBeUndefined();
+  });
+
+  it('returns undefined for empty or missing input', () => {
+    expect(techDocHref('')).toBeUndefined();
+    expect(techDocHref(null)).toBeUndefined();
+    expect(techDocHref(undefined)).toBeUndefined();
+  });
+});

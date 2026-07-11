@@ -37,7 +37,7 @@ import { ACCENT_RGB, NUM_LINES, PEAK_HEIGHT, PEAK_SIGMA, SPEED } from './constan
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvas');
 
 /**
- * The requestAnimationFrame handle for the render loop; cancelled on unmount
+ * The requestAnimationFrame handle for the render loop; canceled on unmount
  * @internal
  */
 let raf: number;
@@ -194,7 +194,7 @@ function traceContour(baseY: number, phase: number, mx: number, my: number, acti
 }
 
 /**
- * A utility method to draw a soft radial glow centred on the cursor
+ * A utility method to draw a soft radial glow centered on the cursor
  * @internal
  * @function
  * @param mx - The smoothed cursor x position, in canvas coordinates
@@ -242,7 +242,7 @@ function draw(): void {
     const phase: number = lineIndex * 0.38; // per-line phase offset
 
     const proximity: number = active ? Math.exp(-((baseY - my) ** 2) / 18_000) : 0;
-    const midBoost: number = 1 - Math.abs(frac - 0.5) * 2; // peaks at vertical centre
+    const midBoost: number = 1 - Math.abs(frac - 0.5) * 2; // peaks at vertical center
     const baseOpacity: number = 0.06 + midBoost * 0.14 + proximity * 0.28;
 
     ctx.beginPath();
@@ -265,17 +265,17 @@ function draw(): void {
  * activates the mountain-peak effect
  * @internal
  * @function
- * @param e - The triggering mouse event
+ * @param event - The triggering mouse event
  */
-function onMove(e: MouseEvent): void {
+function onMove(event: MouseEvent): void {
   const canvas: HTMLCanvasElement | null = canvasRef.value;
   if (!canvas) {
     return;
   }
   // Translate the viewport cursor position into canvas coordinates and activate the peak
-  const r: DOMRect = canvas.getBoundingClientRect();
-  mouseX.value = e.clientX - r.left;
-  mouseY.value = e.clientY - r.top;
+  const rect: DOMRect = canvas.getBoundingClientRect();
+  mouseX.value = event.clientX - rect.left;
+  mouseY.value = event.clientY - rect.top;
   mouseActive.value = true;
 }
 

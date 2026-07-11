@@ -12,7 +12,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████ #components/content/DesignInspiration.vue ██████████████████████████████████████████
+ * ████████████████████████████████████ #components/content/DesignInspiration.vue ████████████████████████████████████
  *
  * MDC component embedded as `::design-inspiration`. Tells the design story: three nature photos (mountain valley,
  * coastal sunset, city twilight) each became one of the three themes on the site (day / sunset / night). Each card
@@ -26,12 +26,16 @@
 
 import type { IUseThemeReturn, TTheme } from '~/composables/use-theme';
 
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 /**
  * The active site theme and the setter backing the live preview CTA on each card
  * @internal
  * @constant
  */
 const { theme, setTheme }: IUseThemeReturn = useTheme();
+
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * An inspiration card pairing a source photograph with the site theme derived from it, including the extracted
@@ -160,14 +164,16 @@ const cards: IInspirationCard[] = [
   },
 ];
 
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 /**
  * A utility method to apply the given theme site-wide as a live preview when a card's CTA is clicked
  * @internal
  * @function
- * @param t - The theme to activate
+ * @param nextTheme - The theme to activate
  */
-function preview(t: TTheme): void {
-  setTheme(t);
+function preview(nextTheme: TTheme): void {
+  setTheme(nextTheme);
 }
 </script>
 

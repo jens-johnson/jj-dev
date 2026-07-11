@@ -38,6 +38,13 @@ const RUN_SPORT_TYPES = ['Run', 'VirtualRun', 'TrailRun'];
 const MATCH_WINDOW_MS = 36 * 60 * 60 * 1000;
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
+// Replacement tolerances: the re-upload passes when distance and elevation land within a fixed floor or a fraction
+// of the expected value, whichever is larger (small runs need the floor; long runs need the fraction).
+const DISTANCE_TOLERANCE_FLOOR_METERS = 50;
+const DISTANCE_TOLERANCE_FRACTION = 0.005;
+const ELEVATION_TOLERANCE_FLOOR_METERS = 20;
+const ELEVATION_TOLERANCE_FRACTION = 0.05;
+
 /* ─── Credentials & access token ──────────────────────────────────────────────────────────────────────────────────── */
 
 /**
@@ -287,8 +294,11 @@ export async function validateReplacement(
   const expectedElevationMeters = expectedElevationFeet * METERS_PER_FOOT;
   const distanceDelta = Math.abs(activity.distance - expectedDistanceMeters);
   const elevationDelta = Math.abs(activity.total_elevation_gain - expectedElevationMeters);
-  const distanceValid = distanceDelta <= Math.max(50, expectedDistanceMeters * 0.005);
-  const elevationValid = elevationDelta <= Math.max(20, expectedElevationMeters * 0.05);
+  const distanceValid =
+    distanceDelta <= Math.max(DISTANCE_TOLERANCE_FLOOR_METERS, expectedDistanceMeters * DISTANCE_TOLERANCE_FRACTION);
+  const elevationValid =
+    elevationDelta <=
+    Math.max(ELEVATION_TOLERANCE_FLOOR_METERS, expectedElevationMeters * ELEVATION_TOLERANCE_FRACTION);
   return {
     valid: distanceValid && elevationValid,
     distanceValid,

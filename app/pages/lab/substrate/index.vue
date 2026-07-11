@@ -120,9 +120,9 @@ function setView(key: string): void {
  * @returns The initially selected node id, or null when there are no devices
  */
 function pickInitial(): string | null {
-  const l = list.value;
-  const gw = l.find((d) => d.kind === 'firewall' || d.kind === 'gateway');
-  return gw?.nodeId ?? l[0]?.nodeId ?? null;
+  const deviceList = list.value;
+  const gateway = deviceList.find((device) => device.kind === 'firewall' || device.kind === 'gateway');
+  return gateway?.nodeId ?? deviceList[0]?.nodeId ?? null;
 }
 
 /**
@@ -137,14 +137,16 @@ const selectedId = ref<string | null>(pickInitial());
  * @internal
  * @constant
  */
-const selectedDevice = computed(() => list.value.find((d) => d.nodeId === selectedId.value) ?? null);
+const selectedDevice = computed(() => list.value.find((device) => device.nodeId === selectedId.value) ?? null);
 
 /**
  * Original queried doc (carries the markdown body) for ContentRenderer
  * @internal
  * @constant
  */
-const selectedRawDoc = computed(() => (devices.value ?? []).find((d) => d.nodeId === selectedId.value) ?? null);
+const selectedRawDoc = computed(
+  () => (devices.value ?? []).find((device) => device.nodeId === selectedId.value) ?? null,
+);
 
 /**
  * Only surface the Notes section when the selected doc actually has body content (some nodes are frontmatter-only)

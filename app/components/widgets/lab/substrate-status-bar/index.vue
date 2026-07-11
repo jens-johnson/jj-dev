@@ -58,8 +58,8 @@ const vis: ComputedRef<IStateVisual> = computed((): IStateVisual => METRIC_HEALT
  * @constant
  */
 const reportingLabel: ComputedRef<string> = computed((): string => {
-  const n: number = reportingCount.value;
-  return n === 1 ? '1 node reporting' : `${n} nodes reporting`;
+  const count: number = reportingCount.value;
+  return count === 1 ? '1 node reporting' : `${count} nodes reporting`;
 });
 </script>
 

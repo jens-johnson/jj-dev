@@ -40,7 +40,7 @@ export interface ISubstrateConnection {
 }
 
 /**
- * An interface representing a single labelled spec row shown in the inspector
+ * An interface representing a single labeled spec row shown in the inspector
  * @interface
  */
 export interface ISubstrateSpec {
@@ -89,7 +89,7 @@ export interface ISubstrateDevice {
   /* The typical idle draw in watts */
   power?: number;
 
-  /* The labelled spec rows shown in the inspector */
+  /* The labeled spec rows shown in the inspector */
   specs?: ISubstrateSpec[];
 
   /* The drawn edges to other devices */

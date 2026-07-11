@@ -131,9 +131,9 @@ const feet = (meters: number): string => `${metersToFeet(meters).toLocaleString(
  */
 function duration(seconds: number): string {
   // Split the duration into whole hours and remaining minutes
-  const h: number = Math.floor(seconds / 3600);
-  const m: number = Math.round((seconds % 3600) / 60);
-  return h ? `${h}h ${m}m` : `${m}m`;
+  const hours: number = Math.floor(seconds / 3600);
+  const minutes: number = Math.round((seconds % 3600) / 60);
+  return hours ? `${hours}h ${minutes}m` : `${minutes}m`;
 }
 
 /**
@@ -161,9 +161,9 @@ function toLocalInput(iso: string | null): string {
     return '';
   }
   // Rebuild the timestamp from its local date parts, zero-padded to the input's expected shape
-  const d: Date = new Date(iso);
-  const pad = (n: number): string => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const date: Date = new Date(iso);
+  const pad = (value: number): string => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 /**
@@ -178,8 +178,8 @@ function fromLocalInput(value: string): string | null {
     return null;
   }
   // Parse the local value and reject anything the Date constructor could not make sense of
-  const d: Date = new Date(value);
-  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+  const date: Date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
 /* ─── Event handlers ──────────────────────────────────────────────────────────────────────────────────────────────── */

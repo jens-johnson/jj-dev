@@ -40,7 +40,7 @@ export interface ISubstrateMetricsNode {
   /* The node uptime in seconds */
   uptimeSec: number;
 
-  /* The current CPU utilisation percentage */
+  /* The current CPU utilization percentage */
   cpuPct: number;
 
   /* The 1/5/15-minute load averages */
@@ -75,10 +75,10 @@ export interface ISubstrateMetricsSample {
   /* The sample timestamp (epoch milliseconds) */
   t: number;
 
-  /* The CPU utilisation percentage at the sample time */
+  /* The CPU utilization percentage at the sample time */
   cpu: number;
 
-  /* The memory utilisation percentage at the sample time */
+  /* The memory utilization percentage at the sample time */
   mem: number;
 }
 

@@ -52,8 +52,8 @@ const { data: allPosts } = await useAsyncData('blog-index', () =>
  * @constant
  */
 const activeTag = computed<string | null>(() => {
-  const t = route.query.tag;
-  return typeof t === 'string' && t.length > 0 ? t : null;
+  const tagQuery = route.query.tag;
+  return typeof tagQuery === 'string' && tagQuery.length > 0 ? tagQuery : null;
 });
 
 /**
@@ -65,8 +65,8 @@ const filteredPosts = computed(() => {
   if (!activeTag.value) {
     return allPosts.value ?? [];
   }
-  return (allPosts.value ?? []).filter((p) =>
-    (p.tags ?? []).some((t: string) => t.toLowerCase() === activeTag.value!.toLowerCase()),
+  return (allPosts.value ?? []).filter((post) =>
+    (post.tags ?? []).some((tag: string) => tag.toLowerCase() === activeTag.value!.toLowerCase()),
   );
 });
 

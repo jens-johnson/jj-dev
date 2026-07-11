@@ -19,10 +19,26 @@
  */
 
 /**
- * A type representing the available site themes
- * @typedef
+ * An enumeration of the available site themes
+ * @public
+ * @enum
  */
-export type TTheme = 'day' | 'sunset' | 'night';
+export enum Theme {
+  /* The bright daytime palette */
+  day = 'day',
+
+  /* The warm dusk palette */
+  sunset = 'sunset',
+
+  /* The dark nighttime palette */
+  night = 'night',
+}
+
+/**
+ * A type representing the available site themes; one of {@link Theme}
+ * @public
+ */
+export type TTheme = `${Theme}`;
 
 /**
  * An interface representing the return value from the `useTheme` composable

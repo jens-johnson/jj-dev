@@ -84,33 +84,33 @@ const vis: ComputedRef<IStateVisual> = computed((): IStateVisual => METRIC_STATE
  * @constant
  */
 const stats: ComputedRef<ITile[]> = computed((): ITile[] => {
-  const n: ISubstrateMetricsNode | null = node.value;
-  const g: ISubstrateMetricsView['guests'] = guests.value;
-  if (!n) {
+  const liveNode: ISubstrateMetricsNode | null = node.value;
+  const liveGuests: ISubstrateMetricsView['guests'] = guests.value;
+  if (!liveNode) {
     return [];
   }
   return [
     {
       label: 'CPU',
-      value: `${n.cpuPct}%`,
+      value: `${liveNode.cpuPct}%`,
       sub: '',
       series: cpuSeries.value,
     },
     {
       label: 'RAM',
-      value: `${n.mem.usedPct}%`,
-      sub: `${n.mem.totalGiB} GB`,
+      value: `${liveNode.mem.usedPct}%`,
+      sub: `${liveNode.mem.totalGiB} GB`,
       series: memSeries.value,
     },
     {
       label: 'Uptime',
-      value: formatUptime(n.uptimeSec),
+      value: formatUptime(liveNode.uptimeSec),
       sub: '',
     },
     {
       label: 'Services',
-      value: g ? String(g.running) : '0',
-      sub: g ? `of ${g.vms + g.cts}` : '',
+      value: liveGuests ? String(liveGuests.running) : '0',
+      sub: liveGuests ? `of ${liveGuests.vms + liveGuests.cts}` : '',
     },
   ];
 });

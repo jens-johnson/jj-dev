@@ -66,10 +66,10 @@ export interface IUseSubstrateMetricsReturn {
   /* The rolling sample history backing the sparklines */
   readonly history: ComputedRef<ISubstrateMetricsSample[]>;
 
-  /* The CPU utilisation series extracted from the history */
+  /* The CPU utilization series extracted from the history */
   readonly cpuSeries: ComputedRef<number[]>;
 
-  /* The memory utilisation series extracted from the history */
+  /* The memory utilization series extracted from the history */
   readonly memSeries: ComputedRef<number[]>;
 
   /* The count of nodes actively reporting telemetry */

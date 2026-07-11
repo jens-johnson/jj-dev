@@ -31,8 +31,9 @@ import type {
 
 import type { IUseSubstrateMetricsReturn } from './types';
 
-// A node is "hot" (degraded) when any pressure gauge crosses its threshold.
+// A node is "hot" (degraded) when a pressure gauge crosses its threshold; swap tolerates more before it counts.
 const HOT_PCT: number = 92;
+const SWAP_HOT_PCT: number = 50;
 
 /**
  * A composable providing live substrate fleet metrics for the lab dashboard
@@ -110,21 +111,21 @@ export function useSubstrateMetrics(): IUseSubstrateMetricsReturn {
   );
 
   /**
-   * The CPU utilisation series extracted from the history
+   * The CPU utilization series extracted from the history
    * @internal
    * @constant
    */
   const cpuSeries: ComputedRef<number[]> = computed((): number[] =>
-    history.value.map((h: ISubstrateMetricsSample): number => h.cpu),
+    history.value.map((sample: ISubstrateMetricsSample): number => sample.cpu),
   );
 
   /**
-   * The memory utilisation series extracted from the history
+   * The memory utilization series extracted from the history
    * @internal
    * @constant
    */
   const memSeries: ComputedRef<number[]> = computed((): number[] =>
-    history.value.map((h: ISubstrateMetricsSample): number => h.mem),
+    history.value.map((sample: ISubstrateMetricsSample): number => sample.mem),
   );
 
   /**
@@ -151,17 +152,17 @@ export function useSubstrateMetrics(): IUseSubstrateMetricsReturn {
     }
 
     // A live feed without a node sample still reads as stale
-    const n: ISubstrateMetricsNode | null | undefined = data.value?.node;
-    if (!n) {
+    const node: ISubstrateMetricsNode | null | undefined = data.value?.node;
+    if (!node) {
       return 'stale';
     }
 
     // Any pressure gauge crossing its threshold marks the fleet degraded
     const hot: boolean =
-      n.cpuPct >= HOT_PCT ||
-      n.mem.usedPct >= HOT_PCT ||
+      node.cpuPct >= HOT_PCT ||
+      node.mem.usedPct >= HOT_PCT ||
       (data.value?.storage?.usedPct ?? 0) >= HOT_PCT ||
-      (n.swap?.usedPct ?? 0) >= 50;
+      (node.swap?.usedPct ?? 0) >= SWAP_HOT_PCT;
     return hot ? 'degraded' : 'healthy';
   });
 
@@ -188,22 +189,22 @@ export function useSubstrateMetrics(): IUseSubstrateMetricsReturn {
    */
   const updatedLabel: ComputedRef<string | null> = computed((): string | null => {
     // No age yet means nothing to label
-    const a: number | null = ageSec.value;
-    if (a === null) {
+    const age: number | null = ageSec.value;
+    if (age === null) {
       return null;
     }
 
     // Bucket the age into the friendliest unit
-    if (a < 5) {
+    if (age < 5) {
       return 'just now';
     }
-    if (a < 60) {
-      return `${a}s ago`;
+    if (age < 60) {
+      return `${age}s ago`;
     }
-    if (a < 3_600) {
-      return `${Math.floor(a / 60)}m ago`;
+    if (age < 3_600) {
+      return `${Math.floor(age / 60)}m ago`;
     }
-    return `${Math.floor(a / 3_600)}h ago`;
+    return `${Math.floor(age / 3_600)}h ago`;
   });
 
   return {

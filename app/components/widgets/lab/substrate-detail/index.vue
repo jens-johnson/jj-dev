@@ -85,7 +85,7 @@ const {
  */
 const byId: ComputedRef<Map<string, ISubstrateDevice>> = computed(
   (): Map<string, ISubstrateDevice> =>
-    new Map(props.devices.map((d: ISubstrateDevice): [string, ISubstrateDevice] => [d.nodeId, d])),
+    new Map(props.devices.map((device: ISubstrateDevice): [string, ISubstrateDevice] => [device.nodeId, device])),
 );
 
 /**

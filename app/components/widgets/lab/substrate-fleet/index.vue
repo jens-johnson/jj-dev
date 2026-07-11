@@ -87,11 +87,17 @@ const guests: ComputedRef<ISubstrateMetricsView['guests']> = computed(
  * @constant
  */
 const summary: ComputedRef<IFleetSummaryStat[]> = computed((): IFleetSummaryStat[] => {
-  const l: ISubstrateDevice[] = props.devices;
+  const inventory: ISubstrateDevice[] = props.devices;
   return [
-    { label: 'Nodes', value: l.length },
-    { label: 'Online', value: l.filter((d: ISubstrateDevice): boolean => d.status === 'online').length },
-    { label: 'Planned', value: l.filter((d: ISubstrateDevice): boolean => d.status === 'planned').length },
+    { label: 'Nodes', value: inventory.length },
+    {
+      label: 'Online',
+      value: inventory.filter((device: ISubstrateDevice): boolean => device.status === 'online').length,
+    },
+    {
+      label: 'Planned',
+      value: inventory.filter((device: ISubstrateDevice): boolean => device.status === 'planned').length,
+    },
   ];
 });
 
@@ -112,7 +118,7 @@ const rows: ComputedRef<ISubstrateDevice[]> = computed((): ISubstrateDevice[] =>
  * @constant
  */
 const liveId: ComputedRef<string | null> = computed(
-  (): string | null => props.devices.find((d) => d.kind === 'hypervisor')?.nodeId ?? null,
+  (): string | null => props.devices.find((device) => device.kind === 'hypervisor')?.nodeId ?? null,
 );
 
 /* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -121,10 +127,11 @@ const liveId: ComputedRef<string | null> = computed(
  * A utility method to determine whether a row renders live telemetry; the reporting host while the feed is up
  * @internal
  * @function
- * @param d - The device on the row being rendered
+ * @param device - The device on the row being rendered
  * @returns Whether the row shows live telemetry
  */
-const isLive = (d: ISubstrateDevice): boolean => d.nodeId === liveId.value && state.value !== 'offline' && !!node.value;
+const isLive = (device: ISubstrateDevice): boolean =>
+  device.nodeId === liveId.value && state.value !== 'offline' && !!node.value;
 
 /**
  * A utility method to pick the gauge and sparkline tone; cools to the live accent, warms to terra under pressure

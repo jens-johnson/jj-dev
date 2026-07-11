@@ -125,31 +125,31 @@ export function kindLabel(kind: string): string {
 
 /**
  * Coerces a queried doc into a fully-populated device, applying schema defaults so consumers never see undefined
- * @param d - The loosely-typed substrate doc from queryCollection
+ * @param doc - The loosely-typed substrate doc from queryCollection
  * @returns The fully-populated device
  */
-export function normalizeDevice(d: IRawSubstrateDoc): ISubstrateDevice {
+export function normalizeDevice(doc: IRawSubstrateDoc): ISubstrateDevice {
   return {
-    nodeId: d.nodeId ?? d.path ?? '',
-    title: d.title ?? 'Untitled',
-    description: d.description ?? '',
-    kind: d.kind ?? 'other',
-    layer: d.layer ?? 'compute',
-    status: d.status ?? 'online',
-    vendor: d.vendor,
-    model: d.model,
-    power: d.power,
-    specs: (d.specs ?? []).map((s) => ({ label: s.label ?? '', value: s.value ?? '' })),
-    connections: (d.connections ?? [])
-      .map((c) => ({
-        to: c.to ?? '',
-        kind: c.kind,
-        label: c.label,
+    nodeId: doc.nodeId ?? doc.path ?? '',
+    title: doc.title ?? 'Untitled',
+    description: doc.description ?? '',
+    kind: doc.kind ?? 'other',
+    layer: doc.layer ?? 'compute',
+    status: doc.status ?? 'online',
+    vendor: doc.vendor,
+    model: doc.model,
+    power: doc.power,
+    specs: (doc.specs ?? []).map((spec) => ({ label: spec.label ?? '', value: spec.value ?? '' })),
+    connections: (doc.connections ?? [])
+      .map((connection) => ({
+        to: connection.to ?? '',
+        kind: connection.kind,
+        label: connection.label,
       }))
-      .filter((c) => c.to),
-    tags: d.tags ?? [],
-    order: d.order ?? 100,
-    path: d.path,
+      .filter((connection) => connection.to),
+    tags: doc.tags ?? [],
+    order: doc.order ?? 100,
+    path: doc.path,
   };
 }
 

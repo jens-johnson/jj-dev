@@ -33,10 +33,12 @@ import type {
 
 /* ─── Validation (no external deps; unknown keys are dropped by construction) ──────────────────────────────────────── */
 
-const isNum = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x);
-const isPct = (x: unknown): x is number => isNum(x) && x >= 0 && x <= 100;
-const isCount = (x: unknown): x is number => isNum(x) && Number.isInteger(x) && x >= 0 && x <= 100_000;
-const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
+const isNum = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
+const isPct = (value: unknown): value is number => isNum(value) && value >= 0 && value <= 100;
+const isCount = (value: unknown): value is number =>
+  isNum(value) && Number.isInteger(value) && value >= 0 && value <= 100_000;
+const isObj = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 /**
  * Validates an untrusted body into a clean payload. The returned object is rebuilt from known fields only, so any
@@ -112,20 +114,20 @@ const HISTORY_MAX = 60; // ~30 min at a 30s push cadence; enough for a live spar
 
 /**
  * Persists the latest snapshot and appends a compact point to the rolling history (for the sparklines)
- * @param p - The validated payload to store
+ * @param payload - The validated payload to store
  */
-export async function writeLatestMetrics(p: ISubstrateMetricsPayload): Promise<void> {
+export async function writeLatestMetrics(payload: ISubstrateMetricsPayload): Promise<void> {
   const store = useStorage('substrate');
   const receivedAt = Date.now();
-  await store.setItem(KEY, { ...p, receivedAt } satisfies IStoredSubstrateMetrics);
+  await store.setItem(KEY, { ...payload, receivedAt } satisfies IStoredSubstrateMetrics);
 
   const prev: ISubstrateMetricsSample[] = (await store.getItem<ISubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
   const next = [
     ...prev,
     {
       t: receivedAt,
-      cpu: p.node.cpuPct,
-      mem: p.node.mem.usedPct,
+      cpu: payload.node.cpuPct,
+      mem: payload.node.mem.usedPct,
     },
   ].slice(-HISTORY_MAX);
   await store.setItem(HISTORY_KEY, next);
@@ -186,7 +188,7 @@ const hits = new Map<string, number[]>();
  * @returns True when the request is allowed, false when the bucket is exhausted
  */
 export function allowRequest(key: string, limit = 12, windowMs = 60_000, now = Date.now()): boolean {
-  const recent: number[] = (hits.get(key) ?? []).filter((t: number): boolean => now - t < windowMs);
+  const recent: number[] = (hits.get(key) ?? []).filter((timestamp: number): boolean => now - timestamp < windowMs);
   if (recent.length >= limit) {
     hits.set(key, recent);
     return false;

@@ -39,11 +39,21 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Component props; the raw source, fence language, and filename handed down from Nuxt Content's code-block renderer
+ * @internal
+ * @constant
+ */
 const props = defineProps<{
   code?: string;
   language?: string;
   filename?: string;
 }>();
+
+/* ─── CONSTANTS ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * How long the copy button flashes its copied state before reverting, in milliseconds
@@ -52,12 +62,16 @@ const props = defineProps<{
  */
 const COPIED_FLASH_MS: number = 1800;
 
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 /**
  * Whether the copy button is flashing its copied state
  * @internal
  * @constant
  */
 const copied: Ref<boolean> = ref(false);
+
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * A utility method to copy the code block's raw source to the clipboard and flash the copied state for 1.8 seconds;

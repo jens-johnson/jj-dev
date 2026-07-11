@@ -40,7 +40,9 @@ const { data, status } = await useFetch<IMetricsResponse>('/api/metrics');
  * @constant
  */
 const weeklyContributions = computed<number[]>(() =>
-  (data.value?.github.weeks ?? []).slice(-SPARKLINE_WEEK_COUNT).map((w) => w.days.reduce((sum, d) => sum + d.count, 0)),
+  (data.value?.github.weeks ?? [])
+    .slice(-SPARKLINE_WEEK_COUNT)
+    .map((week) => week.days.reduce((sum, day) => sum + day.count, 0)),
 );
 
 /**

@@ -66,7 +66,7 @@ const rawProgress: Ref<number> = ref(0);
 const lerpProgress: Ref<number> = ref(0);
 
 /**
- * The requestAnimationFrame handle for the easing loop; cancelled on unmount
+ * The requestAnimationFrame handle for the easing loop; canceled on unmount
  * @internal
  */
 let raf: number;
@@ -157,16 +157,16 @@ const activePanel: ComputedRef<number> = computed((): number =>
  * indicator dot buttons for direct navigation
  * @internal
  * @function
- * @param i - The zero-based index of the panel to scroll to
+ * @param panelIndex - The zero-based index of the panel to scroll to
  */
-function scrollToPanel(i: number): void {
+function scrollToPanel(panelIndex: number): void {
   if (!import.meta.client || !outerRef.value) {
     return;
   }
   // Map the panel index onto the wrapper's scrollable range in document coordinates
   const rect: DOMRect = outerRef.value.getBoundingClientRect();
   const scrollable: number = outerRef.value.offsetHeight - window.innerHeight;
-  const target: number = window.scrollY + rect.top + (i / (PANELS - 1)) * scrollable;
+  const target: number = window.scrollY + rect.top + (panelIndex / (PANELS - 1)) * scrollable;
   // Smooth-scroll the window to the computed position
   window.scrollTo({
     top: target,

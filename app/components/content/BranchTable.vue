@@ -12,7 +12,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████████████ #components/content/BranchTable.vue ██████████████████████████████████████████████
+ * ███████████████████████████████████████ #components/content/BranchTable.vue ███████████████████████████████████████
  *
  * MDC component embedded in blog posts as `::branch-table`. Renders the three-branch / three-environment deploy
  * model as a styled card grid (rather than a flat table) so it reads visually rather than as data.
@@ -21,11 +21,30 @@
  */
 
 /**
+ * A single branch/environment row rendered as a card in the deploy-model grid
+ * @internal
+ * @interface
+ */
+interface IBranchRow {
+  /* The git branch or branch pattern (i.e. "feat/*") */
+  branch: string;
+
+  /* The environment name shown as the card's eyebrow label */
+  env: string;
+
+  /* The deployment URL for the environment */
+  url: string;
+
+  /* The accent-stripe tone keyed to the environment's promotion stage */
+  tone: 'muted' | 'sage' | 'accent';
+}
+
+/**
  * The three branch/environment rows rendered as cards, in promotion order; the tone picks the accent stripe color
  * @internal
  * @constant
  */
-const rows = [
+const rows: IBranchRow[] = [
   {
     branch: 'feat/*',
     env: 'Preview',

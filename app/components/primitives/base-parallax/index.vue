@@ -120,7 +120,7 @@ const smoothY: Ref<number> = ref(0);
 const scrollY: Ref<number> = ref(0);
 
 /**
- * The requestAnimationFrame handle for the per-frame loop; cancelled on unmount
+ * The requestAnimationFrame handle for the per-frame loop; canceled on unmount
  * @internal
  */
 let raf: number;
@@ -145,16 +145,16 @@ function lerpFn(a: number, b: number, t: number): number {
  * range relative to the element center and stores it as the raw parallax input
  * @internal
  * @function
- * @param e - The triggering mouse event
+ * @param event - The triggering mouse event
  */
-function onMouseMove(e: MouseEvent): void {
+function onMouseMove(event: MouseEvent): void {
   if (!rootEl.value) {
     return;
   }
   // Normalize the cursor position to the -1..+1 range relative to the element center
   const { left, top, width, height }: DOMRect = rootEl.value.getBoundingClientRect();
-  rawX.value = ((e.clientX - left) / width - 0.5) * 2;
-  rawY.value = ((e.clientY - top) / height - 0.5) * 2;
+  rawX.value = ((event.clientX - left) / width - 0.5) * 2;
+  rawY.value = ((event.clientY - top) / height - 0.5) * 2;
 }
 
 /**

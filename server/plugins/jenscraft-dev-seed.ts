@@ -26,19 +26,19 @@ import type { IJenscraftMetricsPayload, IStoredJenscraftMetrics } from '#utils/j
  * Rounds a number to one decimal place
  * @internal
  * @function
- * @param n - The number to round
+ * @param value - The number to round
  * @returns The rounded number
  */
-const round1 = (n: number): number => Math.round(n * 10) / 10;
+const round1 = (value: number): number => Math.round(value * 10) / 10;
 
 /**
  * Rounds a number to two decimal places
  * @internal
  * @function
- * @param n - The number to round
+ * @param value - The number to round
  * @returns The rounded number
  */
-const round2 = (n: number): number => Math.round(n * 100) / 100;
+const round2 = (value: number): number => Math.round(value * 100) / 100;
 
 /**
  * Builds a plausible mock Jenscraft metrics snapshot, lightly randomized so each reseed looks like fresh live data

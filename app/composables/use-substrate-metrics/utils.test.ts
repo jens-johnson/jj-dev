@@ -11,44 +11,38 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████ #components/widgets/home/about-animation/constants.ts ███████████████████████████████
+ * █████████████████████████████████ #composables/use-substrate-metrics/utils.test.ts ██████████████████████████████████
  *
- * Constants tuning the topographic contour-line canvas animation: line density, accent color, peak shape, and speed.
+ * Unit tests for the substrate-metrics pure core: the compact human uptime formatter across the day, hour, and minute
+ * buckets.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-/**
- * The number of contour lines drawn across the canvas
- * @public
- * @constant
- */
-export const NUM_LINES: number = 24;
+import { describe, expect, it } from 'vitest';
 
-/**
- * The base accent color (earth brown) as R,G,B components for rgba() composition
- * @public
- * @constant
- */
-export const ACCENT_RGB: string = '139, 101, 52';
+import { formatUptime } from './utils';
 
-/**
- * The Gaussian sigma-squared controlling how far the mouse peak spreads, in squared pixels
- * @public
- * @constant
- */
-export const PEAK_SIGMA: number = 22_000;
+describe('formatUptime', () => {
+  it('renders days and hours once the duration crosses a full day', () => {
+    // 90,000 seconds = 1 day 1 hour; the minutes remainder is dropped at day scale
+    expect(formatUptime(90_000)).toBe('1d 1h');
+  });
 
-/**
- * The maximum vertical displacement of the mountain peak at the cursor center, in pixels
- * @public
- * @constant
- */
-export const PEAK_HEIGHT: number = 110;
+  it('keeps a zeroed hour segment on an exact-day boundary', () => {
+    expect(formatUptime(86_400)).toBe('1d 0h');
+  });
 
-/**
- * The animation speed multiplier; lower is calmer
- * @public
- * @constant
- */
-export const SPEED: number = 0.0032;
+  it('renders hours and minutes when under a day', () => {
+    // 5 hours 30 minutes
+    expect(formatUptime(19_800)).toBe('5h 30m');
+  });
+
+  it('renders minutes alone when under an hour', () => {
+    expect(formatUptime(2_700)).toBe('45m');
+  });
+
+  it('renders a zero duration as minutes', () => {
+    expect(formatUptime(0)).toBe('0m');
+  });
+});
