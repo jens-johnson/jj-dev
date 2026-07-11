@@ -33,6 +33,8 @@ const DEFAULT_THEME: TTheme = 'day';
  * @returns The reactive theme ref, the setter/cycler/initializer functions, and the ordered theme list
  */
 export function useTheme(): IUseThemeReturn {
+  /* ─── State ────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
   /**
    * The shared reactive theme; useState keys it by 'theme' so every caller shares one source, and it must live inside
    * the composable function to have access to the Nuxt instance
@@ -40,6 +42,8 @@ export function useTheme(): IUseThemeReturn {
    * @constant
    */
   const theme: Ref<TTheme> = useState<TTheme>('theme', (): TTheme => DEFAULT_THEME);
+
+  /* ─── Methods ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   /**
    * A utility method to apply a theme; sets the shared state, stamps `data-theme` on <html>, and persists the choice
@@ -90,6 +94,8 @@ export function useTheme(): IUseThemeReturn {
     const preferred: TTheme = stored && THEMES.includes(stored) ? stored : DEFAULT_THEME;
     setTheme(preferred);
   }
+
+  /* ─── Return ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   return {
     theme,

@@ -42,12 +42,16 @@ const SWAP_HOT_PCT: number = 50;
  * @returns The raw feed data plus computed state, health, history series, freshness label, and refresh handles
  */
 export function useSubstrateMetrics(): IUseSubstrateMetricsReturn {
+  /* ─── Setup ────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
   // Fetch the feed client-side only; the page is prerendered to static HTML, so there is no useful server value to
   // bake in, and fetching on the client keeps the metrics current without a stale snapshot in the markup
   const { data, refresh, status } = useFetch<ISubstrateMetricsView>('/api/substrate/metrics', {
     key: 'substrate-metrics',
     server: false,
   });
+
+  /* ─── State ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   /**
    * The client-side clock so the "updated Ns ago" label keeps counting between 30s polls
@@ -62,6 +66,8 @@ export function useSubstrateMetrics(): IUseSubstrateMetricsReturn {
    * @constant
    */
   const fetchedAt: Ref<number> = ref(Date.now());
+
+  /* ─── Lifecycle ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   // Re-stamp the fetch baseline whenever fresh feed data lands
   watch(data, (): void => {
@@ -82,6 +88,8 @@ export function useSubstrateMetrics(): IUseSubstrateMetricsReturn {
       clearInterval(ticker);
     });
   });
+
+  /* ─── Computed ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   /**
    * The feed freshness state; offline until the publisher reports
@@ -206,6 +214,8 @@ export function useSubstrateMetrics(): IUseSubstrateMetricsReturn {
     }
     return `${Math.floor(age / 3_600)}h ago`;
   });
+
+  /* ─── Return ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   return {
     data,

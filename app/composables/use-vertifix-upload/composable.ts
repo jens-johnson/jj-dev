@@ -61,12 +61,16 @@ function errorMessage(err: unknown): string {
  * @returns The reactive item list plus the actions that advance each item through the flow
  */
 export function useVertifixUpload(): IUseVertifixUploadReturn {
+  /* ─── State ────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
   /**
    * The shared reactive item list; useState keys it by 'vertifix-items' so every caller shares one source
    * @internal
    * @constant
    */
   const items: Ref<IVertifixItem[]> = useState<IVertifixItem[]>('vertifix-items', (): IVertifixItem[] => []);
+
+  /* ─── Methods ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   /**
    * A utility method to look up an item in the list by its id
@@ -352,6 +356,8 @@ export function useVertifixUpload(): IUseVertifixUploadReturn {
       patch(id, { status: 'ready', error: null });
     }
   }
+
+  /* ─── Return ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   return {
     items,

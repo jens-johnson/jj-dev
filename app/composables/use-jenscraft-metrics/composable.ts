@@ -33,12 +33,16 @@ import { buildJenscraftLiveMetrics } from './utils';
  * @returns The raw feed data, the freshness state, a computed live-values map, and refresh/status handles
  */
 export function useJenscraftMetrics(enabled: boolean = true): IUseJenscraftMetricsReturn {
+  /* ─── Setup ────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
   // Fetch the feed client-side only; the service page is prerendered, so there is no useful server value
   const { data, refresh, status } = useFetch<IJenscraftMetricsView>('/api/services/jenscraft/metrics', {
     key: 'jenscraft-metrics',
     server: false,
     immediate: enabled,
   });
+
+  /* ─── Lifecycle ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   // Poll every 30 seconds while the consuming page is mounted; scope disposal tears the interval down
   onMounted((): void => {
@@ -50,6 +54,8 @@ export function useJenscraftMetrics(enabled: boolean = true): IUseJenscraftMetri
     }, 30_000);
     onScopeDispose((): void => clearInterval(poll));
   });
+
+  /* ─── Computed ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   /**
    * The feed freshness state; offline until the publisher reports
@@ -69,6 +75,8 @@ export function useJenscraftMetrics(enabled: boolean = true): IUseJenscraftMetri
   const live: ComputedRef<Record<string, string | number> | null> = computed(
     (): Record<string, string | number> | null => buildJenscraftLiveMetrics(data.value),
   );
+
+  /* ─── Return ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   return {
     data,
