@@ -78,11 +78,18 @@ header line with `# ` (or just `#` for empty logo lines):
 
 - The filename in the banner uses the path from the project root (e.g. `.editorconfig`) OR the
   alias-prefixed path for Nuxt source files: `#pages/...`, `#components/...`, `#composables/...`, `#utils/...` for
-  app files and `#server/...` for everything under `server/` (e.g. `#server/api/lab/vertifix/commit.post.ts`).
+  app files, `#server/...` for everything under `server/`, and `#shared/...` for everything under `shared/`
+  (e.g. `#server/api/lab/vertifix/commit.post.ts`).
 - API handlers (`server/api/**`, `server/routes/**`) use the generator's `api` kind and document their full
   request/response contract: USAGE (method + route), AUTH, PARAMS, QUERY, BODY, RETURNS, THROWS
   (`<status> when <condition>`), and SIDE EFFECTS. Regenerate via `pnpm header --spec <json> --write` whenever the
   contract changes; `server/api/lab/vertifix/commit.post.ts` is the exemplar.
+- Handler code conventions: a JSDoc block on the default export with `@throws <status> when <condition>` per error
+  response; awaited external calls (Strava, GitHub, storage) wrap in `runUpstream(<promise>, '<message>.')` from
+  `server/utils/http`, which translates unexpected rejections into 502s (deliberate `createError`s pass through);
+  object destructures annotate with the source's named type; server-utils type imports use the `#utils/<module>`
+  alias (defined in `nuxt.config.ts` for both the Nitro and app tsconfig projects); shared isomorphic helpers live
+  in `#shared/<module>` barrels (i.e. `isIsoString` in `#shared/utils/date`).
 - USAGE and SEE sections are optional; omit if not needed.
 - 120-char line limit applies to description and section content lines (the `█` separator lines
   are a fixed-width design element and may exceed 120).
