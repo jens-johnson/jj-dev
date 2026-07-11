@@ -11,7 +11,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████████████████████████ shared/vertifix/types.ts ██████████████████████████████████████████████
+ * █████████████████████████████████████████████ #shared/vertifix/types.ts █████████████████████████████████████████████
  *
  * Shared data-transfer types for the Vertifix lab flow. Isomorphic; imported by both the Nitro endpoints under
  * server/api/lab/vertifix and the client composable/widget, so the request/response contracts live in one place.
