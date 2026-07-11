@@ -18,6 +18,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { defineSymbol } from '../symbol';
+
 /**
  * Reports whether an unknown value is a parseable ISO date string, narrowing it for downstream use. The check accepts
  * anything Date.parse understands, which covers the ISO 8601 forms the app exchanges
@@ -29,3 +31,11 @@
 export function isIsoString(value: unknown): value is string {
   return typeof value === 'string' && !Number.isNaN(Date.parse(value));
 }
+
+/* ─── Metadata ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Register a readable name/description so the unit suites can title their describe blocks from the source symbol
+defineSymbol(isIsoString, {
+  name: 'Is ISO String',
+  description: 'Reports whether an unknown value is a parseable ISO date string.',
+});

@@ -25,6 +25,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { defineSymbol } from '#shared/utils/symbol';
+
 // Canonical docs URL per technology, keyed by a normalized lowercase name (no version, trimmed). Several common
 // aliases map to the same destination so authored copy can use whatever name reads best in context.
 const TECH_DOCS: Record<string, string> = {
@@ -97,3 +99,11 @@ export function techDocHref(name: string | undefined | null): string | undefined
   }
   return TECH_DOCS[normalizeTech(name)];
 }
+
+/* ─── Metadata ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Register a readable name/description so the unit suites can title their describe blocks from the source symbol
+defineSymbol(techDocHref, {
+  name: 'Build Tech Doc Href',
+  description: 'Resolves the official docs URL for a technology, tool, or platform name.',
+});

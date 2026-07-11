@@ -20,6 +20,8 @@
 
 import { createError, isError } from 'h3';
 
+import { defineSymbol } from '#shared/utils/symbol';
+
 /**
  * Awaits an upstream operation (an external service call or storage I/O), translating an unexpected rejection into a
  * 502 with the given message while letting deliberate H3 errors (i.e. a createError thrown inside the operation) pass
@@ -47,3 +49,11 @@ export async function runUpstream<TResult>(operation: Promise<TResult>, statusMe
     });
   }
 }
+
+/* ─── Metadata ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Register a readable name/description so the unit suites can title their describe blocks from the source symbol
+defineSymbol(runUpstream, {
+  name: 'Run Upstream Call',
+  description: 'Guards an awaited upstream operation, translating unexpected rejections into 502s.',
+});

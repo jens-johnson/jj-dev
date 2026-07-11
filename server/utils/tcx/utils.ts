@@ -26,6 +26,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { defineSymbol } from '#shared/utils/symbol';
 import { METERS_PER_FOOT } from '#shared/utils/units';
 
 import type { ITcxSourceActivity, TTcxStreams } from './types';
@@ -144,3 +145,11 @@ export function buildTcx(activity: ITcxSourceActivity, streams: TTcxStreams, ele
 
   return document.join('');
 }
+
+/* ─── Metadata ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Register a readable name/description so the unit suites can title their describe blocks from the source symbol
+defineSymbol(buildTcx, {
+  name: 'Build TCX Document',
+  description: 'Re-renders a Strava activity as a Garmin TCX file with a corrected elevation gain.',
+});

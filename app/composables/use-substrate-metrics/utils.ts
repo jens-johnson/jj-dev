@@ -18,6 +18,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { defineSymbol } from '#shared/utils/symbol';
+
 /**
  * Formats a duration in seconds to a compact human uptime, e.g. "9d 14h"
  * @param sec - The duration in seconds
@@ -35,3 +37,11 @@ export function formatUptime(sec: number): string {
   }
   return `${minutes}m`;
 }
+
+/* ─── Metadata ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Register a readable name/description so the unit suites can title their describe blocks from the source symbol
+defineSymbol(formatUptime, {
+  name: 'Format Uptime',
+  description: 'Formats a duration in seconds into a compact human uptime label.',
+});

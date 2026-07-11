@@ -18,6 +18,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { defineSymbol } from '#shared/utils/symbol';
 import type { IJenscraftMetricsView } from '~/types/jenscraft-metrics';
 
 import { formatUptime } from '../use-substrate-metrics/utils';
@@ -62,3 +63,11 @@ export function buildJenscraftLiveMetrics(
   // A reporting feed with no recognized metrics still reads as offline for the tiles
   return Object.keys(live).length ? live : null;
 }
+
+/* ─── Metadata ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Register a readable name/description so the unit suites can title their describe blocks from the source symbol
+defineSymbol(buildJenscraftLiveMetrics, {
+  name: 'Build Jenscraft Live Metrics',
+  description: 'Maps a raw metrics feed view onto the jenscraft.md tile keys.',
+});

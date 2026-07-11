@@ -24,6 +24,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { defineSymbol } from '#shared/utils/symbol';
 import type { IHomelabService } from '~/types/services';
 
 import {
@@ -151,3 +152,31 @@ export function splitDeviceMentions(text: string): ITextSegment[] {
   }
   return segments;
 }
+
+/* ─── Metadata ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Register readable names/descriptions so the unit suites can title their describe blocks from the source symbols
+defineSymbol(serviceStatusOf, {
+  name: 'Resolve Service Status',
+  description: 'Resolves the visual treatment for a service status, defaulting to planned.',
+});
+
+defineSymbol(serviceKindIcon, {
+  name: 'Resolve Service Kind Icon',
+  description: 'Resolves the Lucide icon name for a service kind, falling back when unknown.',
+});
+
+defineSymbol(serviceKindLabel, {
+  name: 'Resolve Service Kind Label',
+  description: 'Resolves the human-readable label for a service kind, echoing the kind when unknown.',
+});
+
+defineSymbol(normalizeService, {
+  name: 'Normalize Service',
+  description: 'Coerces a queried content doc into a fully-populated service with schema defaults.',
+});
+
+defineSymbol(normalizeServices, {
+  name: 'Normalize Services',
+  description: 'Normalizes a list of queried docs, sorted by ascending order.',
+});

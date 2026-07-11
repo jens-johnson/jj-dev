@@ -19,6 +19,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { defineSymbol } from '#shared/utils/symbol';
 import type { IVertifixCommitRequest } from '#shared/vertifix';
 
 import type { TVertifixCommitParseResult } from './types';
@@ -70,3 +71,11 @@ export function parseVertifixCommitRequest(body: unknown): TVertifixCommitParseR
     },
   };
 }
+
+/* ─── Metadata ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Register a readable name/description so the unit suites can title their describe blocks from the source symbol
+defineSymbol(parseVertifixCommitRequest, {
+  name: 'Parse Vertifix Commit Request',
+  description: 'Parses and validates an untrusted request body into a typed vertifix commit request.',
+});

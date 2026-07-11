@@ -18,6 +18,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { defineSymbol } from '#shared/utils/symbol';
+
 import { SPARK_LINE_PADDING_PX } from './constants';
 import type { ISparkLineGeometry } from './types';
 
@@ -73,3 +75,11 @@ export function buildSparkLineGeometry(points: number[], width: number, height: 
     end: last,
   };
 }
+
+/* ─── Metadata ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Register a readable name/description so the unit suites can title their describe blocks from the source symbol
+defineSymbol(buildSparkLineGeometry, {
+  name: 'Build Spark Line Geometry',
+  description: 'Builds the SVG line and area path geometry for a numeric sparkline series.',
+});

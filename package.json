@@ -74,7 +74,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.1",
-    "@jens-johnson/style-guide": "github:jens-johnson/jens-johnson#v0.8.1",
+    "@jens-johnson/style-guide": "github:jens-johnson/jens-johnson#v0.9.0",
     "@nuxt/content": "^3.14.0",
     "@nuxt/eslint": "latest",
     "@nuxt/fonts": "^0.14.0",

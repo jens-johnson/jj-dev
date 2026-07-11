@@ -20,6 +20,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { defineSymbol } from '#shared/utils/symbol';
 import type { ISubstrateDevice } from '~/types/substrate';
 
 import type { IRawSubstrateDoc, IStatusVisual } from './types';
@@ -161,3 +162,31 @@ export function normalizeDevice(doc: IRawSubstrateDoc): ISubstrateDevice {
 export function normalizeDevices(docs: IRawSubstrateDoc[]): ISubstrateDevice[] {
   return docs.map(normalizeDevice);
 }
+
+/* ─── Metadata ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Register readable names/descriptions so the unit suites can title their describe blocks from the source symbols
+defineSymbol(statusOf, {
+  name: 'Resolve Device Status',
+  description: 'Resolves the visual treatment for a device status, defaulting to online.',
+});
+
+defineSymbol(kindIcon, {
+  name: 'Resolve Device Kind Icon',
+  description: 'Resolves the Lucide icon name for a device kind, falling back when unknown.',
+});
+
+defineSymbol(kindLabel, {
+  name: 'Resolve Device Kind Label',
+  description: 'Resolves the human-readable label for a device kind, echoing the kind when unknown.',
+});
+
+defineSymbol(normalizeDevice, {
+  name: 'Normalize Device',
+  description: 'Coerces a queried doc into a fully-populated device by applying schema defaults.',
+});
+
+defineSymbol(normalizeDevices, {
+  name: 'Normalize Devices',
+  description: 'Normalizes a list of queried docs into fully-populated devices.',
+});
