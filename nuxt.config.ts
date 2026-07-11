@@ -26,6 +26,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { fileURLToPath } from 'node:url';
+
 /**
  * This project's Nuxt configuration
  * @public
@@ -201,6 +203,16 @@ export default defineNuxtConfig({
 
     /* Run separately via `npm run typecheck` to avoid slowing HMR */
     typeCheck: false,
+
+    /* The app project also compiles server handlers (the typed $fetch route map imports them), so the server-side
+       #utils alias must resolve here too */
+    tsConfig: {
+      compilerOptions: {
+        paths: {
+          '#utils/*': ['../server/utils/*'],
+        },
+      },
+    },
   },
 
   /**
@@ -283,6 +295,22 @@ export default defineNuxtConfig({
    * @see https://content.nuxt.com/docs/getting-started/installation
    */
   nitro: {
+    /**
+     * The `#utils` alias points at server/utils so server code (and its type imports) can reach util modules without
+     * relative-path ladders; values are auto-imported by Nitro, so the alias mostly serves `import type` statements
+     */
+    alias: {
+      '#utils': fileURLToPath(new URL('./server/utils', import.meta.url)),
+    },
+    typescript: {
+      tsConfig: {
+        compilerOptions: {
+          paths: {
+            '#utils/*': ['../server/utils/*'],
+          },
+        },
+      },
+    },
     prerender: {
       crawlLinks: true,
       routes: ['/', '/about', '/blog', '/projects', '/lab', '/lab/substrate', '/uses'],
