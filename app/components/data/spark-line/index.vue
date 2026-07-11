@@ -48,101 +48,75 @@
  */
 import type { TPropsWithDefaults } from '@jens-johnson/style-guide/types/vue';
 
-/**
- * The props accepted by the sparkline; the series is required while the sizing and area fill are optional tuning knobs
- * @internal
- * @interface
- */
-interface Props {
-  /* The numeric series to plot; fewer than two points renders a placeholder glyph instead */
-  points: number[];
-  /* The rendered SVG width in pixels */
-  width?: number;
-  /* The rendered SVG height in pixels */
-  height?: number;
-  /* Whether to render the faint area fill beneath the line */
-  fill?: boolean;
-}
+import { SPARK_LINE_END_DOT_RADIUS_PX } from './constants';
+import type { ISparkLineGeometry, ISparkLineProps } from './types';
+import { buildSparkLineGeometry } from './utils';
+
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * Component props; the numeric series to plot plus optional sizing and area-fill tuning
  * @internal
  * @constant
  */
-const props: TPropsWithDefaults<Props, 'width' | 'height' | 'fill'> = withDefaults(defineProps<Props>(), {
-  width: 88,
-  height: 24,
-  fill: true,
-});
+const props: TPropsWithDefaults<ISparkLineProps, 'width' | 'height' | 'fill'> = withDefaults(
+  defineProps<ISparkLineProps>(),
+  {
+    width: 88,
+    height: 24,
+    fill: true,
+  },
+);
 
-const PAD = 2;
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const geom = computed(() => {
-  const pts = props.points;
-  if (pts.length < 2) {
-    return null;
-  }
-
-  const min = Math.min(...pts);
-  const max = Math.max(...pts);
-  const range = max - min || 1;
-  const stepX = (props.width - PAD * 2) / (pts.length - 1);
-
-  const coords = pts.map((v, i) => {
-    const x = PAD + i * stepX;
-    const y = PAD + (1 - (v - min) / range) * (props.height - PAD * 2);
-    return [x, y] as const;
-  });
-
-  const first = coords[0];
-  const last = coords[coords.length - 1];
-  if (!first || !last) {
-    return null;
-  }
-
-  const line = coords.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
-  const area = `${line} L${last[0].toFixed(1)},${props.height} L${first[0].toFixed(1)},${props.height} Z`;
-
-  return {
-    line,
-    area,
-    end: last,
-  };
-});
+/**
+ * The sparkline SVG geometry for the current series and sizing; null when the series is too short to draw, which
+ * flips the template to its placeholder glyph. The math itself is the pure core in ./utils, exercised by its tests
+ * @internal
+ * @constant
+ */
+const geometry: ComputedRef<ISparkLineGeometry | null> = computed((): ISparkLineGeometry | null =>
+  buildSparkLineGeometry(props.points, props.width, props.height),
+);
 </script>
 
 <template>
   <svg
-    v-if="geom"
+    v-if="geometry"
     :width="width"
     :height="height"
     :viewBox="`0 0 ${width} ${height}`"
     fill="none"
     aria-hidden="true"
   >
+    <!-- The faint area fill beneath the line, when enabled -->
     <path
       v-if="fill"
-      :d="geom.area"
+      :d="geometry.area"
       fill="currentColor"
       class="opacity-10"
     />
 
+    <!-- The stroked series line -->
     <path
-      :d="geom.line"
+      :d="geometry.line"
       stroke="currentColor"
       stroke-width="1.5"
       stroke-linecap="round"
       stroke-linejoin="round"
     />
 
+    <!-- The dot marking the series' final point -->
     <circle
-      :cx="geom.end[0]"
-      :cy="geom.end[1]"
-      r="1.7"
+      :cx="geometry.end[0]"
+      :cy="geometry.end[1]"
+      :r="SPARK_LINE_END_DOT_RADIUS_PX"
       fill="currentColor"
     />
   </svg>
 
+  <!-- The placeholder glyph when the series is too short to draw -->
   <span
     v-else
     class="text-ink-subtle font-mono text-[10px]"

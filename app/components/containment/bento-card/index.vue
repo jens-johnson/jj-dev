@@ -72,7 +72,11 @@ const props: TPropsWithDefaults<ICardTiltOptions, 'intensity' | 'scale' | 'shine
 
 /* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-// The tilt/shine styles and mouse handlers driving the card's 3d hover treatment, tuned by the props above
+/**
+ * The tilt/shine styles and mouse handlers driving the card's 3d hover treatment, tuned by the props above
+ * @internal
+ * @constant
+ */
 const { tiltStyle, shineStyle, onMouseMove, onMouseEnter, onMouseLeave }: IUseCardTiltReturn = useCardTilt({
   intensity: props.intensity,
   scale: props.scale,
