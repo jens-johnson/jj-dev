@@ -55,6 +55,7 @@ export default createCommitlintConfig({
     'release',
     'server',
     'seo',
+    'shared',
     'styles',
     'tailwind',
     'tests',
