@@ -38,10 +38,20 @@ const EXIF_TAGS: string[] = ['DateTimeOriginal', 'CreateDate', 'ModifyDate'];
  */
 function errorMessage(err: unknown): string {
   // Narrow the unknown into the shapes an H3/$fetch error can carry
-  const e = err as { statusMessage?: string; data?: { statusMessage?: string; message?: string }; message?: string };
+  const fetchError = err as {
+    statusMessage?: string;
+    data?: { statusMessage?: string; message?: string };
+    message?: string;
+  };
 
   // Prefer the most specific message available, falling back to a generic one
-  return e?.data?.statusMessage ?? e?.data?.message ?? e?.statusMessage ?? e?.message ?? 'Something went wrong.';
+  return (
+    fetchError?.data?.statusMessage ??
+    fetchError?.data?.message ??
+    fetchError?.statusMessage ??
+    fetchError?.message ??
+    'Something went wrong.'
+  );
 }
 
 /**

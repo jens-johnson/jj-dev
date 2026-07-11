@@ -135,14 +135,14 @@ export function normalizeServices(docs: IRawServiceDoc[]): IHomelabService[] {
  */
 export function splitDeviceMentions(text: string): ITextSegment[] {
   const segments: ITextSegment[] = [];
-  let last = 0;
-  for (const m of text.matchAll(DEVICE_ID_REGEX)) {
-    const start = m.index ?? 0;
+  let last: number = 0;
+  for (const match of text.matchAll(DEVICE_ID_REGEX)) {
+    const start: number = match.index ?? 0;
     if (start > last) {
       segments.push({ text: text.slice(last, start) });
     }
-    segments.push({ text: m[0], href: `/lab/substrate/${m[0].toLowerCase()}` });
-    last = start + m[0].length;
+    segments.push({ text: match[0], href: `/lab/substrate/${match[0].toLowerCase()}` });
+    last = start + match[0].length;
   }
   if (last < text.length) {
     segments.push({ text: text.slice(last) });

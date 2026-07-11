@@ -21,7 +21,30 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-const steps = [
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * A single stage in the (tongue-in-cheek) project-iteration lifecycle
+ * @internal
+ * @interface
+ */
+interface IStep {
+  /* The two-digit ordinal label (i.e. "01") */
+  num: string;
+
+  /* The stage's short name */
+  label: string;
+
+  /* The stage's one-line description */
+  body: string;
+}
+
+/**
+ * The iteration-cycle stages, in order; the highlight rotates through them on a timer
+ * @internal
+ * @constant
+ */
+const steps: IStep[] = [
   {
     num: '01',
     label: 'Excited',
@@ -44,16 +67,38 @@ const steps = [
   },
 ];
 
-const activeIdx = ref(0);
+/**
+ * The dwell time on each stage before the highlight advances, in milliseconds
+ * @internal
+ * @constant
+ */
+const ROTATE_INTERVAL_MS: number = 2200;
+
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The index of the currently highlighted stage; advances on the rotation timer
+ * @internal
+ * @constant
+ */
+const activeIndex: Ref<number> = ref(0);
+
+/**
+ * The rotation interval handle, cleared on unmount; null before the timer starts
+ * @internal
+ */
 let timer: ReturnType<typeof setInterval> | null = null;
 
-onMounted(() => {
-  timer = setInterval(() => {
-    activeIdx.value = (activeIdx.value + 1) % steps.length;
-  }, 2200);
+/* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+onMounted((): void => {
+  // Advance the highlighted stage on a fixed cadence, wrapping at the end
+  timer = setInterval((): void => {
+    activeIndex.value = (activeIndex.value + 1) % steps.length;
+  }, ROTATE_INTERVAL_MS);
 });
 
-onUnmounted(() => {
+onUnmounted((): void => {
   if (timer) {
     clearInterval(timer);
   }
@@ -69,11 +114,11 @@ onUnmounted(() => {
           v-for="(step, i) in steps"
           :key="step.num"
           class="border-border bg-surface relative flex gap-4 rounded-xl border p-4 transition-colors"
-          :class="{ 'border-accent': i === activeIdx }"
+          :class="{ 'border-accent': i === activeIndex }"
         >
           <span
             class="text-caption flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-mono transition-colors"
-            :class="i === activeIdx ? 'bg-accent text-stone-50' : 'bg-bg text-ink-subtle'"
+            :class="i === activeIndex ? 'bg-accent text-stone-50' : 'bg-bg text-ink-subtle'"
           >
             {{ step.num }}
           </span>
@@ -143,18 +188,18 @@ onUnmounted(() => {
             v-for="(step, i) in steps"
             :key="step.num"
             class="border-border bg-surface relative rounded-2xl border p-6 transition-all duration-500"
-            :class="i === activeIdx ? 'border-accent -translate-y-1 shadow-lg' : ''"
+            :class="i === activeIndex ? 'border-accent -translate-y-1 shadow-lg' : ''"
           >
             <div class="mb-3 flex items-center justify-between">
               <span
                 class="text-caption flex h-9 w-9 items-center justify-center rounded-full font-mono font-medium transition-colors"
-                :class="i === activeIdx ? 'bg-accent text-stone-50' : 'bg-bg text-ink-subtle'"
+                :class="i === activeIndex ? 'bg-accent text-stone-50' : 'bg-bg text-ink-subtle'"
               >
                 {{ step.num }}
               </span>
 
               <span
-                v-if="i === activeIdx"
+                v-if="i === activeIndex"
                 class="bg-accent h-2 w-2 animate-pulse rounded-full"
                 aria-hidden="true"
               />

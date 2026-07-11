@@ -140,16 +140,16 @@ const layout: ComputedRef<Map<string, { x: number; y: number }>> = computed(
 const edges: ComputedRef<IEdge[]> = computed((): IEdge[] => {
   // Walk every device's connection list, skipping wires whose endpoints were never placed
   const out: IEdge[] = [];
-  for (const d of props.devices) {
-    for (const c of d.connections ?? []) {
-      if (!layout.value.has(d.nodeId) || !layout.value.has(c.to)) {
+  for (const device of props.devices) {
+    for (const connection of device.connections ?? []) {
+      if (!layout.value.has(device.nodeId) || !layout.value.has(connection.to)) {
         continue;
       }
       out.push({
-        from: d.nodeId,
-        to: c.to,
-        kind: c.kind ?? 'network',
-        label: c.label,
+        from: device.nodeId,
+        to: connection.to,
+        kind: connection.kind ?? 'network',
+        label: connection.label,
       });
     }
   }
@@ -157,22 +157,22 @@ const edges: ComputedRef<IEdge[]> = computed((): IEdge[] => {
 });
 
 /** Cubic-bezier wire between two node centres; eases along x when near-horizontal, along y otherwise. */
-function edgePath(e: IEdge): string {
+function edgePath(edge: IEdge): string {
   // Resolve both endpoints; an unplaced endpoint yields no path
-  const a: { x: number; y: number } | undefined = layout.value.get(e.from);
-  const b: { x: number; y: number } | undefined = layout.value.get(e.to);
-  if (!a || !b) {
+  const start: { x: number; y: number } | undefined = layout.value.get(edge.from);
+  const end: { x: number; y: number } | undefined = layout.value.get(edge.to);
+  if (!start || !end) {
     return '';
   }
-  const dx: number = b.x - a.x;
-  const dy: number = b.y - a.y;
+  const dx: number = end.x - start.x;
+  const dy: number = end.y - start.y;
 
   // Near-horizontal wires ease along x; everything else eases along y
   if (Math.abs(dy) < 60) {
-    return `M ${a.x} ${a.y} C ${a.x + dx * 0.4} ${a.y}, ${b.x - dx * 0.4} ${b.y}, ${b.x} ${b.y}`;
+    return `M ${start.x} ${start.y} C ${start.x + dx * 0.4} ${start.y}, ${end.x - dx * 0.4} ${end.y}, ${end.x} ${end.y}`;
   }
-  const k: number = Math.abs(dy) * 0.5 * (dy > 0 ? 1 : -1);
-  return `M ${a.x} ${a.y} C ${a.x} ${a.y + k}, ${b.x} ${b.y - k}, ${b.x} ${b.y}`;
+  const curveOffset: number = Math.abs(dy) * 0.5 * (dy > 0 ? 1 : -1);
+  return `M ${start.x} ${start.y} C ${start.x} ${start.y + curveOffset}, ${end.x} ${end.y - curveOffset}, ${end.x} ${end.y}`;
 }
 
 /** Absolute-position style for a node card, centred on its layout point. */
@@ -197,12 +197,12 @@ const connectedIds: ComputedRef<Set<string>> = computed((): Set<string> => {
     return set;
   }
   // Collect the far end of every edge touching the active node
-  for (const e of edges.value) {
-    if (e.from === id) {
-      set.add(e.to);
+  for (const edge of edges.value) {
+    if (edge.from === id) {
+      set.add(edge.to);
     }
-    if (e.to === id) {
-      set.add(e.from);
+    if (edge.to === id) {
+      set.add(edge.from);
     }
   }
   return set;

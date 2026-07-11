@@ -50,6 +50,16 @@ import type { CSSProperties } from 'vue';
 
 import type { IBaseParallaxProps } from './types';
 
+/* ─── CONSTANTS ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The hero height in pixels assumed during SSR, where `window.innerHeight` is unavailable; markStyle uses it to seed
+ * scroll progress until the client takes over
+ * @internal
+ * @constant
+ */
+const SSR_FALLBACK_HERO_HEIGHT_PX: number = 800;
+
 /* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
@@ -188,11 +198,11 @@ function layerStyle(mx: number, my: number, sy = 0): CSSProperties {
  */
 function markStyle(): CSSProperties {
   // Convert the scroll offset into a clamped 0..1 progress through the hero
-  const heroH: number = import.meta.client ? window.innerHeight * props.heroFraction : 800;
-  const p: number = Math.min(scrollY.value / heroH, 1);
+  const heroHeight: number = import.meta.client ? window.innerHeight * props.heroFraction : SSR_FALLBACK_HERO_HEIGHT_PX;
+  const progress: number = Math.min(scrollY.value / heroHeight, 1);
   // Fade in and scale up with progress while drifting with the lerped mouse position
-  const opacity: number = 0.02 + p * 0.22;
-  const scale: number = 0.84 + p * 0.16;
+  const opacity: number = 0.02 + progress * 0.22;
+  const scale: number = 0.84 + progress * 0.16;
   const tx: number = smoothX.value * 68;
   const ty: number = smoothY.value * 52 + scrollY.value * -0.4;
   return {

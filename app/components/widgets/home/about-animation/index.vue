@@ -236,10 +236,10 @@ function draw(): void {
   const active: boolean = mouseActive.value && mx >= 0;
 
   // Stroke each contour with proximity-weighted opacity and width
-  for (let i = 0; i < NUM_LINES; i++) {
-    const frac: number = i / (NUM_LINES - 1); // 0 → 1 top to bottom
+  for (let lineIndex = 0; lineIndex < NUM_LINES; lineIndex++) {
+    const frac: number = lineIndex / (NUM_LINES - 1); // 0 → 1 top to bottom
     const baseY: number = frac * H;
-    const phase: number = i * 0.38; // per-line phase offset
+    const phase: number = lineIndex * 0.38; // per-line phase offset
 
     const proximity: number = active ? Math.exp(-((baseY - my) ** 2) / 18_000) : 0;
     const midBoost: number = 1 - Math.abs(frac - 0.5) * 2; // peaks at vertical centre

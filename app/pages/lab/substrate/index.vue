@@ -94,9 +94,9 @@ const TABS: ReadonlyArray<{ key: string; label: string; soon?: boolean }> = [
  */
 const activeView: ComputedRef<string> = computed((): string => {
   // Fall back to the overview tab when the query param is missing or not a known tab key
-  const v = route.query.view;
-  const key: string = typeof v === 'string' ? v : 'overview';
-  return TABS.some((t) => t.key === key) ? key : 'overview';
+  const viewQuery: unknown = route.query.view;
+  const key: string = typeof viewQuery === 'string' ? viewQuery : 'overview';
+  return TABS.some((tab) => tab.key === key) ? key : 'overview';
 });
 
 /**

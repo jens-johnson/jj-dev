@@ -24,14 +24,14 @@
  * @returns The compact uptime label
  */
 export function formatUptime(sec: number): string {
-  const d = Math.floor(sec / 86_400);
-  const h = Math.floor((sec % 86_400) / 3_600);
-  const m = Math.floor((sec % 3_600) / 60);
-  if (d > 0) {
-    return `${d}d ${h}h`;
+  const days: number = Math.floor(sec / 86_400);
+  const hours: number = Math.floor((sec % 86_400) / 3_600);
+  const minutes: number = Math.floor((sec % 3_600) / 60);
+  if (days > 0) {
+    return `${days}d ${hours}h`;
   }
-  if (h > 0) {
-    return `${h}h ${m}m`;
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
   }
-  return `${m}m`;
+  return `${minutes}m`;
 }

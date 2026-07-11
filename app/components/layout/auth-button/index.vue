@@ -83,7 +83,7 @@ const initials: ComputedRef<string> = computed((): string => {
   return (
     parts
       .slice(0, 2)
-      .map((p: string): string => p[0] ?? '')
+      .map((part: string): string => part[0] ?? '')
       .join('')
       .toUpperCase() || '?'
   );

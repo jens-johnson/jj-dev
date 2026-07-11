@@ -19,12 +19,16 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 /**
  * The 0..1 ratio of how far the user has scrolled through the document; drives the bar's scaleX transform
  * @internal
  * @constant
  */
 const progress: Ref<number> = ref(0);
+
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
  * A utility method to handle window scroll events; recomputes the 0..1 progress ratio from the current scroll offset
@@ -37,6 +41,8 @@ function updateProgress(): void {
   const maxScroll: number = document.documentElement.scrollHeight - window.innerHeight;
   progress.value = maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0;
 }
+
+/* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 onMounted((): void => {
   window.addEventListener('scroll', updateProgress, {

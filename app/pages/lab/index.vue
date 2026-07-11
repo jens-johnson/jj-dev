@@ -43,15 +43,15 @@ const { data: devices } = await useAsyncData('lab-substrate-devices', () =>
  * @constant
  */
 const health = computed(() => {
-  const d = devices.value ?? [];
-  if (!d.length) {
+  const deviceList = devices.value ?? [];
+  if (!deviceList.length) {
     return {
       label: 'No data',
       dot: 'bg-ink-subtle',
       pulse: false,
     };
   }
-  if (d.some((x) => x.status === 'offline')) {
+  if (deviceList.some((device) => device.status === 'offline')) {
     return {
       label: 'Degraded',
       dot: 'bg-terra-600',
