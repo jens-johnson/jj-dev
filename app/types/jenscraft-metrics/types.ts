@@ -20,10 +20,26 @@
  */
 
 /**
- * A type representing the freshness state of the Jenscraft metrics feed
- * @typedef
+ * An enumeration of the freshness states of the Jenscraft metrics feed
+ * @public
+ * @enum
  */
-export type TJenscraftMetricsState = 'live' | 'stale' | 'offline';
+export enum JenscraftMetricsState {
+  /* The feed is reporting fresh samples */
+  live = 'live',
+
+  /* The latest sample has aged past the freshness window */
+  stale = 'stale',
+
+  /* No sample has arrived; the publisher is down */
+  offline = 'offline',
+}
+
+/**
+ * A type representing the freshness state of the Jenscraft metrics feed; one of {@link JenscraftMetricsState}
+ * @public
+ */
+export type TJenscraftMetricsState = `${JenscraftMetricsState}`;
 
 /**
  * An interface representing the player counts reported by the Jenscraft server

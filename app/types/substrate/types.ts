@@ -52,10 +52,29 @@ export interface ISubstrateSpec {
 }
 
 /**
- * A type representing the operational state of a device; drives status dots and badge color
- * @typedef
+ * An enumeration of the operational states of a device; drives status dots and badge color
+ * @public
+ * @enum
  */
-export type TSubstrateStatus = 'online' | 'offline' | 'planned' | 'maintenance';
+export enum SubstrateStatus {
+  /* The device is up and reporting */
+  online = 'online',
+
+  /* The device is down */
+  offline = 'offline',
+
+  /* The device is planned but not yet deployed */
+  planned = 'planned',
+
+  /* The device is temporarily down for maintenance */
+  maintenance = 'maintenance',
+}
+
+/**
+ * A type representing the operational state of a device; one of {@link SubstrateStatus}
+ * @public
+ */
+export type TSubstrateStatus = `${SubstrateStatus}`;
 
 /**
  * An interface representing one piece of homelab hardware; a node in the topology

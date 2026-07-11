@@ -87,10 +87,32 @@ export interface IServiceLinks {
 }
 
 /**
- * A type representing the operational state of a service; drives status dots and badge color
- * @typedef
+ * An enumeration of the operational states of a service; drives status dots and badge color
+ * @public
+ * @enum
  */
-export type TServiceStatus = 'online' | 'offline' | 'planned' | 'maintenance' | 'degraded';
+export enum ServiceStatus {
+  /* The service is up and reachable */
+  online = 'online',
+
+  /* The service is down */
+  offline = 'offline',
+
+  /* The service is planned but not yet stood up */
+  planned = 'planned',
+
+  /* The service is temporarily down for maintenance */
+  maintenance = 'maintenance',
+
+  /* The service is up but a health check is failing */
+  degraded = 'degraded',
+}
+
+/**
+ * A type representing the operational state of a service; one of {@link ServiceStatus}
+ * @public
+ */
+export type TServiceStatus = `${ServiceStatus}`;
 
 /**
  * An interface representing one deployed (or planned) homelab service; a card in the Services layer

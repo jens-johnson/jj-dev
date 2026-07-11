@@ -20,17 +20,52 @@
  */
 
 /**
- * A type representing the freshness state of the substrate metrics feed
- * @typedef
+ * An enumeration of the freshness states of the substrate metrics feed
+ * @public
+ * @enum
  */
-export type TSubstrateMetricsState = 'live' | 'stale' | 'offline';
+export enum SubstrateMetricsState {
+  /* The feed is reporting fresh samples */
+  live = 'live',
+
+  /* The latest sample has aged past the freshness window */
+  stale = 'stale',
+
+  /* No sample has arrived; the publisher is down */
+  offline = 'offline',
+}
 
 /**
- * A type representing the rolled-up fleet health: freshness (offline/stale) blended with threshold checks
- * (healthy/degraded)
- * @typedef
+ * A type representing the freshness state of the substrate metrics feed; one of {@link SubstrateMetricsState}
+ * @public
  */
-export type TSubstrateHealth = 'healthy' | 'degraded' | 'stale' | 'offline';
+export type TSubstrateMetricsState = `${SubstrateMetricsState}`;
+
+/**
+ * An enumeration of the rolled-up fleet health states: freshness (offline/stale) blended with threshold checks
+ * (healthy/degraded)
+ * @public
+ * @enum
+ */
+export enum SubstrateHealth {
+  /* All threshold checks pass and the feed is fresh */
+  healthy = 'healthy',
+
+  /* A threshold check is failing while the feed is fresh */
+  degraded = 'degraded',
+
+  /* The latest sample has aged past the freshness window */
+  stale = 'stale',
+
+  /* No sample has arrived; the publisher is down */
+  offline = 'offline',
+}
+
+/**
+ * A type representing the rolled-up fleet health; one of {@link SubstrateHealth}
+ * @public
+ */
+export type TSubstrateHealth = `${SubstrateHealth}`;
 
 /**
  * An interface representing the live compute-node sample in the metrics feed

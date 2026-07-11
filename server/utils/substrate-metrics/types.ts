@@ -74,7 +74,23 @@ export interface ISubstrateMetricsSample {
 }
 
 /**
- * A type representing the freshness state of the substrate metrics feed
- * @typedef
+ * An enumeration of the freshness states of the substrate metrics feed
+ * @public
+ * @enum
  */
-export type TSubstrateMetricsState = 'live' | 'stale' | 'offline';
+export enum SubstrateMetricsState {
+  /* The feed is reporting fresh samples */
+  live = 'live',
+
+  /* The latest sample has aged past the freshness window */
+  stale = 'stale',
+
+  /* No sample has arrived; the publisher is down */
+  offline = 'offline',
+}
+
+/**
+ * A type representing the freshness state of the substrate metrics feed; one of {@link SubstrateMetricsState}
+ * @public
+ */
+export type TSubstrateMetricsState = `${SubstrateMetricsState}`;
