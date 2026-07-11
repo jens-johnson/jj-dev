@@ -39,7 +39,7 @@ function readTags(tcx: string, tag: string): number[] {
 /* ─── Tests ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 describe('buildTcx', () => {
-  it('ramps altitude linearly from zero to the target gain in metres', () => {
+  it('ramps altitude linearly from zero to the target gain in meters', () => {
     const streams: TTcxStreams = { time: { data: [0, 50, 100] }, distance: { data: [0, 500, 1000] } };
 
     // 100 ft → 30.48 m, distributed across time fractions 0, 0.5, 1.

@@ -162,7 +162,10 @@ export default defineEventHandler((event: H3Event): Promise<void> => {
   // app still in "Testing" mode, a blocked grant, etc. nuxt-auth-utils' handler only checks for
   // `code`, so a no-code callback silently re-enters the flow → an endless consent⇄account-chooser
   // loop that never returns to the app. Surface the error and stop, rather than restarting.
-  const { error: oauthError, error_description: oauthErrorDescription } = getQuery(event);
+  const {
+    error: oauthError,
+    error_description: oauthErrorDescription,
+  }: { error?: unknown; error_description?: unknown } = getQuery(event);
   if (oauthError) {
     console.error('[auth] Google returned an error to the callback:', oauthError, oauthErrorDescription ?? '');
     return sendRedirect(event, `/?auth=error&reason=${encodeURIComponent(String(oauthError))}`);
@@ -183,7 +186,7 @@ export default defineEventHandler((event: H3Event): Promise<void> => {
     },
 
     /** Exchange succeeded; persist a trimmed profile and the resolved admin flag into the session. */
-    async onSuccess(event, { user }) {
+    async onSuccess(event, { user }: { user: unknown }) {
       // Narrow the untyped user payload to the OIDC fields we consume
       const profile: IGoogleUser = user as IGoogleUser;
 

@@ -26,12 +26,11 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { METERS_PER_FOOT } from '#shared/utils/units';
+
 import type { ITcxSourceActivity, TTcxStreams } from './types';
 
 /* ─── Constants ───────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-// Feet to metres.
-const FEET_TO_METRES = 0.3048;
 
 // XML entities that must be escaped inside the generated TCX document.
 const XML_ENTITIES: Record<string, string> = {
@@ -52,7 +51,7 @@ const XML_ENTITIES: Record<string, string> = {
  * @returns The escaped string
  */
 function escapeXml(value: unknown): string {
-  return String(value ?? '').replace(/[<>&'"]/g, (character) => XML_ENTITIES[character] ?? character);
+  return String(value ?? '').replace(/[<>&'"]/g, (character: string): string => XML_ENTITIES[character] ?? character);
 }
 
 /* ─── Builder ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -75,19 +74,19 @@ export function buildTcx(activity: ITcxSourceActivity, streams: TTcxStreams, ele
   const rawDistanceEnd = rawDistances?.at(-1) ?? 0;
   const distances =
     rawDistances && rawDistanceEnd > 0
-      ? rawDistances.map((distance) => (distance * activity.distance) / rawDistanceEnd)
-      : times.map((time) => activity.distance * (time / Math.max(activity.elapsed_time, 1)));
+      ? rawDistances.map((distance: number): number => (distance * activity.distance) / rawDistanceEnd)
+      : times.map((time: number): number => activity.distance * (time / Math.max(activity.elapsed_time, 1)));
 
   const heartRates = streams.heartrate?.data;
   const cadences = streams.cadence?.data;
   const start = new Date(activity.start_date);
-  const gainMetres = elevationFeet * FEET_TO_METRES;
+  const gainMeters = elevationFeet * METERS_PER_FOOT;
   const lastTime = Math.max(times.at(-1) ?? activity.elapsed_time, 1);
 
   const trackpoints = times
-    .map((time, index) => {
+    .map((time: number, index: number): string => {
       const timestamp = new Date(start.getTime() + time * 1000).toISOString();
-      const altitude = gainMetres * (time / lastTime);
+      const altitude = gainMeters * (time / lastTime);
       const distance = distances[index] ?? (activity.distance * time) / lastTime;
       const heartRate = heartRates?.[index];
       const cadence = cadences?.[index];

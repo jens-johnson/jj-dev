@@ -36,7 +36,7 @@ export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) {
     return false;
   }
-  const { adminEmail } = useRuntimeConfig();
+  const { adminEmail }: { adminEmail: string } = useRuntimeConfig();
   return email.trim().toLowerCase() === String(adminEmail).trim().toLowerCase();
 }
 
@@ -44,6 +44,8 @@ export function isAdminEmail(email: string | null | undefined): boolean {
  * Route guard for admin-only server endpoints. Requires an authenticated session and admin privileges, throwing 401
  * (via requireUserSession) when unauthenticated and 403 when the session is non-admin
  * @param event - The H3 request event
+ * @throws 401 when the request is unauthenticated (thrown by requireUserSession)
+ * @throws 403 when the authenticated session is not on the admin allow-list
  * @returns The verified session, so handlers can read `user` from it
  */
 export async function requireAdmin(event: H3Event): Promise<UserSessionRequired> {

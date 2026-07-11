@@ -61,6 +61,7 @@
  *
  *   • 422 when any required body field is absent or malformed
  *   • 409 when the original activity still exists on Strava (delete it there first)
+ *   • 502 when a Strava call fails (existence check, upload, polling, trainer flag, or validation)
  *
  * ─── SIDE EFFECTS ────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -71,9 +72,9 @@
 
 import type { H3Event } from 'h3';
 
-import type { IVertifixCommitResult } from '#shared/vertifix';
-
-import type { TVertifixCommitParseResult } from '../../../utils/vertifix';
+import type { IVertifixCommitRequest, IVertifixCommitResult } from '#shared/vertifix';
+import type { IReplacementValidation, IStravaUpload } from '#utils/strava';
+import type { TVertifixCommitParseResult } from '#utils/vertifix';
 
 /**
  * Commits a Vertifix replacement: re-uploads the client-held TCX after the original activity has been manually
@@ -82,6 +83,9 @@ import type { TVertifixCommitParseResult } from '../../../utils/vertifix';
  * @default
  * @function
  * @param event - The incoming request event
+ * @throws 422 when any required body field is absent or malformed
+ * @throws 409 when the original activity still exists on Strava
+ * @throws 502 when a Strava call fails (existence check, upload, polling, trainer flag, or validation)
  * @returns The replacement activity id plus the distance/elevation validation verdict
  */
 export default defineEventHandler(async (event: H3Event): Promise<IVertifixCommitResult> => {
@@ -96,10 +100,11 @@ export default defineEventHandler(async (event: H3Event): Promise<IVertifixCommi
       statusMessage: parsed.message,
     });
   }
-  const { activityId, tcx, name, description, elevationFeet, expectedDistanceMeters } = parsed.request;
+  const { activityId, tcx, name, description, elevationFeet, expectedDistanceMeters }: IVertifixCommitRequest =
+    parsed.request;
 
   // Hard guard: refuse to upload a duplicate until the original has been manually deleted on Strava
-  if (await activityExists(activityId)) {
+  if (await runUpstream(activityExists(activityId), 'The Strava existence check failed.')) {
     throw createError({
       statusCode: 409,
       statusMessage:
@@ -108,18 +113,25 @@ export default defineEventHandler(async (event: H3Event): Promise<IVertifixCommi
   }
 
   // Upload the corrected TCX, resolving the replacement id from the immediate response or by polling
-  const upload = await uploadTcx(tcx, {
-    id: activityId,
-    name,
-    description,
-  });
-  const replacementActivityId: number = upload.activity_id ?? (await pollUpload(upload.id));
+  const upload: IStravaUpload = await runUpstream(
+    uploadTcx(tcx, {
+      id: activityId,
+      name,
+      description,
+    }),
+    'The Strava upload failed.',
+  );
+  const replacementActivityId: number =
+    upload.activity_id ?? (await runUpstream(pollUpload(upload.id), 'Polling the Strava upload failed.'));
 
   // Treadmill uploads land flagged as trainer rides, which hides the map; clear the flag before validating
-  await setTrainerFalse(replacementActivityId);
+  await runUpstream(setTrainerFalse(replacementActivityId), 'Clearing the Strava trainer flag failed.');
 
   // Compare the re-upload's actual totals against the expectations from the prepare step
-  const validation = await validateReplacement(replacementActivityId, expectedDistanceMeters, elevationFeet);
+  const validation: IReplacementValidation = await runUpstream(
+    validateReplacement(replacementActivityId, expectedDistanceMeters, elevationFeet),
+    'Validating the Strava replacement failed.',
+  );
 
   return {
     ok: validation.valid,

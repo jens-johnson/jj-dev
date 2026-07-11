@@ -27,8 +27,10 @@
  *
  * ─── THROWS ──────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
+ *   • 502 when the GitHub contributions fetch fails
  *   • 502 when the Strava token exchange fails
  *   • 502 when the authenticated Strava athlete cannot be resolved
+ *   • 502 when the Strava stats or activities fetch fails
  *
  * ─── SIDE EFFECTS ────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -41,6 +43,8 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+
+import { metersToFeet, metersToMiles } from '#shared/utils/units';
 
 /* ─── Types ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -82,7 +86,7 @@ interface IStravaTokenResponse {
  */
 interface IStravaTotals {
   count: number;
-  distance: number; // metres
+  distance: number; // meters
   moving_time: number; // seconds
   elapsed_time: number;
   elevation_gain: number;
@@ -109,7 +113,7 @@ interface IStravaActivity {
   name: string;
   type: string;
   start_date: string;
-  distance: number; // metres
+  distance: number; // meters
   moving_time: number; // seconds
 }
 
@@ -149,28 +153,6 @@ let cacheTimestamp = 0;
 /* ─── Helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
- * Converts metres to miles, rounded to one decimal place
- * @internal
- * @function
- * @param m - The distance in metres
- * @returns The distance in miles
- */
-function metresToMiles(m: number): number {
-  return Math.round((m / 1609.344) * 10) / 10;
-}
-
-/**
- * Converts metres to feet, rounded to the nearest foot
- * @internal
- * @function
- * @param m - The length in metres
- * @returns The length in feet
- */
-function metresToFeet(m: number): number {
-  return Math.round(m * 3.28084);
-}
-
-/**
  * Groups a flat array of daily contributions into ISO weeks (Mon–Sun), newest last
  * @internal
  * @function
@@ -186,7 +168,7 @@ function groupIntoWeeks(contributions: IGhContribution[], numWeeks: number): IMe
   for (let w = 0; w < numWeeks; w++) {
     const slice = days.slice(w * 7, w * 7 + 7);
     result.push({
-      days: slice.map((d) => ({
+      days: slice.map((d: IGhContribution): { count: number; level: 0 | 1 | 2 | 3 | 4 } => ({
         count: d.count,
         level: d.level,
       })),
@@ -215,11 +197,11 @@ function buildWeeklyMiles(activities: IStravaActivity[], numWeeks: number): numb
     const age = now - new Date(act.start_date).getTime();
     const weekIdx = Math.floor(age / msPerWeek);
     if (weekIdx < numWeeks) {
-      buckets[numWeeks - 1 - weekIdx] += metresToMiles(act.distance);
+      buckets[numWeeks - 1 - weekIdx] += metersToMiles(act.distance);
     }
   }
 
-  return buckets.map((v) => Math.round(v * 10) / 10);
+  return buckets.map((v: number): number => Math.round(v * 10) / 10);
 }
 
 /* ─── Handler ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -230,6 +212,10 @@ function buildWeeklyMiles(activities: IStravaActivity[], numWeeks: number): numb
  * @public
  * @default
  * @function
+ * @throws 502 when the GitHub contributions fetch fails
+ * @throws 502 when the Strava token exchange fails
+ * @throws 502 when the authenticated Strava athlete cannot be resolved
+ * @throws 502 when the Strava stats or activities fetch fails
  * @returns The GitHub contribution weeks plus Strava year-to-date run totals and the weekly-mileage series
  */
 export default defineEventHandler(async (): Promise<IMetricsResponse> => {
@@ -250,33 +236,41 @@ export default defineEventHandler(async (): Promise<IMetricsResponse> => {
   /* ─── GitHub ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
   // Fetch the current calendar year of contribution activity from the GitHub contributions API
-  const ghRes: IGhContributionsResponse = await fetch(
-    `https://github-contributions-api.jogruber.de/v4/jens-johnson?y=${year}`,
-  ).then((r) => r.json() as Promise<IGhContributionsResponse>);
+  const ghRes: IGhContributionsResponse = await runUpstream(
+    fetch(`https://github-contributions-api.jogruber.de/v4/jens-johnson?y=${year}`).then(
+      (r: Response): Promise<IGhContributionsResponse> => r.json(),
+    ),
+    'The GitHub contributions fetch failed.',
+  );
 
   const totalContributions: number = ghRes.total[year] ?? 0;
 
   // Filter out future-dated entries; the API returns the full calendar year,
   // and a naive .slice(-182) would grab months that haven't happened yet.
   const today: string = new Date().toISOString().slice(0, 10);
-  const pastContributions: IGhContribution[] = ghRes.contributions.filter((c) => c.date <= today);
+  const pastContributions: IGhContribution[] = ghRes.contributions.filter(
+    (c: IGhContribution): boolean => c.date <= today,
+  );
   const weeks: IMetricsWeek[] = groupIntoWeeks(pastContributions, 26);
 
   /* ─── Strava token exchange ──────────────────────────────────────────────────────────────────────────────────────── */
 
   // Exchange the long-lived refresh token for a short-lived access token
-  const tokenRes = await fetch('https://www.strava.com/oauth/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      client_id: stravaClientId,
-      client_secret: stravaClientSecret,
-      refresh_token: stravaRefreshToken,
-      grant_type: 'refresh_token',
-    }),
-  }).then((r) => r.json());
+  const tokenRes: Partial<IStravaTokenResponse> & { errors?: unknown; message?: string } = await runUpstream(
+    fetch('https://www.strava.com/oauth/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        client_id: stravaClientId,
+        client_secret: stravaClientSecret,
+        refresh_token: stravaRefreshToken,
+        grant_type: 'refresh_token',
+      }),
+    }).then((r: Response): Promise<Partial<IStravaTokenResponse> & { errors?: unknown; message?: string }> => r.json()),
+    'The Strava token exchange failed.',
+  );
 
   // A failed exchange (bad credentials, revoked token) surfaces as a 502; the upstream API is the failing party
   if (tokenRes.errors || !tokenRes.access_token) {
@@ -287,14 +281,17 @@ export default defineEventHandler(async (): Promise<IMetricsResponse> => {
     });
   }
 
-  const { access_token } = tokenRes as IStravaTokenResponse;
+  const { access_token }: IStravaTokenResponse = tokenRes as IStravaTokenResponse;
 
   // Get the authenticated athlete to retrieve their ID
-  const athleteRes = await fetch('https://www.strava.com/api/v3/athlete', {
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
-  }).then((r) => r.json());
+  const athleteRes: { id?: number } = await runUpstream(
+    fetch('https://www.strava.com/api/v3/athlete', {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    }).then((r: Response): Promise<{ id?: number }> => r.json()),
+    'The Strava athlete lookup failed.',
+  );
 
   // An unresolvable athlete also surfaces as a 502; the token was accepted but the profile lookup failed
   if (!athleteRes.id) {
@@ -310,18 +307,24 @@ export default defineEventHandler(async (): Promise<IMetricsResponse> => {
   /* ─── Strava stats ───────────────────────────────────────────────────────────────────────────────────────────────── */
 
   // Fetch the aggregate run totals and the recent-activity list in parallel
-  const [statsRes, activitiesRes] = await Promise.all([
-    fetch(`https://www.strava.com/api/v3/athletes/${athleteId}/stats`, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    }).then((r) => r.json() as Promise<IStravaStatsResponse>),
+  const [statsRes, activitiesRes]: [IStravaStatsResponse, IStravaActivity[]] = await Promise.all([
+    runUpstream(
+      fetch(`https://www.strava.com/api/v3/athletes/${athleteId}/stats`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }).then((r: Response): Promise<IStravaStatsResponse> => r.json()),
+      'The Strava stats fetch failed.',
+    ),
 
-    fetch('https://www.strava.com/api/v3/athlete/activities?per_page=200', {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    }).then((r) => r.json() as Promise<IStravaActivity[]>),
+    runUpstream(
+      fetch('https://www.strava.com/api/v3/athlete/activities?per_page=200', {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }).then((r: Response): Promise<IStravaActivity[]> => r.json()),
+      'The Strava activities fetch failed.',
+    ),
   ]);
 
   // Assemble the payload: contribution weeks for the heatmap, run totals and weekly miles for the sparkline
@@ -331,9 +334,9 @@ export default defineEventHandler(async (): Promise<IMetricsResponse> => {
       weeks,
     },
     strava: {
-      ytdMiles: metresToMiles(statsRes.ytd_run_totals.distance),
+      ytdMiles: metersToMiles(statsRes.ytd_run_totals.distance),
       ytdRuns: statsRes.ytd_run_totals.count,
-      ytdElevationFt: metresToFeet(statsRes.ytd_run_totals.elevation_gain),
+      ytdElevationFt: metersToFeet(statsRes.ytd_run_totals.elevation_gain),
       weeklyMiles: buildWeeklyMiles(activitiesRes, 16),
     },
   };

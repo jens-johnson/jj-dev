@@ -70,6 +70,7 @@
  *   • 429 when the per-IP rate limit is exhausted
  *   • 413 when the body is empty or exceeds 4096 bytes
  *   • 422 when the body is not valid JSON or fails payload validation
+ *   • 502 when storing the snapshot fails
  *
  * ─── SIDE EFFECTS ────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -87,6 +88,11 @@ import type { H3Event } from 'h3';
  * @default
  * @function
  * @param event - The incoming request event
+ * @throws 401 when the bearer secret is missing or does not match
+ * @throws 429 when the per-IP rate limit is exhausted
+ * @throws 413 when the body is empty or exceeds 4096 bytes
+ * @throws 422 when the body is not valid JSON or fails payload validation
+ * @throws 502 when storing the snapshot fails
  * @returns Null with a 204 status once the snapshot is stored
  */
 export default defineEventHandler(async (event: H3Event): Promise<null> => {
@@ -123,7 +129,7 @@ export default defineEventHandler(async (event: H3Event): Promise<null> => {
   }
 
   // Persist the clean snapshot (stamped with the receive time) and acknowledge with an empty 204
-  await writeLatestJenscraftMetrics(result.value);
+  await runUpstream(writeLatestJenscraftMetrics(result.value), 'Storing the Jenscraft snapshot failed.');
   setResponseStatus(event, 204);
   return null;
 });

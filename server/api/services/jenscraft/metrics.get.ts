@@ -25,6 +25,10 @@
  *   • The last-known snapshot (players, tps, mspt, uptimeSec, world, mobs) plus the derived freshness state and age
  *   • An all-null snapshot with state 'offline' when nothing has been stored yet
  *
+ * ─── THROWS ──────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • 502 when reading the stored snapshot fails
+ *
  * ─── SIDE EFFECTS ────────────────────────────────────────────────────────────────────────────────────────────────────
  *
  *   • Sets a short-lived Cache-Control header (public, max-age=5, s-maxage=15)
@@ -34,8 +38,8 @@
 
 import type { H3Event } from 'h3';
 
-import type { IJenscraftMetricsPayload, IStoredJenscraftMetrics } from '../../../utils/jenscraft-metrics';
-import type { TSubstrateMetricsState } from '../../../utils/substrate-metrics';
+import type { IJenscraftMetricsPayload, IStoredJenscraftMetrics } from '#utils/jenscraft-metrics';
+import type { TSubstrateMetricsState } from '#utils/substrate-metrics';
 
 /**
  * An interface representing the public metrics response: the last-known snapshot fields plus the derived freshness
@@ -78,6 +82,7 @@ interface IJenscraftMetricsResponse {
  * @default
  * @function
  * @param event - The incoming request event
+ * @throws 502 when reading the stored snapshot fails
  * @returns The last-known snapshot fields plus the derived freshness state and age
  */
 export default defineEventHandler(async (event: H3Event): Promise<IJenscraftMetricsResponse> => {
@@ -85,7 +90,10 @@ export default defineEventHandler(async (event: H3Event): Promise<IJenscraftMetr
   setResponseHeader(event, 'Cache-Control', 'public, max-age=5, s-maxage=15');
 
   // Read the last-known snapshot; an empty store renders as offline with every metric nulled
-  const stored: IStoredJenscraftMetrics | null = await readLatestJenscraftMetrics();
+  const stored: IStoredJenscraftMetrics | null = await runUpstream(
+    readLatestJenscraftMetrics(),
+    'Reading the Jenscraft snapshot failed.',
+  );
   if (!stored) {
     return {
       state: 'offline' as const,
@@ -101,7 +109,7 @@ export default defineEventHandler(async (event: H3Event): Promise<IJenscraftMetr
   }
 
   // Derive freshness from the server receive time, then surface the snapshot with absent metrics nulled
-  const { state, ageSec } = metricsState(stored.receivedAt);
+  const { state, ageSec }: { state: TSubstrateMetricsState; ageSec: number } = metricsState(stored.receivedAt);
   return {
     state,
     ageSec,

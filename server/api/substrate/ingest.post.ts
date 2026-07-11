@@ -62,6 +62,7 @@
  *   • 429 when the per-IP rate limit is exhausted
  *   • 413 when the body is empty or exceeds 4096 bytes
  *   • 422 when the body is not valid JSON or fails payload validation
+ *   • 502 when storing the payload fails
  *
  * ─── SIDE EFFECTS ────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -80,6 +81,11 @@ import type { H3Event } from 'h3';
  * @default
  * @function
  * @param event - The incoming request event
+ * @throws 401 when the bearer secret is missing or does not match
+ * @throws 429 when the per-IP rate limit is exhausted
+ * @throws 413 when the body is empty or exceeds 4096 bytes
+ * @throws 422 when the body is not valid JSON or fails payload validation
+ * @throws 502 when storing the payload fails
  * @returns Null with a 204 status once the payload is stored
  */
 export default defineEventHandler(async (event: H3Event): Promise<null> => {
@@ -116,7 +122,7 @@ export default defineEventHandler(async (event: H3Event): Promise<null> => {
   }
 
   // Persist the clean payload (stamped with the receive time, appended to the sparkline history) and acknowledge 204
-  await writeLatestMetrics(result.value);
+  await runUpstream(writeLatestMetrics(result.value), 'Storing the metrics payload failed.');
   setResponseStatus(event, 204);
   return null;
 });

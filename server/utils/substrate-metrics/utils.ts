@@ -119,7 +119,7 @@ export async function writeLatestMetrics(p: ISubstrateMetricsPayload): Promise<v
   const receivedAt = Date.now();
   await store.setItem(KEY, { ...p, receivedAt } satisfies IStoredSubstrateMetrics);
 
-  const prev = (await store.getItem<ISubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
+  const prev: ISubstrateMetricsSample[] = (await store.getItem<ISubstrateMetricsSample[]>(HISTORY_KEY)) ?? [];
   const next = [
     ...prev,
     {
@@ -186,7 +186,7 @@ const hits = new Map<string, number[]>();
  * @returns True when the request is allowed, false when the bucket is exhausted
  */
 export function allowRequest(key: string, limit = 12, windowMs = 60_000, now = Date.now()): boolean {
-  const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs);
+  const recent: number[] = (hits.get(key) ?? []).filter((t: number): boolean => now - t < windowMs);
   if (recent.length >= limit) {
     hits.set(key, recent);
     return false;

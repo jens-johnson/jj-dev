@@ -26,6 +26,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { METERS_PER_FOOT, metersToFeet } from '#shared/utils/units';
+
 import type { IReplacementValidation, IStravaActivity, IStravaUpload, TStravaStreams, TUploadActivity } from './types';
 
 /* ─── Constants ───────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -34,8 +36,6 @@ const API = 'https://www.strava.com/api/v3';
 const OAUTH_TOKEN_URL = 'https://www.strava.com/oauth/token';
 const RUN_SPORT_TYPES = ['Run', 'VirtualRun', 'TrailRun'];
 const MATCH_WINDOW_MS = 36 * 60 * 60 * 1000;
-const METRES_PER_FOOT = 0.3048;
-const FEET_PER_METRE = 3.28084;
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
 /* ─── Credentials & access token ──────────────────────────────────────────────────────────────────────────────────── */
@@ -45,6 +45,7 @@ const JSON_HEADERS = { 'Content-Type': 'application/json' };
  * metrics.get.ts); throws a 500 when any of the three values are missing
  * @internal
  * @function
+ * @throws 500 when any of the three credentials is missing
  * @returns The client id, client secret, and refresh token
  */
 function credentials(): { clientId: string; clientSecret: string; refreshToken: string } {
@@ -74,6 +75,7 @@ let cachedExpiry = 0;
 
 /**
  * Exchanges the refresh token for an access token, reusing the cached one until ~60s before it expires
+ * @throws 502 when the Strava token exchange fails
  * @returns The current Strava access token
  */
 export async function stravaAccessToken(): Promise<string> {
@@ -82,8 +84,9 @@ export async function stravaAccessToken(): Promise<string> {
     return cachedAccessToken;
   }
 
-  const { clientId, clientSecret, refreshToken } = credentials();
-  const response = await fetch(OAUTH_TOKEN_URL, {
+  const { clientId, clientSecret, refreshToken }: { clientId: string; clientSecret: string; refreshToken: string } =
+    credentials();
+  const response: Response = await fetch(OAUTH_TOKEN_URL, {
     method: 'POST',
     headers: JSON_HEADERS,
     body: JSON.stringify({
@@ -109,11 +112,12 @@ export async function stravaAccessToken(): Promise<string> {
  * @function
  * @param path - The API path to request, relative to the Strava v3 base URL
  * @param init - The fetch options to merge with the bearer auth header
+ * @throws The upstream status when the Strava response is not ok
  * @returns The parsed JSON response (undefined for a 204)
  */
 async function stravaFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = await stravaAccessToken();
-  const response = await fetch(`${API}${path}`, {
+  const token: string = await stravaAccessToken();
+  const response: Response = await fetch(`${API}${path}`, {
     ...init,
     headers: { Authorization: `Bearer ${token}`, ...init.headers },
   });
@@ -137,13 +141,13 @@ export async function activitiesNear(isoDate: string): Promise<IStravaActivity[]
   const center = new Date(isoDate).getTime();
   const after = Math.floor((center - MATCH_WINDOW_MS) / 1000);
   const before = Math.floor((center + MATCH_WINDOW_MS) / 1000);
-  const activities = await stravaFetch<IStravaActivity[]>(
+  const activities: IStravaActivity[] = await stravaFetch<IStravaActivity[]>(
     `/athlete/activities?after=${after}&before=${before}&per_page=100`,
   );
   return activities
-    .filter((activity) => RUN_SPORT_TYPES.includes(activity.sport_type))
+    .filter((activity: IStravaActivity): boolean => RUN_SPORT_TYPES.includes(activity.sport_type))
     .sort(
-      (a, b) =>
+      (a: IStravaActivity, b: IStravaActivity): number =>
         Math.abs(new Date(a.start_date).getTime() - center) - Math.abs(new Date(b.start_date).getTime() - center),
     );
 }
@@ -170,11 +174,14 @@ export function getStreams(id: number, keys = 'time,distance,heartrate,cadence')
 /**
  * Checks whether the activity still exists; the guard the commit step uses to confirm a manual delete
  * @param id - The Strava activity id
+ * @throws 502 when the existence check fails with an unexpected status
  * @returns True when the activity still exists
  */
 export async function activityExists(id: number): Promise<boolean> {
-  const token = await stravaAccessToken();
-  const response = await fetch(`${API}/activities/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+  const token: string = await stravaAccessToken();
+  const response: Response = await fetch(`${API}/activities/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   if (response.status === 404) {
     return false;
   }
@@ -190,10 +197,11 @@ export async function activityExists(id: number): Promise<boolean> {
  * Uploads a corrected TCX as a new activity
  * @param tcx - The TCX document to upload
  * @param activity - The minimal activity metadata to apply
+ * @throws 502 when the Strava upload request fails
  * @returns The upload handle to poll
  */
 export async function uploadTcx(tcx: string, activity: TUploadActivity): Promise<IStravaUpload> {
-  const token = await stravaAccessToken();
+  const token: string = await stravaAccessToken();
   const form = new FormData();
   form.append('file', new Blob([tcx], { type: 'application/vnd.garmin.tcx+xml' }), 'activity.tcx');
   form.append('data_type', 'tcx');
@@ -201,7 +209,7 @@ export async function uploadTcx(tcx: string, activity: TUploadActivity): Promise
   form.append('description', activity.description ?? '');
   form.append('trainer', '0');
   form.append('external_id', `vertifix-${activity.id}-${Date.now()}`);
-  const response = await fetch(`${API}/uploads`, {
+  const response: Response = await fetch(`${API}/uploads`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: form,
@@ -217,18 +225,20 @@ export async function uploadTcx(tcx: string, activity: TUploadActivity): Promise
  * @param uploadId - The upload id to poll
  * @param attempts - The maximum number of poll attempts
  * @param intervalMs - The delay between attempts in milliseconds
+ * @throws 502 when Strava reports an upload error
+ * @throws 504 when Strava is still processing the upload after the final attempt
  * @returns The new activity id once processing completes
  */
 export async function pollUpload(uploadId: number, attempts = 20, intervalMs = 1500): Promise<number> {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
-    const upload = await stravaFetch<IStravaUpload>(`/uploads/${uploadId}`);
+    const upload: IStravaUpload = await stravaFetch<IStravaUpload>(`/uploads/${uploadId}`);
     if (upload.error) {
       throw createError({ statusCode: 502, message: upload.error });
     }
     if (upload.activity_id) {
       return upload.activity_id;
     }
-    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    await new Promise((resolve: (value: unknown) => void): void => void setTimeout(resolve, intervalMs));
   }
   throw createError({
     statusCode: 504,
@@ -254,6 +264,7 @@ export function setTrainerFalse(id: number): Promise<IStravaActivity> {
  * @param id - The replacement activity id
  * @param expectedDistanceMeters - The expected distance in meters
  * @param expectedElevationFeet - The expected elevation gain in feet
+ * @throws 502 when the replacement activity cannot be read after the upload
  * @returns The validation outcome
  */
 export async function validateReplacement(
@@ -267,13 +278,13 @@ export async function validateReplacement(
     if (activity.distance > 0) {
       break;
     }
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve: (value: unknown) => void): void => void setTimeout(resolve, 1000));
   }
   if (!activity) {
     throw createError({ statusCode: 502, message: 'Could not read the replacement activity after upload.' });
   }
 
-  const expectedElevationMeters = expectedElevationFeet * METRES_PER_FOOT;
+  const expectedElevationMeters = expectedElevationFeet * METERS_PER_FOOT;
   const distanceDelta = Math.abs(activity.distance - expectedDistanceMeters);
   const elevationDelta = Math.abs(activity.total_elevation_gain - expectedElevationMeters);
   const distanceValid = distanceDelta <= Math.max(50, expectedDistanceMeters * 0.005);
@@ -285,6 +296,6 @@ export async function validateReplacement(
     expectedDistanceMeters,
     actualDistanceMeters: activity.distance,
     expectedElevationFeet,
-    actualElevationFeet: Math.round(activity.total_elevation_gain * FEET_PER_METRE),
+    actualElevationFeet: metersToFeet(activity.total_elevation_gain),
   };
 }

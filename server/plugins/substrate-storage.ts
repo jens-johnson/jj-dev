@@ -27,7 +27,7 @@
 
 import upstashDriver from 'unstorage/drivers/upstash';
 
-export default defineNitroPlugin(() => {
+export default defineNitroPlugin((): void => {
   // Local dev keeps the default in-memory mount so the seed plugin can fake data without any external service.
   if (import.meta.dev) {
     return;

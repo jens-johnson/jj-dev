@@ -20,7 +20,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { IJenscraftMetricsPayload, IStoredJenscraftMetrics } from '../utils/jenscraft-metrics';
+import type { IJenscraftMetricsPayload, IStoredJenscraftMetrics } from '#utils/jenscraft-metrics';
 
 /**
  * Rounds a number to one decimal place

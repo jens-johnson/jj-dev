@@ -23,7 +23,7 @@ import type {
   IStoredSubstrateMetrics,
   ISubstrateMetricsPayload,
   ISubstrateMetricsSample,
-} from '../utils/substrate-metrics';
+} from '#utils/substrate-metrics';
 
 /**
  * Rounds a number to one decimal place
@@ -70,15 +70,25 @@ function mockPayload(): ISubstrateMetricsPayload {
   };
 }
 
-/** A plausible ~15 min CPU/RAM history so the sparklines aren't empty on first paint in dev. */
+/**
+ * Builds a plausible ~15 min CPU/RAM history so the sparklines aren't empty on first paint in dev
+ * @internal
+ * @function
+ * @param points - The number of samples to generate
+ * @param stepMs - The spacing between samples in milliseconds
+ * @returns The generated history samples, oldest first and anchored at now
+ */
 function mockHistory(points = 30, stepMs = 30_000): ISubstrateMetricsSample[] {
   // Anchor the series at now and walk backwards one step per point
   const now: number = Date.now();
-  return Array.from({ length: points }, (_, i) => ({
-    t: now - (points - 1 - i) * stepMs,
-    cpu: round1(8 + Math.sin(i / 3) * 4 + Math.random() * 3),
-    mem: round1(36 + Math.sin(i / 6) * 5 + Math.random() * 2),
-  }));
+  return Array.from(
+    { length: points },
+    (_, i: number): ISubstrateMetricsSample => ({
+      t: now - (points - 1 - i) * stepMs,
+      cpu: round1(8 + Math.sin(i / 3) * 4 + Math.random() * 3),
+      mem: round1(36 + Math.sin(i / 6) * 5 + Math.random() * 2),
+    }),
+  );
 }
 
 export default defineNitroPlugin((): void => {

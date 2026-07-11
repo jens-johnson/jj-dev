@@ -25,6 +25,10 @@
  *   • The last-known payload (node, guests, storage, internet) plus the derived freshness state, age, and history
  *   • An all-null payload with state 'offline' (history still included) when nothing has been stored yet
  *
+ * ─── THROWS ──────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • 502 when reading the stored metrics or the sparkline history fails
+ *
  * ─── SIDE EFFECTS ────────────────────────────────────────────────────────────────────────────────────────────────────
  *
  *   • Sets a short-lived Cache-Control header (public, max-age=5, s-maxage=15)
@@ -39,7 +43,7 @@ import type {
   ISubstrateMetricsPayload,
   ISubstrateMetricsSample,
   TSubstrateMetricsState,
-} from '../../utils/substrate-metrics';
+} from '#utils/substrate-metrics';
 
 /**
  * An interface representing the public metrics response: the last-known payload fields plus the derived freshness
@@ -80,6 +84,7 @@ interface ISubstrateMetricsResponse {
  * @default
  * @function
  * @param event - The incoming request event
+ * @throws 502 when reading the stored metrics or the sparkline history fails
  * @returns The last-known payload fields plus the derived freshness state, age, and history
  */
 export default defineEventHandler(async (event: H3Event): Promise<ISubstrateMetricsResponse> => {
@@ -88,8 +93,8 @@ export default defineEventHandler(async (event: H3Event): Promise<ISubstrateMetr
 
   // Read the last-known payload and the sparkline history together; an empty store renders as offline
   const [stored, history]: [IStoredSubstrateMetrics | null, ISubstrateMetricsSample[]] = await Promise.all([
-    readLatestMetrics(),
-    readHistory(),
+    runUpstream(readLatestMetrics(), 'Reading the stored metrics failed.'),
+    runUpstream(readHistory(), 'Reading the metrics history failed.'),
   ]);
   if (!stored) {
     return {
@@ -105,7 +110,7 @@ export default defineEventHandler(async (event: H3Event): Promise<ISubstrateMetr
   }
 
   // Derive freshness from the server receive time, then surface the payload with absent blocks nulled
-  const { state, ageSec } = metricsState(stored.receivedAt);
+  const { state, ageSec }: { state: TSubstrateMetricsState; ageSec: number } = metricsState(stored.receivedAt);
   return {
     state,
     ageSec,
