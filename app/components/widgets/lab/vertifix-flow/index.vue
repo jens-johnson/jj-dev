@@ -19,7 +19,8 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-import type { TVertifixStatus } from '~/composables/use-vertifix-upload';
+import { METERS_PER_MILE, metersToFeet } from '#shared/utils/units';
+import type { IUseVertifixUploadReturn, TVertifixStatus } from '~/composables/use-vertifix-upload';
 
 const {
   items,
@@ -34,7 +35,7 @@ const {
   downloadBackup,
   commit,
   retry,
-} = useVertifixUpload();
+}: IUseVertifixUploadReturn = useVertifixUpload();
 
 const dragging: Ref<boolean> = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -94,8 +95,8 @@ function statusClass(status: TVertifixStatus): string {
 
 /* ─── Formatters ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const milesFmt = (metres: number): string => `${(metres / 1609.344).toFixed(2)} mi`;
-const feet = (metres: number): string => `${Math.round(metres * 3.28084).toLocaleString()} ft`;
+const milesFmt = (meters: number): string => `${(meters / METERS_PER_MILE).toFixed(2)} mi`;
+const feet = (meters: number): string => `${metersToFeet(meters).toLocaleString()} ft`;
 
 /**
  * A utility method to format a duration in seconds as hours and minutes (i.e. `1h 24m`, or `42m` under an hour)

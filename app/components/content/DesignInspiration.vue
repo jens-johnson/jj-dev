@@ -24,9 +24,9 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { TTheme } from '~/composables/use-theme';
+import type { IUseThemeReturn, TTheme } from '~/composables/use-theme';
 
-const { theme, setTheme } = useTheme();
+const { theme, setTheme }: IUseThemeReturn = useTheme();
 
 /**
  * An inspiration card pairing a source photograph with the site theme derived from it, including the extracted

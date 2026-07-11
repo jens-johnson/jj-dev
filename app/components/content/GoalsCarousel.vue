@@ -76,7 +76,7 @@ function onScroll(): void {
     return;
   }
   // Derive the visible card index from the scroll offset (each card spans 85% of the container width)
-  const { scrollLeft, clientWidth } = scrollContainer.value;
+  const { scrollLeft, clientWidth }: { scrollLeft: number; clientWidth: number } = scrollContainer.value;
   const i: number = Math.round(scrollLeft / (clientWidth * 0.85));
   activeIdx.value = Math.min(goals.length - 1, Math.max(0, i));
 }

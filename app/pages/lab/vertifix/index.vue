@@ -19,13 +19,15 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { UserSessionComposable } from '#auth-utils';
+
 useSeoMeta({
   title: 'Vertifix · Lab · Jens Johnson',
   description: 'Internal admin tool; retroactively restore elevation gain on Strava treadmill runs.',
   robots: 'noindex, nofollow',
 });
 
-const { loggedIn, session } = useUserSession();
+const { loggedIn, session }: UserSessionComposable = useUserSession();
 const isAdmin = computed(() => session.value?.isAdmin === true);
 </script>
 

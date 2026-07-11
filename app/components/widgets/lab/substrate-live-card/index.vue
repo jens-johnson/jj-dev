@@ -19,8 +19,9 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-metrics';
 
-const { data, state, cpuSeries, memSeries, updatedLabel } = useSubstrateMetrics();
+const { data, state, cpuSeries, memSeries, updatedLabel }: IUseSubstrateMetricsReturn = useSubstrateMetrics();
 const node = computed(() => data.value?.node ?? null);
 const guests = computed(() => data.value?.guests ?? null);
 const storage = computed(() => data.value?.storage ?? null);

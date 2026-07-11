@@ -18,8 +18,9 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { IUseThemeReturn } from '~/composables/use-theme';
 
-const { initTheme } = useTheme();
+const { initTheme }: IUseThemeReturn = useTheme();
 onMounted(initTheme);
 </script>
 

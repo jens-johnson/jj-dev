@@ -28,7 +28,7 @@
  */
 import type { IHomelabService } from '~/types/services';
 
-const { services } = defineProps<{ services: IHomelabService[] }>();
+const { services }: { services: IHomelabService[] } = defineProps<{ services: IHomelabService[] }>();
 </script>
 
 <template>

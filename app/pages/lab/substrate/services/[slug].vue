@@ -20,6 +20,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import type { IUseJenscraftMetricsReturn } from '~/composables/use-jenscraft-metrics';
 import type { IServicePlugin } from '~/types/services';
 
 const route = useRoute();
@@ -61,7 +62,7 @@ const descriptionSegments = computed(() => splitDeviceMentions(service.value?.de
 
 // Jenscraft is the only service wired to a live publisher feed today; other service pages stay inert (no fetch) and
 // fall back to the metrics widget's "awaiting feed" state.
-const { live: liveMetrics } = useJenscraftMetrics(slug.value === 'jenscraft');
+const { live: liveMetrics }: IUseJenscraftMetricsReturn = useJenscraftMetrics(slug.value === 'jenscraft');
 
 /* ─── Links ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -77,8 +78,8 @@ const mapLink = computed(() => service.value?.links?.map ?? null);
 
 const linkItems = computed(() =>
   Object.entries(service.value?.links ?? {})
-    .filter(([key, url]) => !!url && key !== 'map')
-    .map(([key, url]) => ({
+    .filter(([key, url]: [string, string | undefined]): boolean => !!url && key !== 'map')
+    .map(([key, url]: [string, string | undefined]): { key: string; url: string; label: string; icon: string } => ({
       key,
       url: url as string,
       ...(LINK_META[key] ?? { label: key, icon: 'lucide:link' }),
@@ -111,14 +112,16 @@ function toggleCategory(category: string): void {
 }
 
 const visiblePlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
-  (service.value?.plugins ?? []).filter((p) => !activeCategory.value || p.category === activeCategory.value),
+  (service.value?.plugins ?? []).filter(
+    (p: IServicePlugin): boolean => !activeCategory.value || p.category === activeCategory.value,
+  ),
 );
 
 const serverPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
-  visiblePlugins.value.filter((p) => p.side === 'server'),
+  visiblePlugins.value.filter((p: IServicePlugin): boolean => p.side === 'server'),
 );
 const clientPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
-  visiblePlugins.value.filter((p) => p.side === 'client'),
+  visiblePlugins.value.filter((p: IServicePlugin): boolean => p.side === 'client'),
 );
 
 /* ─── Body ────────────────────────────────────────────────────────────────────────────────────────────────────────── */

@@ -43,7 +43,7 @@ const {
   tiles,
   live = null,
   label = 'service',
-} = defineProps<{
+}: { tiles: IServiceMetricTile[]; live?: Record<string, string | number> | null; label?: string } = defineProps<{
   /** Declared tiles from the service frontmatter. */
   tiles: IServiceMetricTile[];
   /** Live values keyed by tile `key`; null until the metrics publisher reports in. */

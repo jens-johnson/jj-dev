@@ -22,8 +22,9 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { UserSessionComposable } from '#auth-utils';
 
-const { loggedIn, user, session, clear } = useUserSession();
+const { loggedIn, user, session, clear }: UserSessionComposable = useUserSession();
 
 const menuOpen: Ref<boolean> = ref(false);
 const root = ref<HTMLElement | null>(null);
@@ -55,7 +56,7 @@ const initials: ComputedRef<string> = computed((): string => {
   return (
     parts
       .slice(0, 2)
-      .map((p) => p[0] ?? '')
+      .map((p: string): string => p[0] ?? '')
       .join('')
       .toUpperCase() || '?'
   );

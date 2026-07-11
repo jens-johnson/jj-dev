@@ -98,7 +98,7 @@ function onMouseMove(e: MouseEvent): void {
     return;
   }
   // Normalize the cursor position to the -1..+1 range relative to the element center
-  const { left, top, width, height } = rootEl.value.getBoundingClientRect();
+  const { left, top, width, height }: DOMRect = rootEl.value.getBoundingClientRect();
   rawX.value = ((e.clientX - left) / width - 0.5) * 2;
   rawY.value = ((e.clientY - top) / height - 0.5) * 2;
 }

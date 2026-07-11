@@ -20,8 +20,10 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-metrics';
 
-const { data, state, health, internet, reportingCount, updatedLabel } = useSubstrateMetrics();
+const { data, state, health, internet, reportingCount, updatedLabel }: IUseSubstrateMetricsReturn =
+  useSubstrateMetrics();
 const node = computed(() => data.value?.node ?? null);
 const vis = computed(() => METRIC_HEALTH[health.value]);
 

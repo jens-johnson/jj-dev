@@ -19,6 +19,7 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { UserSessionComposable } from '#auth-utils';
 
 useSeoMeta({
   title: 'Lab · Jens Johnson',
@@ -54,7 +55,7 @@ const health = computed(() => {
   };
 });
 
-const { session } = useUserSession();
+const { session }: UserSessionComposable = useUserSession();
 /** The Vertifix tool is internal; its card only reveals once an admin session resolves client-side. */
 const isAdmin = computed(() => session.value?.isAdmin === true);
 

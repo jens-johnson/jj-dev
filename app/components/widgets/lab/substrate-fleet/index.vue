@@ -27,13 +27,14 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-metrics';
 import type { ISubstrateDevice } from '~/types/substrate';
 import type { ISubstrateMetricsNode, ISubstrateMetricsView } from '~/types/substrate-metrics';
 
 const props = defineProps<{ devices: ISubstrateDevice[] }>();
 
 // The live Proxmox feed driving the telemetry rows: current snapshot, feed state, CPU/RAM history, freshness label
-const { data, state, cpuSeries, memSeries, updatedLabel } = useSubstrateMetrics();
+const { data, state, cpuSeries, memSeries, updatedLabel }: IUseSubstrateMetricsReturn = useSubstrateMetrics();
 const node: ComputedRef<ISubstrateMetricsNode | null> = computed(
   (): ISubstrateMetricsNode | null => data.value?.node ?? null,
 );
@@ -50,8 +51,8 @@ const summary: ComputedRef<{ label: string; value: number }[]> = computed((): { 
   const l: ISubstrateDevice[] = props.devices;
   return [
     { label: 'Nodes', value: l.length },
-    { label: 'Online', value: l.filter((d) => d.status === 'online').length },
-    { label: 'Planned', value: l.filter((d) => d.status === 'planned').length },
+    { label: 'Online', value: l.filter((d: ISubstrateDevice): boolean => d.status === 'online').length },
+    { label: 'Planned', value: l.filter((d: ISubstrateDevice): boolean => d.status === 'planned').length },
   ];
 });
 

@@ -46,6 +46,7 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-metrics';
 import type { ISubstrateDevice } from '~/types/substrate';
 import type { ISubstrateInternet, ISubstrateMetricsNode } from '~/types/substrate-metrics';
 
@@ -58,7 +59,8 @@ const props = defineProps<{
 /* ─── Connection resolution ───────────────────────────────────────────────────────────────────────────────────────── */
 
 const byId: ComputedRef<Map<string, ISubstrateDevice>> = computed(
-  (): Map<string, ISubstrateDevice> => new Map(props.devices.map((d) => [d.nodeId, d])),
+  (): Map<string, ISubstrateDevice> =>
+    new Map(props.devices.map((d: ISubstrateDevice): [string, ISubstrateDevice] => [d.nodeId, d])),
 );
 const titleOf = (id: string): string => byId.value.get(id)?.title ?? id;
 
@@ -86,7 +88,11 @@ const vendorModel: ComputedRef<string> = computed((): string =>
 /* ─── Live metrics (shown only for the live Proxmox host) ──────────────────────────────────────────────────────────── */
 
 // The shared live-metrics feed: the current snapshot, its feed state, and a human-readable freshness label
-const { data: liveData, state: liveState, updatedLabel: liveUpdated } = useSubstrateMetrics();
+const {
+  data: liveData,
+  state: liveState,
+  updatedLabel: liveUpdated,
+}: IUseSubstrateMetricsReturn = useSubstrateMetrics();
 const liveNode: ComputedRef<ISubstrateMetricsNode | null> = computed((): ISubstrateMetricsNode | null =>
   props.device?.kind === 'hypervisor' && liveState.value !== 'offline' ? (liveData.value?.node ?? null) : null,
 );

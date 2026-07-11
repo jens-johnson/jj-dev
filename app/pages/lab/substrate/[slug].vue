@@ -22,6 +22,7 @@
 
 import type { SubstrateCollectionItem } from '@nuxt/content';
 
+import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-metrics';
 import type { ISubstrateDevice } from '~/types/substrate';
 import type { ISubstrateInternet } from '~/types/substrate-metrics';
 
@@ -71,7 +72,11 @@ const connLabel = (kind?: string): string => CONN_LABEL[kind ?? 'network'] ?? 'L
 
 /* ─── Live internet (WAN node only) ───────────────────────────────────────────────────────────────────────────────── */
 
-const { data: liveData, state: liveState, updatedLabel: liveUpdated } = useSubstrateMetrics();
+const {
+  data: liveData,
+  state: liveState,
+  updatedLabel: liveUpdated,
+}: IUseSubstrateMetricsReturn = useSubstrateMetrics();
 const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubstrateInternet | null =>
   device.value?.kind === 'internet' && liveState.value !== 'offline' ? (liveData.value?.internet ?? null) : null,
 );

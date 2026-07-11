@@ -23,8 +23,9 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { IUseThemeReturn } from '~/composables/use-theme';
 
-const { theme, cycleTheme } = useTheme();
+const { theme, cycleTheme }: IUseThemeReturn = useTheme();
 const route = useRoute();
 
 const menuOpen = ref(false);

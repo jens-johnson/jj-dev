@@ -51,7 +51,7 @@
  */
 import type { TPropsWithDefaults } from '@jens-johnson/style-guide/types/vue';
 
-import type { ICardTiltOptions } from '~/composables/use-card-tilt';
+import type { ICardTiltOptions, IUseCardTiltReturn } from '~/composables/use-card-tilt';
 
 /* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -73,7 +73,7 @@ const props: TPropsWithDefaults<ICardTiltOptions, 'intensity' | 'scale' | 'shine
 /* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 // The tilt/shine styles and mouse handlers driving the card's 3d hover treatment, tuned by the props above
-const { tiltStyle, shineStyle, onMouseMove, onMouseEnter, onMouseLeave } = useCardTilt({
+const { tiltStyle, shineStyle, onMouseMove, onMouseEnter, onMouseLeave }: IUseCardTiltReturn = useCardTilt({
   intensity: props.intensity,
   scale: props.scale,
   shineOpacity: props.shineOpacity,
