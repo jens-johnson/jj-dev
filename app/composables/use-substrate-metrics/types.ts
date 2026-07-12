@@ -29,6 +29,7 @@ import type {
 
 /**
  * An interface representing a per-state visual treatment (Tailwind class bundle) for the metrics UI
+ * @public
  * @interface
  */
 export interface IStateVisual {

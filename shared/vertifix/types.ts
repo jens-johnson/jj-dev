@@ -23,6 +23,7 @@
 
 /**
  * An interface representing a Strava run near a photo capture time, offered to the user as a possible match
+ * @public
  * @interface
  */
 export interface IVertifixCandidate {
@@ -47,6 +48,7 @@ export interface IVertifixCandidate {
 
 /**
  * An interface representing the response from GET /api/lab/vertifix/matches
+ * @public
  * @interface
  */
 export interface IVertifixMatchesResult {
@@ -61,6 +63,7 @@ export interface IVertifixMatchesResult {
 
 /**
  * An interface representing the body for POST /api/lab/vertifix/prepare
+ * @public
  * @interface
  */
 export interface IVertifixPrepareRequest {
@@ -73,6 +76,7 @@ export interface IVertifixPrepareRequest {
 
 /**
  * An interface representing a human-readable summary of what the prepared replacement will contain
+ * @public
  * @interface
  */
 export interface IVertifixSummary {
@@ -100,6 +104,7 @@ export interface IVertifixSummary {
 
 /**
  * An interface representing the response from POST /api/lab/vertifix/prepare; the TCX is held by the client until commit
+ * @public
  * @interface
  */
 export interface IVertifixPrepareResult {
@@ -120,6 +125,7 @@ export interface IVertifixPrepareResult {
 
 /**
  * An interface representing the body for POST /api/lab/vertifix/commit
+ * @public
  * @interface
  */
 export interface IVertifixCommitRequest {
@@ -144,6 +150,7 @@ export interface IVertifixCommitRequest {
 
 /**
  * An interface representing validation of the re-uploaded activity against the expected metrics
+ * @public
  * @interface
  */
 export interface IVertifixValidation {
@@ -165,6 +172,7 @@ export interface IVertifixValidation {
 
 /**
  * An interface representing the response from POST /api/lab/vertifix/commit
+ * @public
  * @interface
  */
 export interface IVertifixCommitResult {

@@ -11,49 +11,28 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████ #components/widgets/lab/substrate-topology/types.ts ████████████████████████████████
+ * ██████████████████████████████ app/components/widgets/lab/substrate-overview/enums.ts ███████████████████████████████
  *
- * Type definitions for the substrate topology diagram: the layer enum, its derived union, the props contract, and the
- * drawable edge shape.
+ * The roadmap phase-status enumeration for the substrate overview tab.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ISubstrateDevice } from '~/types/substrate';
-
-import type { SubstrateLayer } from './enums';
-
 /**
- * A type representing a topology band; one of {@link SubstrateLayer}
+ * An enumeration of the roadmap phase statuses
  * @public
+ * @enum
  */
-export type TSubstrateLayer = `${SubstrateLayer}`;
+export enum PhaseStatus {
+  /* Not yet scheduled; a later ambition */
+  future = 'future',
 
-/**
- * The props accepted by the topology diagram: the device inventory to place and wire
- * @public
- * @interface
- */
-export interface ISubstrateTopologyProps {
-  /* The device inventory to place and wire; layout derives from each device's layer and order */
-  devices: ISubstrateDevice[];
-}
+  /* Queued up after the in-progress work */
+  next = 'next',
 
-/**
- * A drawable wire between two placed nodes, flattened from the device connection lists
- * @public
- * @interface
- */
-export interface IEdge {
-  /* The source node id */
-  from: string;
+  /* Scheduled but not yet started */
+  planned = 'planned',
 
-  /* The target node id */
-  to: string;
-
-  /* The connection kind driving the wire's styling */
-  kind: string;
-
-  /* An optional short label, e.g. "NFS" */
-  label?: string;
+  /* Actively being built */
+  progress = 'progress',
 }

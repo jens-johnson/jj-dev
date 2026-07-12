@@ -20,6 +20,7 @@
 
 /**
  * An interface representing the Tailwind class bundle for a status: dot fill, text color, and a faint tinted background
+ * @public
  * @interface
  */
 export interface IStatusVisual {
@@ -40,6 +41,7 @@ export interface IStatusVisual {
  * An interface representing the loose shape of a substrate doc straight from `queryCollection`; every field optional,
  * mirroring how @nuxt/content widens schema columns to `T | undefined`. Normalized into a concrete device by the
  * helpers in this module
+ * @public
  * @interface
  */
 export interface IRawSubstrateDoc {

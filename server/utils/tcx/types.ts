@@ -21,6 +21,7 @@
 /**
  * An interface representing the subset of a Strava activity that buildTcx reads; IStravaActivity is structurally
  * assignable to it
+ * @public
  * @interface
  */
 export interface ITcxSourceActivity {
@@ -39,6 +40,7 @@ export interface ITcxSourceActivity {
 
 /**
  * An interface representing a single Strava data stream (e.g. `time`, `distance`, `heartrate`, `cadence`)
+ * @public
  * @interface
  */
 export interface ITcxStream {

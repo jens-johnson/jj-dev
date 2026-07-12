@@ -21,6 +21,7 @@
 /**
  * An interface representing a Strava activity; the fields the TCX builder's ITcxSourceActivity needs are a
  * structural subset
+ * @public
  * @interface
  */
 export interface IStravaActivity {
@@ -66,6 +67,7 @@ export type TUploadActivity = Pick<IStravaActivity, 'id' | 'name' | 'description
 
 /**
  * An interface representing a single Strava data stream payload (`time`, `distance`, `heartrate`, `cadence`, etc.)
+ * @public
  * @interface
  */
 export interface IStravaStream {
@@ -81,6 +83,7 @@ export type TStravaStreams = Record<string, IStravaStream | undefined>;
 
 /**
  * An interface representing the response shape from `POST /uploads` and `GET /uploads/{id}`
+ * @public
  * @interface
  */
 export interface IStravaUpload {
@@ -99,6 +102,7 @@ export interface IStravaUpload {
 
 /**
  * An interface representing the outcome of validateReplacement: whether the re-uploaded activity matches expectations
+ * @public
  * @interface
  */
 export interface IReplacementValidation {

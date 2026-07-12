@@ -48,6 +48,7 @@ import type {
 /**
  * An interface representing the public metrics response: the last-known payload fields plus the derived freshness
  * state, age, and the rolling sparkline history; the payload fields are null until a push has been stored
+ * @internal
  * @interface
  */
 interface ISubstrateMetricsResponse {

@@ -24,8 +24,11 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import type { SubstrateStatus } from './enums';
+
 /**
  * An interface representing a drawn edge from one device to another; "kind" styles the wire
+ * @public
  * @interface
  */
 export interface ISubstrateConnection {
@@ -41,6 +44,7 @@ export interface ISubstrateConnection {
 
 /**
  * An interface representing a single labeled spec row shown in the inspector
+ * @public
  * @interface
  */
 export interface ISubstrateSpec {
@@ -52,25 +56,6 @@ export interface ISubstrateSpec {
 }
 
 /**
- * An enumeration of the operational states of a device; drives status dots and badge color
- * @public
- * @enum
- */
-export enum SubstrateStatus {
-  /* The device is up and reporting */
-  online = 'online',
-
-  /* The device is down */
-  offline = 'offline',
-
-  /* The device is planned but not yet deployed */
-  planned = 'planned',
-
-  /* The device is temporarily down for maintenance */
-  maintenance = 'maintenance',
-}
-
-/**
  * A type representing the operational state of a device; one of {@link SubstrateStatus}
  * @public
  */
@@ -78,6 +63,7 @@ export type TSubstrateStatus = `${SubstrateStatus}`;
 
 /**
  * An interface representing one piece of homelab hardware; a node in the topology
+ * @public
  * @interface
  */
 export interface ISubstrateDevice {

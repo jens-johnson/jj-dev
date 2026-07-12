@@ -19,4 +19,5 @@
  */
 
 export * from './composable';
+export * from './enums';
 export * from './types';

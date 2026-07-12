@@ -11,49 +11,43 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████ #components/widgets/lab/substrate-topology/types.ts ████████████████████████████████
+ * ███████████████████████████████████ app/composables/use-vertifix-upload/enums.ts ████████████████████████████████████
  *
- * Type definitions for the substrate topology diagram: the layer enum, its derived union, the props contract, and the
- * drawable edge shape.
+ * The stage enumeration for a Vertifix item as it moves through the flow.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ISubstrateDevice } from '~/types/substrate';
-
-import type { SubstrateLayer } from './enums';
-
 /**
- * A type representing a topology band; one of {@link SubstrateLayer}
+ * An enumeration of the stages a Vertifix item moves through as it works its way through the flow
  * @public
+ * @enum
  */
-export type TSubstrateLayer = `${SubstrateLayer}`;
+export enum VertifixStatus {
+  /* The photo's EXIF capture time is being read */
+  reading = 'reading',
 
-/**
- * The props accepted by the topology diagram: the device inventory to place and wire
- * @public
- * @interface
- */
-export interface ISubstrateTopologyProps {
-  /* The device inventory to place and wire; layout derives from each device's layer and order */
-  devices: ISubstrateDevice[];
-}
+  /* Read; ready to search Strava for matching runs */
+  ready = 'ready',
 
-/**
- * A drawable wire between two placed nodes, flattened from the device connection lists
- * @public
- * @interface
- */
-export interface IEdge {
-  /* The source node id */
-  from: string;
+  /* Searching Strava for runs near the capture time */
+  matching = 'matching',
 
-  /* The target node id */
-  to: string;
+  /* Candidate runs have been returned */
+  matched = 'matched',
 
-  /* The connection kind driving the wire's styling */
-  kind: string;
+  /* Requesting a corrected-elevation TCX for the selected activity */
+  preparing = 'preparing',
 
-  /* An optional short label, e.g. "NFS" */
-  label?: string;
+  /* The corrected-elevation TCX is ready to commit */
+  prepared = 'prepared',
+
+  /* Posting the prepared TCX to the commit endpoint */
+  committing = 'committing',
+
+  /* The re-upload committed successfully */
+  done = 'done',
+
+  /* The item hit an error and can be retried */
+  error = 'error',
 }

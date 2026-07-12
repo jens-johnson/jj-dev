@@ -44,6 +44,7 @@ import type { TSubstrateMetricsState } from '#utils/substrate-metrics';
 /**
  * An interface representing the public metrics response: the last-known snapshot fields plus the derived freshness
  * state and age; every metric is null until the publisher has stored a snapshot carrying it
+ * @internal
  * @interface
  */
 interface IJenscraftMetricsResponse {

@@ -11,49 +11,28 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████ #components/widgets/lab/substrate-topology/types.ts ████████████████████████████████
+ * █████████████████████████████████████ app/components/containment/card/enums.ts ██████████████████████████████████████
  *
- * Type definitions for the substrate topology diagram: the layer enum, its derived union, the props contract, and the
- * drawable edge shape.
+ * The inner-padding-preset enumeration for the card component.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ISubstrateDevice } from '~/types/substrate';
-
-import type { SubstrateLayer } from './enums';
-
 /**
- * A type representing a topology band; one of {@link SubstrateLayer}
+ * An enumeration of the inner padding presets the card supports
  * @public
+ * @enum
  */
-export type TSubstrateLayer = `${SubstrateLayer}`;
+export enum PadPreset {
+  /* Large inner padding (p-8) */
+  lg = 'lg',
 
-/**
- * The props accepted by the topology diagram: the device inventory to place and wire
- * @public
- * @interface
- */
-export interface ISubstrateTopologyProps {
-  /* The device inventory to place and wire; layout derives from each device's layer and order */
-  devices: ISubstrateDevice[];
-}
+  /* Medium inner padding (p-6); the default */
+  md = 'md',
 
-/**
- * A drawable wire between two placed nodes, flattened from the device connection lists
- * @public
- * @interface
- */
-export interface IEdge {
-  /* The source node id */
-  from: string;
+  /* No inner padding; the consumer owns spacing */
+  none = 'none',
 
-  /* The target node id */
-  to: string;
-
-  /* The connection kind driving the wire's styling */
-  kind: string;
-
-  /* An optional short label, e.g. "NFS" */
-  label?: string;
+  /* Small inner padding (p-4) */
+  sm = 'sm',
 }

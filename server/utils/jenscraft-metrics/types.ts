@@ -21,6 +21,7 @@
 /**
  * An interface representing the validated, public-safe payload the Jenscraft LXC publisher POSTs; counts and
  * percentages only, never identifiers
+ * @public
  * @interface
  */
 export interface IJenscraftMetricsPayload {
@@ -51,6 +52,7 @@ export interface IJenscraftMetricsPayload {
 
 /**
  * An interface representing the stored record, adding the server receive time (the source of truth for staleness)
+ * @public
  * @interface
  */
 export interface IStoredJenscraftMetrics extends IJenscraftMetricsPayload {

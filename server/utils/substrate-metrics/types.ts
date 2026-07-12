@@ -18,9 +18,12 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import type { SubstrateMetricsState } from './enums';
+
 /**
  * An interface representing the validated, public-safe payload the lab publisher POSTs; counts and percentages only,
  * never identifiers
+ * @public
  * @interface
  */
 export interface ISubstrateMetricsPayload {
@@ -51,6 +54,7 @@ export interface ISubstrateMetricsPayload {
 
 /**
  * An interface representing the stored record, adding the server receive time (the source of truth for staleness)
+ * @public
  * @interface
  */
 export interface IStoredSubstrateMetrics extends ISubstrateMetricsPayload {
@@ -60,6 +64,7 @@ export interface IStoredSubstrateMetrics extends ISubstrateMetricsPayload {
 
 /**
  * An interface representing one compact rolling-history point, kept just for the sparklines
+ * @public
  * @interface
  */
 export interface ISubstrateMetricsSample {
@@ -71,22 +76,6 @@ export interface ISubstrateMetricsSample {
 
   /* The memory utilisation percentage at the sample time */
   mem: number;
-}
-
-/**
- * An enumeration of the freshness states of the substrate metrics feed
- * @public
- * @enum
- */
-export enum SubstrateMetricsState {
-  /* The feed is reporting fresh samples */
-  live = 'live',
-
-  /* The latest sample has aged past the freshness window */
-  stale = 'stale',
-
-  /* No sample has arrived; the publisher is down */
-  offline = 'offline',
 }
 
 /**

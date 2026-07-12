@@ -150,9 +150,10 @@ English: "theme composable" not "useTheme", "hero component" not "HeroParallax")
 
 Atomic design hierarchy; every component lives in a category directory under
 `app/components/`. Each component is an `index.vue` inside its own named folder, which is a **component module**:
-co-located `types.ts` (the `I<Component>Props` interface, enums + derived unions), `constants.ts` (named, typed
-magic values), and `utils.ts` + `utils.test.ts` when the component owns pure logic (i.e. the spark-line geometry
-builder), all imported via `./types` / `./constants` / `./utils`. Every script-scope declaration carries a JSDoc
+co-located `types.ts` (the `I<Component>Props` interface + derived unions), `enums.ts` (any enums, co-located in
+their own file per the style guide's module structure), `constants.ts` (named, typed magic values), and `utils.ts` +
+`utils.test.ts` when the component owns pure logic (i.e. the spark-line geometry builder), all imported via `./types`
+/ `./enums` / `./constants` / `./utils`. Every script-scope declaration carries a JSDoc
 block (`@internal` + `@constant`), enforced by the SFC-scoped `jsdoc/require-jsdoc` context; the inline
 `interface Props` idiom is retired.
 

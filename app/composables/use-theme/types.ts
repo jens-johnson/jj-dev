@@ -18,21 +18,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-/**
- * An enumeration of the available site themes
- * @public
- * @enum
- */
-export enum Theme {
-  /* The bright daytime palette */
-  day = 'day',
-
-  /* The warm dusk palette */
-  sunset = 'sunset',
-
-  /* The dark nighttime palette */
-  night = 'night',
-}
+import type { Theme } from './enums';
 
 /**
  * A type representing the available site themes; one of {@link Theme}

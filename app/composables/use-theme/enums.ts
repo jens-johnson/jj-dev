@@ -11,49 +11,25 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████ #components/widgets/lab/substrate-topology/types.ts ████████████████████████████████
+ * ████████████████████████████████████████ app/composables/use-theme/enums.ts █████████████████████████████████████████
  *
- * Type definitions for the substrate topology diagram: the layer enum, its derived union, the props contract, and the
- * drawable edge shape.
+ * The site-theme enumeration for the palette switcher.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ISubstrateDevice } from '~/types/substrate';
-
-import type { SubstrateLayer } from './enums';
-
 /**
- * A type representing a topology band; one of {@link SubstrateLayer}
+ * An enumeration of the available site themes
  * @public
+ * @enum
  */
-export type TSubstrateLayer = `${SubstrateLayer}`;
+export enum Theme {
+  /* The bright daytime palette */
+  day = 'day',
 
-/**
- * The props accepted by the topology diagram: the device inventory to place and wire
- * @public
- * @interface
- */
-export interface ISubstrateTopologyProps {
-  /* The device inventory to place and wire; layout derives from each device's layer and order */
-  devices: ISubstrateDevice[];
-}
+  /* The warm dusk palette */
+  sunset = 'sunset',
 
-/**
- * A drawable wire between two placed nodes, flattened from the device connection lists
- * @public
- * @interface
- */
-export interface IEdge {
-  /* The source node id */
-  from: string;
-
-  /* The target node id */
-  to: string;
-
-  /* The connection kind driving the wire's styling */
-  kind: string;
-
-  /* An optional short label, e.g. "NFS" */
-  label?: string;
+  /* The dark nighttime palette */
+  night = 'night',
 }

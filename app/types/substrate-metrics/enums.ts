@@ -11,49 +11,45 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████ #components/widgets/lab/substrate-topology/types.ts ████████████████████████████████
+ * ███████████████████████████████████████ app/types/substrate-metrics/enums.ts ████████████████████████████████████████
  *
- * Type definitions for the substrate topology diagram: the layer enum, its derived union, the props contract, and the
- * drawable edge shape.
+ * The freshness-state and fleet-health enumerations for the substrate live-metrics feed.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ISubstrateDevice } from '~/types/substrate';
-
-import type { SubstrateLayer } from './enums';
-
 /**
- * A type representing a topology band; one of {@link SubstrateLayer}
+ * An enumeration of the freshness states of the substrate metrics feed
  * @public
+ * @enum
  */
-export type TSubstrateLayer = `${SubstrateLayer}`;
+export enum SubstrateMetricsState {
+  /* The feed is reporting fresh samples */
+  live = 'live',
 
-/**
- * The props accepted by the topology diagram: the device inventory to place and wire
- * @public
- * @interface
- */
-export interface ISubstrateTopologyProps {
-  /* The device inventory to place and wire; layout derives from each device's layer and order */
-  devices: ISubstrateDevice[];
+  /* The latest sample has aged past the freshness window */
+  stale = 'stale',
+
+  /* No sample has arrived; the publisher is down */
+  offline = 'offline',
 }
 
 /**
- * A drawable wire between two placed nodes, flattened from the device connection lists
+ * An enumeration of the rolled-up fleet health states: freshness (offline/stale) blended with threshold checks
+ * (healthy/degraded)
  * @public
- * @interface
+ * @enum
  */
-export interface IEdge {
-  /* The source node id */
-  from: string;
+export enum SubstrateHealth {
+  /* All threshold checks pass and the feed is fresh */
+  healthy = 'healthy',
 
-  /* The target node id */
-  to: string;
+  /* A threshold check is failing while the feed is fresh */
+  degraded = 'degraded',
 
-  /* The connection kind driving the wire's styling */
-  kind: string;
+  /* The latest sample has aged past the freshness window */
+  stale = 'stale',
 
-  /* An optional short label, e.g. "NFS" */
-  label?: string;
+  /* No sample has arrived; the publisher is down */
+  offline = 'offline',
 }

@@ -11,49 +11,25 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████ #components/widgets/lab/substrate-topology/types.ts ████████████████████████████████
+ * ███████████████████████████████████████ app/types/jenscraft-metrics/enums.ts ████████████████████████████████████████
  *
- * Type definitions for the substrate topology diagram: the layer enum, its derived union, the props contract, and the
- * drawable edge shape.
+ * The freshness-state enumeration for the Jenscraft live-metrics feed.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ISubstrateDevice } from '~/types/substrate';
-
-import type { SubstrateLayer } from './enums';
-
 /**
- * A type representing a topology band; one of {@link SubstrateLayer}
+ * An enumeration of the freshness states of the Jenscraft metrics feed
  * @public
+ * @enum
  */
-export type TSubstrateLayer = `${SubstrateLayer}`;
+export enum JenscraftMetricsState {
+  /* The feed is reporting fresh samples */
+  live = 'live',
 
-/**
- * The props accepted by the topology diagram: the device inventory to place and wire
- * @public
- * @interface
- */
-export interface ISubstrateTopologyProps {
-  /* The device inventory to place and wire; layout derives from each device's layer and order */
-  devices: ISubstrateDevice[];
-}
+  /* The latest sample has aged past the freshness window */
+  stale = 'stale',
 
-/**
- * A drawable wire between two placed nodes, flattened from the device connection lists
- * @public
- * @interface
- */
-export interface IEdge {
-  /* The source node id */
-  from: string;
-
-  /* The target node id */
-  to: string;
-
-  /* The connection kind driving the wire's styling */
-  kind: string;
-
-  /* An optional short label, e.g. "NFS" */
-  label?: string;
+  /* No sample has arrived; the publisher is down */
+  offline = 'offline',
 }
