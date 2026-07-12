@@ -59,93 +59,7 @@
 
 import type { H3Event } from 'h3';
 
-/**
- * The subset of the Google OIDC userinfo payload we consume
- * @internal
- * @interface
- */
-interface IGoogleUser {
-  /* The stable Google subject identifier for the account */
-  sub: string;
-
-  /* The account's display name */
-  name: string;
-
-  /* The account's email address */
-  email: string;
-
-  /* Whether Google has verified the email address */
-  email_verified?: boolean;
-
-  /* The account's avatar URL */
-  picture?: string;
-}
-
-/**
- * Origin (scheme + host, no trailing slash) for the current deployment, derived from Vercel's
- * system environment variables.
- *
- * These resolve at *runtime* in the function; unlike the request headers nuxt-auth-utils relies on.
- * On Vercel's Fluid runtime the h3 event sees neither a real `Host` nor `x-forwarded-*` (the proxy
- * headers don't reach it), so `getRequestURL()` collapses to `http://localhost` and Google rejects
- * the resulting `http://localhost/auth/callback` with `Error 400: redirect_uri_mismatch`. Reading
- * `process.env` sidesteps that entirely. Returns undefined off Vercel (local dev).
- *
- * • Production → `https://<VERCEL_PROJECT_PRODUCTION_URL>` (jens-johnson.com)
- * • staging    → `https://staging.jens-johnson.com` (its assigned custom preview domain)
- * @internal
- * @function
- * @returns The deployment's public origin, or undefined off Vercel (local dev)
- */
-function vercelOrigin(): string | undefined {
-  // Resolve the deployment environment; production and the staging preview branch map to registered domains
-  const env: string | undefined = process.env.VERCEL_ENV;
-  if (env === 'production' && process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
-  }
-  // No env var exposes the staging branch's custom domain, so map it explicitly. Other preview
-  // branches fall through; their *.vercel.app URLs aren't registered with Google anyway.
-  if (env === 'preview' && process.env.VERCEL_GIT_COMMIT_REF === 'staging') {
-    return 'https://staging.jens-johnson.com';
-  }
-  return undefined;
-}
-
-/**
- * Resolve the absolute OAuth redirect URI Google must call back to; matching one of the URIs
- * registered in the Google OIDC client (prod / staging / localhost). Priority:
- *
- * 1. `NUXT_OAUTH_GOOGLE_REDIRECT_URL`; explicit per-environment override, if set in Vercel.
- * 2. Vercel system env (`vercelOrigin`); reliable at runtime; fixes prod + staging.
- * 3. `x-forwarded-host`; for proxies that do surface it (belt-and-suspenders).
- * 4. `undefined`; local dev; nuxt-auth-utils derives it from `Host` (`http://localhost:3000/...`).
- * @internal
- * @function
- * @param event - The incoming request event
- * @returns The absolute redirect URI, or undefined to let nuxt-auth-utils derive it
- */
-function resolveRedirectURL(event: H3Event): string | undefined {
-  // 1. Explicit per-environment override, if set in Vercel
-  if (process.env.NUXT_OAUTH_GOOGLE_REDIRECT_URL) {
-    return process.env.NUXT_OAUTH_GOOGLE_REDIRECT_URL;
-  }
-
-  // 2. Vercel system env; reliable at runtime for prod and staging
-  const origin: string | undefined = vercelOrigin();
-  if (origin) {
-    return `${origin}/auth/callback`;
-  }
-
-  // 3. Forwarded proxy headers, for proxies that do surface them
-  const forwardedHost: string | undefined = getRequestHeader(event, 'x-forwarded-host')?.split(',')[0]?.trim();
-  if (forwardedHost) {
-    const proto: string = getRequestHeader(event, 'x-forwarded-proto')?.split(',')[0]?.trim() || 'https';
-    return `${proto}://${forwardedHost}/auth/callback`;
-  }
-
-  // 4. Local dev; nuxt-auth-utils derives the URI from the Host header
-  return undefined;
-}
+import type { IGoogleUser } from '#utils/auth';
 
 /**
  * Runs the Google OIDC login + callback flow: redirects to Google, then exchanges the returned code and seals the
@@ -185,10 +99,16 @@ export default defineEventHandler((event: H3Event): Promise<void> => {
       redirectURL: resolveRedirectURL(event),
     },
 
-    /** Exchange succeeded; persist a trimmed profile and the resolved admin flag into the session. */
-    async onSuccess(event, { user }: { user: unknown }) {
+    /**
+     * Handles a successful OAuth exchange; narrows the Google profile, seals the user session with the trimmed
+     * fields and the resolved admin flag, then redirects home
+     * @param event - The incoming request event
+     * @param oauth - The OAuth result; `user` is the raw Google OIDC userinfo payload
+     * @returns A redirect to the app root
+     */
+    async onSuccess(event: H3Event, oauth: { user: unknown }): Promise<void> {
       // Narrow the untyped user payload to the OIDC fields we consume
-      const profile: IGoogleUser = user as IGoogleUser;
+      const profile: IGoogleUser = oauth.user as IGoogleUser;
 
       await setUserSession(event, {
         user: {
@@ -205,8 +125,13 @@ export default defineEventHandler((event: H3Event): Promise<void> => {
       return sendRedirect(event, '/');
     },
 
-    /** Exchange failed (user denied consent, bad config, etc.); log and bounce home with a flag. */
-    onError(event, error) {
+    /**
+     * Handles a failed OAuth exchange (denied consent, bad config, etc.); logs the error and bounces home with a flag
+     * @param event - The incoming request event
+     * @param error - The error thrown by the OAuth exchange
+     * @returns A redirect to the app root with an auth-error flag
+     */
+    onError(event: H3Event, error: unknown): Promise<void> {
       console.error('[auth] Google OAuth error:', error);
       return sendRedirect(event, '/?auth=error');
     },
