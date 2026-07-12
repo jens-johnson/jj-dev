@@ -313,7 +313,7 @@ export default defineNuxtConfig({
     },
     prerender: {
       crawlLinks: true,
-      routes: ['/', '/about', '/blog', '/projects', '/lab', '/lab/substrate', '/uses'],
+      routes: ['/', '/about', '/blog', '/projects', '/lab', '/lab/substrate'],
 
       /**
        * Never prerender the auth routes. With `crawlLinks` on, the prerenderer follows the nav's
