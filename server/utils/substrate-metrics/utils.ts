@@ -19,7 +19,7 @@
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • docs/project-planning/substrate-metrics-feed.md; the design + payload contract
+ * • docs/.archive/project-planning/substrate-metrics-feed.md; the design + payload contract
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */

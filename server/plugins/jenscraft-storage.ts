@@ -20,7 +20,7 @@
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • docs/project-planning/substrate-metrics-feed.md; the shared Upstash storage plan
+ * • docs/.archive/project-planning/substrate-metrics-feed.md; the shared Upstash storage plan
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */

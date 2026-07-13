@@ -20,7 +20,7 @@
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • docs/project-planning/substrate-metrics-feed.md; the design + the Upstash (Phase B) plan
+ * • docs/.archive/project-planning/substrate-metrics-feed.md; the design + the Upstash (Phase B) plan
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
