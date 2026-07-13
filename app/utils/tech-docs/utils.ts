@@ -77,6 +77,8 @@ const TECH_DOCS: Record<string, string> = {
 
 /**
  * Normalizes a tech name for lookup: lowercase, trimmed, and with a trailing version (e.g. "26.1.2") stripped
+ * @internal
+ * @function
  * @param name - The raw tech name
  * @returns The normalized lookup key
  */
@@ -90,6 +92,8 @@ function normalizeTech(name: string): string {
 
 /**
  * Resolves the official docs URL for a technology/tool/platform name
+ * @public
+ * @function
  * @param name - The tech name, possibly with a trailing version
  * @returns The docs URL, or undefined when the name is not in the registry
  */

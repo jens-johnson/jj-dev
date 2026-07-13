@@ -58,6 +58,8 @@ const STATUS: Record<string, IStatusVisual> = {
 
 /**
  * Resolves the visual treatment for a device status, defaulting to "online"
+ * @public
+ * @function
  * @param status - The device status key
  * @returns The matching visual treatment, or the "online" treatment when unknown
  */
@@ -89,6 +91,8 @@ const KIND_ICON: Record<string, string> = {
 
 /**
  * Resolves the Lucide icon name for a device kind
+ * @public
+ * @function
  * @param kind - The device kind key
  * @returns The matching Lucide icon name, or the fallback icon when unknown
  */
@@ -117,6 +121,8 @@ const KIND_LABEL: Record<string, string> = {
 
 /**
  * Resolves the human-readable label for a device kind
+ * @public
+ * @function
  * @param kind - The device kind key
  * @returns The matching label, or the kind itself when unknown
  */
@@ -126,6 +132,8 @@ export function kindLabel(kind: string): string {
 
 /**
  * Coerces a queried doc into a fully-populated device, applying schema defaults so consumers never see undefined
+ * @public
+ * @function
  * @param doc - The loosely-typed substrate doc from queryCollection
  * @returns The fully-populated device
  */
@@ -156,6 +164,8 @@ export function normalizeDevice(doc: IRawSubstrateDoc): ISubstrateDevice {
 
 /**
  * Normalizes a list of queried docs
+ * @public
+ * @function
  * @param docs - The loosely-typed substrate docs from queryCollection
  * @returns The normalized devices
  */

@@ -22,6 +22,8 @@ import { defineSymbol } from '#shared/utils/symbol';
 
 /**
  * Formats a duration in seconds to a compact human uptime, e.g. "9d 14h"
+ * @public
+ * @function
  * @param sec - The duration in seconds
  * @returns The compact uptime label
  */
