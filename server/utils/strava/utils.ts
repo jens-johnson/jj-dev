@@ -82,6 +82,8 @@ let cachedExpiry = 0;
 
 /**
  * Exchanges the refresh token for an access token, reusing the cached one until ~60s before it expires
+ * @public
+ * @function
  * @throws 502 when the Strava token exchange fails
  * @returns The current Strava access token
  */
@@ -141,6 +143,8 @@ async function stravaFetch<T>(path: string, init: RequestInit = {}): Promise<T> 
 
 /**
  * Lists running activities within plus/minus 36h of the given date, nearest start time first
+ * @public
+ * @function
  * @param isoDate - The center date (ISO string)
  * @returns The matching running activities, sorted by proximity to the center date
  */
@@ -161,6 +165,8 @@ export async function activitiesNear(isoDate: string): Promise<IStravaActivity[]
 
 /**
  * Fetches a single activity
+ * @public
+ * @function
  * @param id - The Strava activity id
  * @returns The activity
  */
@@ -170,6 +176,8 @@ export function getActivity(id: number): Promise<IStravaActivity> {
 
 /**
  * Fetches the activity streams, keyed by type, for the TCX rebuild
+ * @public
+ * @function
  * @param id - The Strava activity id
  * @param keys - The comma-separated stream keys to request
  * @returns The streams keyed by type
@@ -180,6 +188,8 @@ export function getStreams(id: number, keys = 'time,distance,heartrate,cadence')
 
 /**
  * Checks whether the activity still exists; the guard the commit step uses to confirm a manual delete
+ * @public
+ * @function
  * @param id - The Strava activity id
  * @throws 502 when the existence check fails with an unexpected status
  * @returns True when the activity still exists
@@ -202,6 +212,8 @@ export async function activityExists(id: number): Promise<boolean> {
 
 /**
  * Uploads a corrected TCX as a new activity
+ * @public
+ * @function
  * @param tcx - The TCX document to upload
  * @param activity - The minimal activity metadata to apply
  * @throws 502 when the Strava upload request fails
@@ -229,6 +241,8 @@ export async function uploadTcx(tcx: string, activity: TUploadActivity): Promise
 
 /**
  * Polls an upload until Strava finishes processing it
+ * @public
+ * @function
  * @param uploadId - The upload id to poll
  * @param attempts - The maximum number of poll attempts
  * @param intervalMs - The delay between attempts in milliseconds
@@ -255,6 +269,8 @@ export async function pollUpload(uploadId: number, attempts = 20, intervalMs = 1
 
 /**
  * Clears the `trainer` flag on the replacement so it is not tagged as a treadmill run
+ * @public
+ * @function
  * @param id - The Strava activity id
  * @returns The updated activity
  */
@@ -268,6 +284,8 @@ export function setTrainerFalse(id: number): Promise<IStravaActivity> {
 
 /**
  * Re-reads the replacement and checks distance and elevation are within tolerance of expected
+ * @public
+ * @function
  * @param id - The replacement activity id
  * @param expectedDistanceMeters - The expected distance in meters
  * @param expectedElevationFeet - The expected elevation gain in feet

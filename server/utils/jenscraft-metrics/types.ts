@@ -96,3 +96,10 @@ export interface IJenscraftMetricsResponse {
   /* The defeated-mob count; null when absent */
   mobs: NonNullable<IJenscraftMetricsPayload['mobs']> | null;
 }
+
+/**
+ * A result type representing the outcome of validating an untrusted Jenscraft payload; the ok branch carries the
+ * clean, rebuilt value, and the failure branch carries nothing (the reason is deliberately not surfaced)
+ * @public
+ */
+export type TJenscraftMetricsValidation = { ok: true; value: IJenscraftMetricsPayload } | { ok: false };

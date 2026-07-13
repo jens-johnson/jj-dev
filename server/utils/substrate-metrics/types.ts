@@ -193,3 +193,10 @@ export interface ISubstrateMetricsResponse {
   /* The rolling CPU/memory history for the sparklines (empty when none) */
   history: ISubstrateMetricsSample[];
 }
+
+/**
+ * A result type representing the outcome of validating an untrusted substrate payload; the ok branch carries the
+ * clean, rebuilt value, and the failure branch carries nothing (the reason is deliberately not surfaced)
+ * @public
+ */
+export type TSubstrateMetricsValidation = { ok: true; value: ISubstrateMetricsPayload } | { ok: false };

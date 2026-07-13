@@ -24,20 +24,78 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { IJenscraftMetricsPayload, IStoredJenscraftMetrics } from './types';
+import { JENSCRAFT_LATEST_KEY } from './constants';
+import type { IJenscraftMetricsPayload, IStoredJenscraftMetrics, TJenscraftMetricsValidation } from './types';
 
 /* ─── Validation (no external deps; unknown keys are dropped by construction) ──────────────────────────────────────── */
 
-const isNum = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
-const isPct = (value: unknown): value is number => isNum(value) && value >= 0 && value <= 100;
-const isCount = (value: unknown): value is number =>
-  isNum(value) && Number.isInteger(value) && value >= 0 && value <= 100_000;
-const isBigCount = (value: unknown): value is number =>
-  isNum(value) && Number.isInteger(value) && value >= 0 && value <= 1_000_000_000;
-const isObj = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-const inRange = (value: unknown, low: number, high: number): value is number =>
-  isNum(value) && value >= low && value <= high;
+/**
+ * A type guard for a finite number
+ * @internal
+ * @function
+ * @param value - The value to test
+ * @returns True when the value is a finite number
+ */
+function isNum(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+/**
+ * A type guard for a percentage (a finite number in the 0..100 range)
+ * @internal
+ * @function
+ * @param value - The value to test
+ * @returns True when the value is a number within 0..100
+ */
+function isPct(value: unknown): value is number {
+  return isNum(value) && value >= 0 && value <= 100;
+}
+
+/**
+ * A type guard for a non-negative integer count (capped at 100,000 to reject absurd values)
+ * @internal
+ * @function
+ * @param value - The value to test
+ * @returns True when the value is an integer within 0..100,000
+ */
+function isCount(value: unknown): value is number {
+  return isNum(value) && Number.isInteger(value) && value >= 0 && value <= 100_000;
+}
+
+/**
+ * A type guard for a large non-negative integer count (capped at 1,000,000,000 to reject absurd values)
+ * @internal
+ * @function
+ * @param value - The value to test
+ * @returns True when the value is an integer within 0..1,000,000,000
+ */
+function isBigCount(value: unknown): value is number {
+  return isNum(value) && Number.isInteger(value) && value >= 0 && value <= 1_000_000_000;
+}
+
+/**
+ * A type guard for a plain (non-array, non-null) object
+ * @internal
+ * @function
+ * @param value - The value to test
+ * @returns True when the value is a plain object
+ */
+function isObj(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * A type guard for a finite number within an inclusive range
+ * @internal
+ * @function
+ * @param value - The value to test
+ * @param low - The inclusive lower bound
+ * @param high - The inclusive upper bound
+ * @returns True when the value is a number within low..high
+ */
+function inRange(value: unknown, low: number, high: number): value is number {
+  return isNum(value) && value >= low && value <= high;
+}
 
 /**
  * Validates the optional players block, rebuilding it from the four known count fields only
@@ -97,31 +155,37 @@ function applyNumbers(input: Record<string, unknown>, value: IJenscraftMetricsPa
 /**
  * Validates an untrusted body into a clean payload. The returned object is rebuilt from known fields only, so any
  * extra keys an attacker sends are silently dropped
+ * @public
+ * @function
  * @param input - The untrusted request body
  * @returns An ok result with the clean value, or `{ ok: false }` on any shape/range violation
  */
-export function validateJenscraftPayload(
-  input: unknown,
-): { ok: true; value: IJenscraftMetricsPayload } | { ok: false } {
+export function validateJenscraftPayload(input: unknown): TJenscraftMetricsValidation {
+  // Reject anything without the envelope fields: an object, a numeric version, and a bounded timestamp string
   if (!isObj(input) || !isNum(input.v) || typeof input.ts !== 'string' || input.ts.length > 40) {
     return { ok: false };
   }
 
+  // Seed the clean payload with the validated envelope; every metric block is attached below only when it checks out
   const value: IJenscraftMetricsPayload = { v: input.v, ts: input.ts };
 
   // Every metric is optional; the publisher sends whatever it could gather, so a cold start or a missing spark
   // reading just shows a placeholder on that one tile instead of dropping the whole snapshot.
   if (input.players !== undefined) {
-    const players = cleanPlayers(input.players);
+    // The players block, when present, must rebuild cleanly from its four count fields
+    const players: ReturnType<typeof cleanPlayers> = cleanPlayers(input.players);
     if (!players) {
       return { ok: false };
     }
     value.players = players;
   }
+
+  // Validate and round the optional spark/uptime numbers onto the payload; a present-but-out-of-range field rejects
   if (!applyNumbers(input, value)) {
     return { ok: false };
   }
 
+  // Attach the remaining optional blocks only when present and in range
   if (isObj(input.world) && isPct(input.world.exploredPct)) {
     value.world = { exploredPct: Math.round(input.world.exploredPct * 10) / 10 };
   }
@@ -134,20 +198,26 @@ export function validateJenscraftPayload(
 
 /* ─── Storage (Nitro useStorage: memory in dev; the `jenscraft` mount points at Upstash in prod) ──────────────────── */
 
-const KEY = 'metrics:latest';
-
 /**
  * Persists the latest snapshot, stamping the server receive time used for staleness
+ * @public
+ * @function
  * @param payload - The validated payload to store
+ * @returns A promise that resolves once the snapshot has been written
  */
 export async function writeLatestJenscraftMetrics(payload: IJenscraftMetricsPayload): Promise<void> {
-  await useStorage('jenscraft').setItem(KEY, { ...payload, receivedAt: Date.now() } satisfies IStoredJenscraftMetrics);
+  await useStorage('jenscraft').setItem(JENSCRAFT_LATEST_KEY, {
+    ...payload,
+    receivedAt: Date.now(),
+  } satisfies IStoredJenscraftMetrics);
 }
 
 /**
  * Reads the latest stored snapshot
+ * @public
+ * @function
  * @returns The stored record, or null when none has been written
  */
 export async function readLatestJenscraftMetrics(): Promise<IStoredJenscraftMetrics | null> {
-  return (await useStorage('jenscraft').getItem<IStoredJenscraftMetrics>(KEY)) ?? null;
+  return (await useStorage('jenscraft').getItem<IStoredJenscraftMetrics>(JENSCRAFT_LATEST_KEY)) ?? null;
 }
