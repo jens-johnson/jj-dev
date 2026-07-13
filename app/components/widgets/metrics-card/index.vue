@@ -20,7 +20,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { IMetricsResponse } from '../../../../server/api/metrics.get';
+import type { IMetricsResponse } from '#utils/metrics';
+
 import { SPARKLINE_EMPTY_BAR_HEIGHT, SPARKLINE_MAX_BAR_HEIGHT_PX, SPARKLINE_WEEK_COUNT } from './constants';
 
 /* ─── DATA FETCH ─────────────────────────────────────────────────────────────────────────────────────────────────── */
