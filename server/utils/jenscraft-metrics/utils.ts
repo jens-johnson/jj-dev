@@ -14,8 +14,8 @@
  * █████████████████████████████████████ #server/utils/jenscraft-metrics/utils.ts ██████████████████████████████████████
  *
  * Server-side helpers for the Jenscraft live-metrics feed: a dependency-free validator for the public payload and the
- * Nitro storage read/write. Staleness (metricsState) and the rate limiter (allowRequest) are reused from the substrate
- * metrics util. Auto-imported into the jenscraft server routes.
+ * Nitro storage read/write. Staleness (metricsState) is reused from the substrate module, and rate limiting
+ * (checkRateLimit) from the rate-limit module. Auto-imported into the jenscraft server routes.
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *

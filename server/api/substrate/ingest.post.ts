@@ -97,7 +97,7 @@ export default defineEventHandler(async (event: H3Event): Promise<null> => {
 
   // Rate-limit per client IP; the bucket is exhausted well below any legitimate push cadence
   const ip: string = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown';
-  if (!allowRequest(ip)) {
+  if (!(await checkRateLimit(ip))) {
     throw createError({ statusCode: 429, statusMessage: 'Too Many Requests' });
   }
 

@@ -104,7 +104,7 @@ export default defineEventHandler(async (event: H3Event): Promise<null> => {
 
   // Rate-limit per client IP (namespaced so the jenscraft and substrate feeds do not share buckets)
   const ip: string = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown';
-  if (!allowRequest(`jenscraft:${ip}`)) {
+  if (!(await checkRateLimit(`jenscraft:${ip}`))) {
     throw createError({ statusCode: 429, statusMessage: 'Too Many Requests' });
   }
 

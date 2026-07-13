@@ -14,8 +14,8 @@
  * █████████████████████████████████████ #server/utils/substrate-metrics/utils.ts ██████████████████████████████████████
  *
  * Server-side helpers for the Substrate live-metrics feed: a dependency-free validator for the public payload, the
- * Nitro storage read/write, staleness computation, and a dev-grade rate limiter. Auto-imported into the substrate
- * server routes and the dev-seed plugin.
+ * Nitro storage read/write, and staleness computation. Auto-imported into the substrate server routes and the
+ * dev-seed plugin.
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -240,39 +240,4 @@ export function metricsState(
   const state: TSubstrateMetricsState =
     ageSec <= SUBSTRATE_LIVE_MAX_AGE_S ? 'live' : ageSec <= SUBSTRATE_STALE_MAX_AGE_S ? 'stale' : 'offline';
   return { state, ageSec };
-}
-
-/* ─── Dev-grade in-memory rate limit (per-process; Phase B replaces with Upstash Ratelimit) ───────────────────────── */
-
-/**
- * The per-process rate-limit buckets, keyed by client, holding the timestamps of recent requests
- * @internal
- * @constant
- */
-const hits: Map<string, number[]> = new Map<string, number[]>();
-
-/**
- * Dev-grade in-memory rate limiter (per-process)
- * @public
- * @function
- * @param key - The bucket key (e.g. the client IP)
- * @param limit - The maximum requests allowed within the window
- * @param windowMs - The rolling window length in milliseconds
- * @param now - The current time (epoch milliseconds), defaulting to now
- * @returns True when the request is allowed, false when the bucket is exhausted
- */
-export function allowRequest(
-  key: string,
-  limit: number = 12,
-  windowMs: number = 60_000,
-  now: number = Date.now(),
-): boolean {
-  const recent: number[] = (hits.get(key) ?? []).filter((timestamp: number): boolean => now - timestamp < windowMs);
-  if (recent.length >= limit) {
-    hits.set(key, recent);
-    return false;
-  }
-  recent.push(now);
-  hits.set(key, recent);
-  return true;
 }

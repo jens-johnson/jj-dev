@@ -61,6 +61,7 @@
     ]
   },
   "dependencies": {
+    "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "@vueuse/core": "^14.3.0",
     "better-sqlite3": "^12.8.0",
