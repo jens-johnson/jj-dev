@@ -11,7 +11,7 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * █████████████████████████████████████████ shared/utils/symbol/utils.test.ts █████████████████████████████████████████
+ * ████████████████████████████████████████ #shared/utils/symbol/utils.test.ts █████████████████████████████████████████
  *
  * Unit tests for the symbol metadata registry: registration, the name fallback chain, and description resolution.
  *

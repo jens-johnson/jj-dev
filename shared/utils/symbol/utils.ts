@@ -11,7 +11,7 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████████████████ shared/utils/symbol/utils.ts ████████████████████████████████████████████
+ * ███████████████████████████████████████████ #shared/utils/symbol/utils.ts ███████████████████████████████████████████
  *
  * Symbol metadata registry: defineSymbol attaches a readable name/description to a symbol; symbolName/symbolDescription
  * read it back.

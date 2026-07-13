@@ -11,7 +11,7 @@
  *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████ app/components/widgets/lab/substrate-topology/enums.ts ███████████████████████████████
+ * ████████████████████████████████ #components/widgets/lab/substrate-topology/enums.ts ████████████████████████████████
  *
  * The topology-band enumeration for the substrate topology diagram.
  *
