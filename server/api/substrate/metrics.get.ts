@@ -40,42 +40,10 @@ import type { H3Event } from 'h3';
 
 import type {
   IStoredSubstrateMetrics,
-  ISubstrateMetricsPayload,
+  ISubstrateMetricsResponse,
   ISubstrateMetricsSample,
   TSubstrateMetricsState,
 } from '#utils/substrate-metrics';
-
-/**
- * An interface representing the public metrics response: the last-known payload fields plus the derived freshness
- * state, age, and the rolling sparkline history; the payload fields are null until a push has been stored
- * @internal
- * @interface
- */
-interface ISubstrateMetricsResponse {
-  /* The derived freshness state of the feed */
-  state: TSubstrateMetricsState;
-
-  /* The payload age in seconds; null when no payload has been stored */
-  ageSec: number | null;
-
-  /* The publisher-side timestamp (ISO string); null when no payload has been stored */
-  ts: string | null;
-
-  /* The compute-node sample; null when no payload has been stored */
-  node: ISubstrateMetricsPayload['node'] | null;
-
-  /* The guest counts; null when no payload has been stored */
-  guests: ISubstrateMetricsPayload['guests'] | null;
-
-  /* The storage usage percentage; null when absent */
-  storage: NonNullable<ISubstrateMetricsPayload['storage']> | null;
-
-  /* The internet-edge reachability + latency; null when absent */
-  internet: NonNullable<ISubstrateMetricsPayload['internet']> | null;
-
-  /* The rolling CPU/memory history for the sparklines (empty when none) */
-  history: ISubstrateMetricsSample[];
-}
 
 /**
  * Serves the public Substrate metrics read: the last-known payload plus a derived freshness state (live | stale |

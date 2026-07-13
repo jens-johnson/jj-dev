@@ -38,43 +38,8 @@
 
 import type { H3Event } from 'h3';
 
-import type { IJenscraftMetricsPayload, IStoredJenscraftMetrics } from '#utils/jenscraft-metrics';
+import type { IJenscraftMetricsResponse, IStoredJenscraftMetrics } from '#utils/jenscraft-metrics';
 import type { TSubstrateMetricsState } from '#utils/substrate-metrics';
-
-/**
- * An interface representing the public metrics response: the last-known snapshot fields plus the derived freshness
- * state and age; every metric is null until the publisher has stored a snapshot carrying it
- * @internal
- * @interface
- */
-interface IJenscraftMetricsResponse {
-  /* The derived freshness state of the feed */
-  state: TSubstrateMetricsState;
-
-  /* The snapshot age in seconds; null when no snapshot has been stored */
-  ageSec: number | null;
-
-  /* The publisher-side timestamp (ISO string); null when no snapshot has been stored */
-  ts: string | null;
-
-  /* The player counts; null when absent */
-  players: NonNullable<IJenscraftMetricsPayload['players']> | null;
-
-  /* The ticks-per-second figure; null when absent */
-  tps: number | null;
-
-  /* The milliseconds-per-tick figure; null when absent */
-  mspt: number | null;
-
-  /* The server uptime in seconds; null when absent */
-  uptimeSec: number | null;
-
-  /* The world-explored percentage; null when absent */
-  world: NonNullable<IJenscraftMetricsPayload['world']> | null;
-
-  /* The defeated-mob count; null when absent */
-  mobs: NonNullable<IJenscraftMetricsPayload['mobs']> | null;
-}
 
 /**
  * Serves the public Jenscraft metrics read: the last-known snapshot plus a derived freshness state (live | stale |
