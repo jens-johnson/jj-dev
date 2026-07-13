@@ -50,7 +50,7 @@ export default withNuxt(
      */
     {
       name: 'jj-dev/ignores',
-      ignores: ['public/**'],
+      ignores: ['public/**', '.claude/**'],
     },
 
     /**

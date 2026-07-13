@@ -30,4 +30,4 @@ package-lock.json
 CHANGELOG.md
 *.min.js
 *.min.css
-.claude/conversations/
+.claude/
