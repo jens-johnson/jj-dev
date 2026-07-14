@@ -42,50 +42,6 @@ import type {
 /* ─── Validation (no external deps; unknown keys are dropped by construction) ──────────────────────────────────────── */
 
 /**
- * A type guard for a finite number
- * @internal
- * @function
- * @param value - The value to test
- * @returns True when the value is a finite number
- */
-function isNum(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value);
-}
-
-/**
- * A type guard for a percentage (a finite number in the 0..100 range)
- * @internal
- * @function
- * @param value - The value to test
- * @returns True when the value is a number within 0..100
- */
-function isPct(value: unknown): value is number {
-  return isNum(value) && value >= 0 && value <= 100;
-}
-
-/**
- * A type guard for a non-negative integer count (capped at 100,000 to reject absurd values)
- * @internal
- * @function
- * @param value - The value to test
- * @returns True when the value is an integer within 0..100,000
- */
-function isCount(value: unknown): value is number {
-  return isNum(value) && Number.isInteger(value) && value >= 0 && value <= 100_000;
-}
-
-/**
- * A type guard for a plain (non-array, non-null) object
- * @internal
- * @function
- * @param value - The value to test
- * @returns True when the value is a plain object
- */
-function isObj(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-/**
  * Validates an untrusted body into a clean payload. The returned object is rebuilt from known fields only, so any
  * extra keys an attacker sends are silently dropped
  * @public
