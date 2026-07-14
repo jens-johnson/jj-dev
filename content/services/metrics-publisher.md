@@ -20,11 +20,11 @@ metrics: []
 
 ## What it reports
 
-- **CPU / RAM / load** — live host utilisation
-- **Uptime** — since the last host boot
-- **Guests** — VM + container counts (and how many are running)
-- **Storage** — pool usage
-- **Internet** — edge reachability + round-trip latency
+- **CPU / RAM / load**; live host utilisation
+- **Uptime**; since the last host boot
+- **Guests**; VM + container counts (and how many are running)
+- **Storage**; pool usage
+- **Internet**; edge reachability + round-trip latency
 
 ## How it works
 

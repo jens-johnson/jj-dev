@@ -12,9 +12,9 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████ #components/content/StackBlocks.vue ██████████████████████████████████████████████
+ * ███████████████████████████████████████ #components/content/StackBlocks.vue ███████████████████████████████████████
  *
- * MDC component embedded as `::stack-blocks`. Renders the tech stack as five layered blocks — each block is one
+ * MDC component embedded as `::stack-blocks`. Renders the tech stack as five layered blocks; each block is one
  * layer of the platform (Vercel, Nuxt 4, Tailwind, DX tooling, Agentic dev). Clicking a block expands it to reveal
  * the body copy. Default-open is the top layer; only one expanded at a time.
  *
@@ -24,16 +24,39 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-interface StackLayer {
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * One layer of the tech-stack visualization: its ordinal, identity, summary copy, and optional reference links
+ * @internal
+ * @interface
+ */
+interface IStackLayer {
+  /* The two-digit ordinal rendered in the layer's number chip */
   num: string;
+
+  /* The layer title */
   title: string;
+
+  /* The lucide icon name rendered beside the title */
   icon: string;
+
+  /* The one-line summary shown in the collapsed header */
   tagline: string;
+
+  /* The body copy revealed when the layer is expanded */
   body: string;
+
+  /* Optional reference links rendered as pills beneath the body copy */
   links?: { label: string; href: string }[];
 }
 
-const stack: StackLayer[] = [
+/**
+ * The five stack layers rendered bottom-of-stack first (infrastructure up to developer/agent experience)
+ * @internal
+ * @constant
+ */
+const stack: IStackLayer[] = [
   {
     num: '01',
     title: 'DX-Oriented Ecosystem',
@@ -78,7 +101,14 @@ const stack: StackLayer[] = [
   },
 ];
 
-const expandedIdx = ref(0);
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The index of the currently expanded layer; -1 when every layer is collapsed. Defaults to the top layer open
+ * @internal
+ * @constant
+ */
+const expandedIndex: Ref<number> = ref(0);
 </script>
 
 <template>
@@ -89,11 +119,11 @@ const expandedIdx = ref(0);
         :key="layer.num"
         class="stack-block group bg-surface relative cursor-pointer overflow-hidden rounded-2xl border transition-all duration-500"
         :class="[
-          i === expandedIdx ? 'border-accent z-10 shadow-lg' : 'border-border hover:border-accent/60',
-          i === expandedIdx ? '' : 'hover:-translate-y-1',
+          i === expandedIndex ? 'border-accent z-10 shadow-lg' : 'border-border hover:border-accent/60',
+          i === expandedIndex ? '' : 'hover:-translate-y-1',
         ]"
         :style="{ marginTop: i === 0 ? '0' : '-12px' }"
-        @click="expandedIdx = expandedIdx === i ? -1 : i"
+        @click="expandedIndex = expandedIndex === i ? -1 : i"
       >
         <!-- Collapsed-state header -->
         <div class="flex items-center gap-4 p-5">
@@ -101,7 +131,7 @@ const expandedIdx = ref(0);
           <span
             class="text-caption flex h-10 w-10 shrink-0 items-center justify-center rounded-lg font-mono transition-colors"
             :class="
-              i === expandedIdx
+              i === expandedIndex
                 ? 'bg-accent text-stone-50'
                 : 'bg-bg text-ink-subtle group-hover:bg-accent/15 group-hover:text-accent'
             "
@@ -114,7 +144,7 @@ const expandedIdx = ref(0);
             :name="layer.icon"
             size="22"
             class="shrink-0 transition-colors"
-            :class="i === expandedIdx ? 'text-accent' : 'text-ink-subtle group-hover:text-accent'"
+            :class="i === expandedIndex ? 'text-accent' : 'text-ink-subtle group-hover:text-accent'"
           />
 
           <!-- Title + tagline -->
@@ -122,6 +152,7 @@ const expandedIdx = ref(0);
             <h3 class="font-display text-h5 text-ink leading-tight font-bold">
               {{ layer.title }}
             </h3>
+
             <p class="font-body text-body-sm text-ink-muted truncate">
               {{ layer.tagline }}
             </p>
@@ -132,21 +163,25 @@ const expandedIdx = ref(0);
             name="lucide:chevron-down"
             size="20"
             class="text-ink-subtle shrink-0 transition-transform duration-300"
-            :class="i === expandedIdx ? 'text-accent rotate-180' : ''"
+            :class="i === expandedIndex ? 'text-accent rotate-180' : ''"
           />
         </div>
 
         <!-- Expanded body -->
         <div
           class="grid transition-[grid-template-rows] duration-500 ease-in-out"
-          :style="{ gridTemplateRows: i === expandedIdx ? '1fr' : '0fr' }"
+          :style="{ gridTemplateRows: i === expandedIndex ? '1fr' : '0fr' }"
         >
           <div class="overflow-hidden">
             <div class="border-border border-t px-5 py-4">
               <p class="font-body text-body-sm text-ink-muted leading-relaxed">
                 {{ layer.body }}
               </p>
-              <div v-if="layer.links?.length" class="mt-3 flex flex-wrap gap-2">
+
+              <div
+                v-if="layer.links?.length"
+                class="mt-3 flex flex-wrap gap-2"
+              >
                 <a
                   v-for="link in layer.links"
                   :key="link.href"
@@ -156,7 +191,10 @@ const expandedIdx = ref(0);
                   class="text-caption text-accent border-accent/30 hover:bg-accent/10 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 font-mono transition-colors"
                 >
                   {{ link.label }}
-                  <Icon name="lucide:arrow-up-right" size="11" />
+                  <Icon
+                    name="lucide:arrow-up-right"
+                    size="11"
+                  />
                 </a>
               </div>
             </div>

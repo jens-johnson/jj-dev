@@ -13,7 +13,8 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ████████████████████████████████████████████████ stylelint.config.mjs ████████████████████████████████████████████████
  *
- * Stylelint config — Tailwind v4 aware. Lints `main.css` and `<style>` blocks in `.vue` files.
+ * Stylelint config: the shared @jens-johnson/style-guide base (standard + Vue + Tailwind v4 whitelist) plus jj-dev's
+ * design-token relaxations (OKLCH palette, Tailwind-owned class naming, sectioned token files).
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
@@ -23,36 +24,23 @@
  */
 
 export default {
-  extends: ['stylelint-config-standard', 'stylelint-config-recommended-vue'],
+  extends: ['@jens-johnson/style-guide/stylelint'],
+
+  /* jj-dev relaxations on top of the shared base; each is a deliberate consequence of the design-token system */
   rules: {
-    // Tailwind directives — don't flag.
-    'at-rule-no-unknown': [
-      true,
-      {
-        ignoreAtRules: [
-          'tailwind',
-          'apply',
-          'layer',
-          'config',
-          'screen',
-          'variants',
-          'responsive',
-          'theme',
-          'utility',
-          'custom-variant',
-          'reference',
-        ],
-      },
-    ],
-    // OKLCH is current, well-supported.
+    /* OKLCH is current and well-supported */
     'color-function-notation': null,
-    // Tailwind v4 uses CSS vars heavily; allow them in custom-property names.
+
+    /* Tailwind v4 uses CSS vars heavily; allow them in custom-property names */
     'custom-property-pattern': null,
-    // Tailwind utilities dominate — no need to enforce class naming.
+
+    /* Tailwind utilities dominate; no need to enforce class naming */
     'selector-class-pattern': null,
-    // Empty `@layer base {}` blocks are fine as scaffolding.
+
+    /* Empty `@layer base {}` blocks are fine as scaffolding */
     'block-no-empty': null,
-    // Font family names like Menlo, Consolas are conventionally cased.
+
+    /* Font family names like Menlo, Consolas are conventionally cased */
     'value-keyword-case': [
       'lower',
       {
@@ -60,12 +48,25 @@ export default {
         camelCaseSvgKeywords: true,
       },
     ],
-    // OKLCH's third arg is hue in degrees — the spec accepts a bare number.
+
+    /* OKLCH's third arg is hue in degrees; the spec accepts a bare number */
     'hue-degree-notation': null,
-    // We group tokens by section with blank lines for readability.
+
+    /* Tokens are grouped by section with blank lines for readability */
     'custom-property-empty-line-before': null,
-    // Tailwind v4's documented syntax is `@import 'tailwindcss';` (no url()).
+
+    /* Tailwind v4's documented syntax is `@import 'tailwindcss';` (no url()) */
     'import-notation': null,
   },
-  ignoreFiles: ['.nuxt/**', '.output/**', 'node_modules/**', 'dist/**', 'coverage/**'],
+
+  overrides: [
+    /* Inline `style=""` attributes in Vue templates are bare declarations by design; the position rule misreads
+       them as declarations outside a rule (stylelint-config-recommended-vue >= 1.6 lints style attributes) */
+    {
+      files: ['**/*.vue'],
+      rules: {
+        'no-invalid-position-declaration': null,
+      },
+    },
+  ],
 };

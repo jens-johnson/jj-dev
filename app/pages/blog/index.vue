@@ -13,13 +13,18 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ███████████████████████████████████████████████ #pages/blog/index.vue ███████████████████████████████████████████████
  *
- * Blog index — chronological listing of published writing, queried from the `blog` Nuxt Content collection. Drafts
+ * Blog index; chronological listing of published writing, queried from the `blog` Nuxt Content collection. Drafts
  * are filtered out; supports `?tag=Foo` query param for tag filtering. Latest post features at the top with the
  * rest as a vertical timeline.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+/**
+ * The current route; carries the optional `?tag=` filter query param
+ * @internal
+ * @constant
+ */
 const route = useRoute();
 
 useSeoMeta({
@@ -30,38 +35,79 @@ useSeoMeta({
   ogDescription: 'Notes on craft, code, and the occasional rabbit hole.',
 });
 
-/* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * All published posts from the blog content collection, newest first
+ * @internal
+ * @constant
+ */
 const { data: allPosts } = await useAsyncData('blog-index', () =>
   queryCollection('blog').where('draft', '=', false).order('publishedAt', 'DESC').all(),
 );
 
+/**
+ * The active tag filter from the `?tag=` query param; null when unfiltered
+ * @internal
+ * @constant
+ */
 const activeTag = computed<string | null>(() => {
-  const t = route.query.tag;
-  return typeof t === 'string' && t.length > 0 ? t : null;
+  const tagQuery = route.query.tag;
+  return typeof tagQuery === 'string' && tagQuery.length > 0 ? tagQuery : null;
 });
 
+/**
+ * The posts surfaced by the current tag filter; every published post when no tag is active
+ * @internal
+ * @constant
+ */
 const filteredPosts = computed(() => {
-  if (!activeTag.value) return allPosts.value ?? [];
-  return (allPosts.value ?? []).filter((p) =>
-    (p.tags ?? []).some((t: string) => t.toLowerCase() === activeTag.value!.toLowerCase()),
+  if (!activeTag.value) {
+    return allPosts.value ?? [];
+  }
+  return (allPosts.value ?? []).filter((post) =>
+    (post.tags ?? []).some((tag: string) => tag.toLowerCase() === activeTag.value!.toLowerCase()),
   );
 });
 
+/**
+ * The newest matching post, featured at the top of the page
+ * @internal
+ * @constant
+ */
 const featured = computed(() => filteredPosts.value[0] ?? null);
+
+/**
+ * The remaining matching posts, rendered as the vertical timeline
+ * @internal
+ * @constant
+ */
 const rest = computed(() => filteredPosts.value.slice(1));
 
-/* All distinct tags across all posts, sorted alphabetically. */
+/**
+ * All distinct tags across all posts, sorted alphabetically; drives the tag filter pill row
+ * @internal
+ * @constant
+ */
 const allTags = computed(() => {
   const set = new Set<string>();
   for (const post of allPosts.value ?? []) {
-    for (const tag of post.tags ?? []) set.add(tag);
+    for (const tag of post.tags ?? []) {
+      set.add(tag);
+    }
   }
   return Array.from(set).sort();
 });
 
-/* ─── Formatting helpers ──────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── HELPERS ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Formats an ISO date string as a long en-US date (i.e. "July 9, 2026") for the post metadata rows
+ * @internal
+ * @function
+ * @param iso - The ISO date string to format
+ * @returns The formatted date
+ */
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -70,13 +116,26 @@ function formatDate(iso: string): string {
   });
 }
 
-function tagHref(tag: string) {
+/**
+ * Builds the route location a tag pill links to; the blog index filtered by that tag via the `?tag=` query param
+ * @internal
+ * @function
+ * @param tag - The tag to filter by
+ * @returns The route location object
+ */
+function tagHref(tag: string): { path: string; query: { tag: string } } {
   return { path: '/blog', query: { tag } };
 }
 
-/* ─── Entrance animation ──────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── ENTRANCE ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * Whether the entrance animations have been triggered; flips true shortly after mount
+ * @internal
+ * @constant
+ */
 const revealed = ref(false);
+
 onMounted(() => {
   setTimeout(() => {
     revealed.value = true;
@@ -101,6 +160,7 @@ onMounted(() => {
         >
           03 · Writing
         </p>
+
         <h1
           class="font-display text-h1 text-ink leading-tight font-bold tracking-tight"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'"
@@ -113,6 +173,7 @@ onMounted(() => {
         >
           Notes on craft.
         </h1>
+
         <p
           class="font-body text-body-lg text-ink-muted mt-6 max-w-2xl leading-relaxed"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
@@ -128,7 +189,10 @@ onMounted(() => {
         </p>
 
         <!-- All tags pill row -->
-        <div v-if="allTags.length > 0" class="mt-8 flex flex-wrap items-center gap-2">
+        <div
+          v-if="allTags.length > 0"
+          class="mt-8 flex flex-wrap items-center gap-2"
+        >
           <NuxtLink
             to="/blog"
             class="text-caption rounded-full border px-3 py-1 font-mono tracking-widest uppercase transition-colors"
@@ -140,6 +204,7 @@ onMounted(() => {
           >
             All
           </NuxtLink>
+
           <NuxtLink
             v-for="tag in allTags"
             :key="tag"
@@ -160,25 +225,42 @@ onMounted(() => {
     <!-- ─── Posts ─────────────────────────────────────────────────────────────── -->
     <section class="mx-auto max-w-6xl px-6 py-16">
       <!-- Filter banner -->
-      <div v-if="activeTag" class="border-border bg-surface mb-10 flex items-center gap-3 rounded-xl border px-5 py-4">
-        <Icon name="lucide:filter" size="16" class="text-accent" />
+      <div
+        v-if="activeTag"
+        class="border-border bg-surface mb-10 flex items-center gap-3 rounded-xl border px-5 py-4"
+      >
+        <Icon
+          name="lucide:filter"
+          size="16"
+          class="text-accent"
+        />
+
         <p class="font-body text-body-sm text-ink-muted">
           Showing posts tagged
           <span class="text-ink font-medium">{{ activeTag }}</span>
         </p>
+
         <NuxtLink
           to="/blog"
           class="text-caption text-accent ml-auto inline-flex items-center gap-1 font-mono tracking-widest uppercase hover:underline"
         >
-          Clear <Icon name="lucide:x" size="11" />
+          Clear
+          <Icon
+            name="lucide:x"
+            size="11"
+          />
         </NuxtLink>
       </div>
 
       <!-- Empty state -->
-      <div v-if="filteredPosts.length === 0" class="flex flex-col items-center py-24 text-center">
+      <div
+        v-if="filteredPosts.length === 0"
+        class="flex flex-col items-center py-24 text-center"
+      >
         <p class="text-caption text-ink-subtle font-mono tracking-widest uppercase">
           {{ activeTag ? `No posts tagged ${activeTag}` : 'No posts yet' }}
         </p>
+
         <p class="font-body text-body text-ink-muted mt-3 max-w-sm">
           {{ activeTag ? 'Try a different tag or clear the filter.' : 'First posts are on the way.' }}
         </p>
@@ -197,33 +279,47 @@ onMounted(() => {
             >
               Latest
             </span>
+
             <p class="text-caption text-ink-subtle font-mono">
               {{ formatDate(featured.publishedAt) }}
             </p>
-            <span v-if="featured.series" class="text-caption text-ink-subtle font-mono">
+
+            <span
+              v-if="featured.series"
+              class="text-caption text-ink-subtle font-mono"
+            >
               · {{ featured.series.name }} · Part {{ featured.series.part }}
             </span>
           </div>
 
-          <NuxtLink :to="featured.path" class="group block">
+          <NuxtLink
+            :to="featured.path"
+            class="group block"
+          >
             <h2
               class="font-display text-h3 text-ink group-hover:text-accent mb-2 leading-tight font-bold tracking-tight transition-colors"
             >
               {{ featured.title }}
             </h2>
+
             <p
               v-if="featured.subtitle"
               class="font-display text-h5 text-ink-muted mb-4 leading-snug font-medium italic"
             >
               {{ featured.subtitle }}
             </p>
+
             <p class="font-body text-body-lg text-ink-muted mb-6 max-w-3xl leading-relaxed">
               {{ featured.description }}
             </p>
 
             <p class="text-caption text-accent inline-flex items-center gap-1.5 font-mono tracking-widest uppercase">
               Read post
-              <Icon name="lucide:arrow-right" size="13" class="transition-transform group-hover:translate-x-1" />
+              <Icon
+                name="lucide:arrow-right"
+                size="13"
+                class="transition-transform group-hover:translate-x-1"
+              />
             </p>
           </NuxtLink>
 
@@ -240,7 +336,10 @@ onMounted(() => {
         </article>
 
         <!-- ─── Rest ────────────────────────────────────────────────────────── -->
-        <div v-if="rest.length > 0" class="mt-16">
+        <div
+          v-if="rest.length > 0"
+          class="mt-16"
+        >
           <p class="text-caption text-ink-subtle mb-8 font-mono tracking-widest uppercase">More</p>
 
           <div class="space-y-0">
@@ -252,18 +351,28 @@ onMounted(() => {
               <p class="text-caption text-ink-subtle font-mono">
                 {{ formatDate(post.publishedAt) }}
               </p>
+
               <div>
-                <NuxtLink :to="post.path" class="group block">
+                <NuxtLink
+                  :to="post.path"
+                  class="group block"
+                >
                   <h3 class="font-display text-h5 text-ink group-hover:text-accent mb-1 font-bold transition-colors">
                     {{ post.title }}
                   </h3>
-                  <p v-if="post.subtitle" class="font-body text-body-sm text-ink-muted mb-2 italic">
+
+                  <p
+                    v-if="post.subtitle"
+                    class="font-body text-body-sm text-ink-muted mb-2 italic"
+                  >
                     {{ post.subtitle }}
                   </p>
+
                   <p class="font-body text-body text-ink-muted mb-3 max-w-3xl">
                     {{ post.description }}
                   </p>
                 </NuxtLink>
+
                 <div class="flex flex-wrap items-center gap-2">
                   <NuxtLink
                     v-for="tag in post.tags"

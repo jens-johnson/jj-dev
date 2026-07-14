@@ -14,51 +14,113 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * █████████████████████████████████████ #pages/lab/substrate/services/[slug].vue ██████████████████████████████████████
  *
- * Per-service detail page for the Substrate homelab. Renders one service's full doc — connect details, live-metrics
+ * Per-service detail page for the Substrate homelab. Renders one service's full doc; connect details, live-metrics
  * dashboard, server/client plugins, and the prose body (architecture, decisions). 404s on an unknown slug.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { ServicePlugin } from '~/types/services';
+import type { IUseJenscraftMetricsReturn } from '~/composables/use-jenscraft-metrics';
+import type { IServicePlugin } from '~/types/services';
 
+/**
+ * The current route; its slug param selects the service
+ * @internal
+ * @constant
+ */
 const route = useRoute();
+
+/**
+ * The service slug from the route params
+ * @internal
+ * @constant
+ */
 const slug = computed(() => String(route.params.slug ?? ''));
 
-/* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The raw service docs from the content collection
+ * @internal
+ * @constant
+ */
 const { data: services } = await useAsyncData('services-all', () => queryCollection('services').all());
 
-/** Raw queried doc (carries the markdown body) for ContentRenderer. */
-const rawDoc = computed(() => (services.value ?? []).find((s) => s.serviceId === slug.value) ?? null);
+/**
+ * Raw queried doc (carries the markdown body) for ContentRenderer
+ * @internal
+ * @constant
+ */
+const rawDoc = computed(() => (services.value ?? []).find((doc) => doc.serviceId === slug.value) ?? null);
 
 if (!rawDoc.value) {
-  throw createError({ statusCode: 404, statusMessage: `No service “${slug.value}” in Substrate`, fatal: true });
+  throw createError({
+    statusCode: 404,
+    statusMessage: `No service “${slug.value}” in Substrate`,
+    fatal: true,
+  });
 }
 
-const service = computed(() => normalizeServices(services.value ?? []).find((s) => s.serviceId === slug.value) ?? null);
+/**
+ * The normalized service for the current slug; null flips the template off (the guard above already 404ed)
+ * @internal
+ * @constant
+ */
+const service = computed(
+  () => normalizeServices(services.value ?? []).find((doc) => doc.serviceId === slug.value) ?? null,
+);
 
-/** Host device title, resolved from the substrate collection, so the host chip reads as a name not an id. */
+/**
+ * The substrate device docs; resolve the host device's display title for the "Runs on" chip
+ * @internal
+ * @constant
+ */
 const { data: devices } = await useAsyncData('services-host-devices', () => queryCollection('substrate').all());
+
+/**
+ * Host device title, resolved from the substrate collection, so the host chip reads as a name not an id
+ * @internal
+ * @constant
+ */
 const hostTitle = computed(() => {
   const id = service.value?.host;
-  if (!id) return null;
-  return (devices.value ?? []).find((d) => d.nodeId === id)?.title ?? id;
+  if (!id) {
+    return null;
+  }
+  return (devices.value ?? []).find((device) => device.nodeId === id)?.title ?? id;
 });
 
+/**
+ * Whether the service is still planned; switches links to inert pills and mutes the header icon tile
+ * @internal
+ * @constant
+ */
 const isPlanned = computed(() => service.value?.status === 'planned');
 
-/** Description split into plain + device-linked segments (e.g. `srv-01` → its node page), rendered monospace. */
+/**
+ * Description split into plain + device-linked segments (e.g. `srv-01` → its node page), rendered monospace
+ * @internal
+ * @constant
+ */
 const descriptionSegments = computed(() => splitDeviceMentions(service.value?.description ?? ''));
 
-/* ─── Live metrics ────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── LIVE METRICS ───────────────────────────────────────────────────────────────────────────────────────────────── */
 
-// Jenscraft is the only service wired to a live publisher feed today; other service pages stay inert (no fetch) and
-// fall back to the metrics widget's "awaiting feed" state.
-const { live: liveMetrics } = useJenscraftMetrics(slug.value === 'jenscraft');
+/**
+ * The live metrics feed. Jenscraft is the only service wired to a live publisher feed today; other service pages stay
+ * inert (no fetch) and fall back to the metrics widget's "awaiting feed" state
+ * @internal
+ * @constant
+ */
+const { live: liveMetrics }: IUseJenscraftMetricsReturn = useJenscraftMetrics(slug.value === 'jenscraft');
 
-/* ─── Links ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── LINKS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The display label and icon per known link key; unknown keys fall back to a generic link entry
+ * @internal
+ * @constant
+ */
 const LINK_META: Record<string, { label: string; icon: string }> = {
   live: { label: 'Website', icon: 'lucide:external-link' },
   map: { label: 'View Map', icon: 'lucide:map' },
@@ -66,39 +128,98 @@ const LINK_META: Record<string, { label: string; icon: string }> = {
   docs: { label: 'Docs', icon: 'lucide:book-open' },
 };
 
-/** The public web-map link is hoisted up beside the status indicator, so it's pulled out of the general link row. */
+/**
+ * The public web-map link is hoisted up beside the status indicator, so it's pulled out of the general link row
+ * @internal
+ * @constant
+ */
 const mapLink = computed(() => service.value?.links?.map ?? null);
 
+/**
+ * The general link-row items; every declared link except the hoisted map link, joined with its label/icon metadata
+ * @internal
+ * @constant
+ */
 const linkItems = computed(() =>
   Object.entries(service.value?.links ?? {})
-    .filter(([key, url]) => !!url && key !== 'map')
-    .map(([key, url]) => ({ key, url: url as string, ...(LINK_META[key] ?? { label: key, icon: 'lucide:link' }) })),
+    .filter(([key, url]: [string, string | undefined]): boolean => !!url && key !== 'map')
+    .map(([key, url]: [string, string | undefined]): { key: string; url: string; label: string; icon: string } => ({
+      key,
+      url: url as string,
+      ...(LINK_META[key] ?? { label: key, icon: 'lucide:link' }),
+    })),
 );
 
-/* ─── Plugins (split server / client) ─────────────────────────────────────────────────────────────────────────────── */
+/* ─── PLUGINS ────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Distinct plugin categories (for the filter bar), sorted, derived from whatever the service actually declares. */
-const pluginCategories = computed<string[]>(() => {
+/**
+ * Distinct plugin categories (for the filter bar), sorted, derived from whatever the service actually declares
+ * @internal
+ * @constant
+ */
+const pluginCategories: ComputedRef<string[]> = computed((): string[] => {
+  // Collect the distinct categories across the declared plugins, then sort them for a stable filter bar
   const set = new Set<string>();
-  for (const p of service.value?.plugins ?? []) set.add(p.category);
+  for (const plugin of service.value?.plugins ?? []) {
+    set.add(plugin.category);
+  }
   return Array.from(set).sort();
 });
 
-/** Active category filter; null = show all. Clicking a chip filters the list; clicking it again (or "All") resets. */
-const activeCategory = ref<string | null>(null);
-function toggleCategory(category: string) {
+/**
+ * Active category filter; null = show all. Clicking a chip filters the list; clicking it again (or "All") resets
+ * @internal
+ * @constant
+ */
+const activeCategory: Ref<string | null> = ref<string | null>(null);
+
+/**
+ * Toggles the active plugin-category filter; clicking the already-active chip clears the filter back to "all"
+ * @internal
+ * @function
+ * @param category - The category chip that was clicked
+ */
+function toggleCategory(category: string): void {
+  // Clicking the active chip clears the filter; any other chip becomes the new filter
   activeCategory.value = activeCategory.value === category ? null : category;
 }
 
-const visiblePlugins = computed<ServicePlugin[]>(() =>
-  (service.value?.plugins ?? []).filter((p) => !activeCategory.value || p.category === activeCategory.value),
+/**
+ * The plugins surfaced by the active category filter; every declared plugin when no filter is active
+ * @internal
+ * @constant
+ */
+const visiblePlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
+  (service.value?.plugins ?? []).filter(
+    (plugin: IServicePlugin): boolean => !activeCategory.value || plugin.category === activeCategory.value,
+  ),
 );
 
-const serverPlugins = computed<ServicePlugin[]>(() => visiblePlugins.value.filter((p) => p.side === 'server'));
-const clientPlugins = computed<ServicePlugin[]>(() => visiblePlugins.value.filter((p) => p.side === 'client'));
+/**
+ * The visible plugins that run server-side
+ * @internal
+ * @constant
+ */
+const serverPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
+  visiblePlugins.value.filter((plugin: IServicePlugin): boolean => plugin.side === 'server'),
+);
 
-/* ─── Body ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/**
+ * The visible plugins recommended client-side
+ * @internal
+ * @constant
+ */
+const clientPlugins: ComputedRef<IServicePlugin[]> = computed((): IServicePlugin[] =>
+  visiblePlugins.value.filter((plugin: IServicePlugin): boolean => plugin.side === 'client'),
+);
 
+/* ─── BODY ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the raw doc's minimark body has at least one content node; gates the write-up section
+ * @internal
+ * @constant
+ */
 const hasNotes = computed(() => {
   const value = (rawDoc.value?.body as unknown as { value?: unknown[] } | undefined)?.value;
   return Array.isArray(value) && value.length > 0;
@@ -111,14 +232,21 @@ useSeoMeta({
 </script>
 
 <template>
-  <div v-if="service" class="bg-bg min-h-screen">
+  <div
+    v-if="service"
+    class="bg-bg min-h-screen"
+  >
     <div class="mx-auto max-w-3xl px-6 pt-20 pb-24 md:pt-28">
       <!-- Back -->
       <NuxtLink
         to="/lab/substrate?view=services"
         class="text-caption text-ink-subtle hover:text-accent mb-7 inline-flex items-center gap-1.5 font-mono tracking-widest uppercase transition-colors"
       >
-        <Icon name="lucide:arrow-left" size="13" /> Services
+        <Icon
+          name="lucide:arrow-left"
+          size="13"
+        />
+        Services
       </NuxtLink>
 
       <!-- Header -->
@@ -127,17 +255,30 @@ useSeoMeta({
           class="flex size-14 shrink-0 items-center justify-center rounded-2xl"
           :class="isPlanned ? 'border-border text-ink-subtle border border-dashed' : 'bg-accent/10 text-accent'"
         >
-          <Icon :name="service.icon ?? serviceKindIcon(service.kind)" size="28" />
+          <Icon
+            :name="service.icon ?? serviceKindIcon(service.kind)"
+            size="28"
+          />
         </span>
 
         <div class="min-w-0 flex-1">
           <p class="text-accent mb-1 font-mono text-[11px] tracking-widest uppercase">
             {{ serviceKindLabel(service.kind) }}
           </p>
-          <h1 class="font-display text-ink font-bold tracking-tight" style="font-size: clamp(2rem, 5vw, 3rem)">
+
+          <h1
+            class="font-display text-ink font-bold tracking-tight"
+            style="font-size: clamp(2rem, 5vw, 3rem)"
+          >
             {{ service.title }}
           </h1>
-          <p v-if="service.address" class="text-body-sm text-ink-subtle mt-1 font-mono">{{ service.address }}</p>
+
+          <p
+            v-if="service.address"
+            class="text-body-sm text-ink-subtle mt-1 font-mono"
+          >
+            {{ service.address }}
+          </p>
         </div>
 
         <div class="flex shrink-0 flex-col items-end gap-2">
@@ -145,7 +286,11 @@ useSeoMeta({
             class="text-caption inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono font-medium"
             :class="serviceStatusOf(service.status).tint"
           >
-            <span class="size-2 rounded-full" :class="serviceStatusOf(service.status).dot" />
+            <span
+              class="size-2 rounded-full"
+              :class="serviceStatusOf(service.status).dot"
+            />
+
             <span :class="serviceStatusOf(service.status).text">{{ serviceStatusOf(service.status).label }}</span>
           </span>
 
@@ -157,29 +302,52 @@ useSeoMeta({
             rel="noopener noreferrer"
             class="text-caption text-ink-muted hover:text-accent inline-flex items-center gap-1 font-mono transition-colors"
           >
-            <Icon name="lucide:map" size="13" /> View Map
+            <Icon
+              name="lucide:map"
+              size="13"
+            />
+            View Map
           </a>
         </div>
       </header>
 
-      <p v-if="service.description" class="font-body text-body-lg text-ink-muted mt-6 leading-relaxed">
-        <template v-for="(seg, i) in descriptionSegments" :key="i"
-          ><NuxtLink v-if="seg.href" :to="seg.href" class="text-accent font-mono hover:underline">{{
-            seg.text
-          }}</NuxtLink
-          ><template v-else>{{ seg.text }}</template></template
+      <p
+        v-if="service.description"
+        class="font-body text-body-lg text-ink-muted mt-6 leading-relaxed"
+      >
+        <template
+          v-for="(seg, i) in descriptionSegments"
+          :key="i"
+          ><NuxtLink
+            v-if="seg.href"
+            :to="seg.href"
+            class="text-accent font-mono hover:underline"
+            >{{ seg.text }}</NuxtLink
+          >
+
+          <template v-else>{{ seg.text }}</template></template
         >
       </p>
 
       <!-- Links -->
-      <div v-if="linkItems.length" class="mt-6 flex flex-wrap gap-2">
-        <template v-for="link in linkItems" :key="link.key">
+      <div
+        v-if="linkItems.length"
+        class="mt-6 flex flex-wrap gap-2"
+      >
+        <template
+          v-for="link in linkItems"
+          :key="link.key"
+        >
           <!-- Planned: non-clickable pill (the destination isn't live yet). -->
           <span
             v-if="isPlanned"
             class="border-border text-caption text-ink-subtle inline-flex items-center gap-1.5 rounded-full border border-dashed px-3 py-1.5 font-mono"
           >
-            <Icon :name="link.icon" size="13" /> {{ link.label }}
+            <Icon
+              :name="link.icon"
+              size="13"
+            />
+            {{ link.label }}
             <span class="text-ink-subtle/60">· planned</span>
           </span>
           <!-- Live: real anchor. -->
@@ -190,17 +358,31 @@ useSeoMeta({
             rel="noopener noreferrer"
             class="border-border bg-surface text-body-sm text-ink hover:border-accent/60 hover:text-accent inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-medium transition-colors"
           >
-            <Icon :name="link.icon" size="14" /> {{ link.label }}
+            <Icon
+              :name="link.icon"
+              size="14"
+            />
+            {{ link.label }}
           </a>
         </template>
       </div>
 
       <!-- Summary: stack + host -->
       <div class="mt-8 grid gap-4 sm:grid-cols-2">
-        <div v-if="service.stack?.length" class="border-border bg-surface rounded-2xl border p-5">
+        <div
+          v-if="service.stack?.length"
+          class="border-border bg-surface rounded-2xl border p-5"
+        >
           <p class="text-ink-subtle mb-3 font-mono text-[10px] tracking-widest uppercase">Stack</p>
-          <ul class="flex flex-wrap gap-1.5" role="list">
-            <li v-for="tech in service.stack" :key="tech">
+
+          <ul
+            class="flex flex-wrap gap-1.5"
+            role="list"
+          >
+            <li
+              v-for="tech in service.stack"
+              :key="tech"
+            >
               <component
                 :is="techDocHref(tech) ? 'a' : 'span'"
                 v-bind="
@@ -210,23 +392,42 @@ useSeoMeta({
                 :class="techDocHref(tech) ? 'hover:border-accent/60 hover:text-accent transition-colors' : ''"
               >
                 {{ tech }}
-                <Icon v-if="techDocHref(tech)" name="lucide:external-link" size="10" class="opacity-60" />
+                <Icon
+                  v-if="techDocHref(tech)"
+                  name="lucide:external-link"
+                  size="10"
+                  class="opacity-60"
+                />
               </component>
             </li>
           </ul>
         </div>
 
-        <div v-if="service.host" class="border-border bg-surface rounded-2xl border p-5">
+        <div
+          v-if="service.host"
+          class="border-border bg-surface rounded-2xl border p-5"
+        >
           <p class="text-ink-subtle mb-3 font-mono text-[10px] tracking-widest uppercase">Runs on</p>
+
           <NuxtLink
             :to="`/lab/substrate/${service.host}`"
             class="group border-border bg-bg/40 hover:border-accent/60 flex items-center gap-2.5 rounded-lg border px-3 py-2 transition-colors"
           >
-            <Icon name="lucide:cpu" size="14" class="text-ink-subtle shrink-0" />
+            <Icon
+              name="lucide:cpu"
+              size="14"
+              class="text-ink-subtle shrink-0"
+            />
+
             <span class="text-body-sm text-ink group-hover:text-accent flex-1 truncate font-medium transition-colors">
               {{ hostTitle }}
             </span>
-            <Icon name="lucide:arrow-up-right" size="14" class="text-ink-subtle shrink-0" />
+
+            <Icon
+              name="lucide:arrow-up-right"
+              size="14"
+              class="text-ink-subtle shrink-0"
+            />
           </NuxtLink>
         </div>
       </div>
@@ -241,11 +442,17 @@ useSeoMeta({
       />
 
       <!-- Plugins -->
-      <section v-if="service.plugins?.length" class="mt-8">
+      <section
+        v-if="service.plugins?.length"
+        class="mt-8"
+      >
         <h2 class="font-display text-h5 text-ink mb-4 font-bold tracking-tight">Plugins &amp; add-ons</h2>
 
         <!-- Category filter: click a tag to show only that category; "All" (or the active tag again) resets. -->
-        <div v-if="pluginCategories.length > 1" class="mb-5 flex flex-wrap items-center gap-1.5">
+        <div
+          v-if="pluginCategories.length > 1"
+          class="mb-5 flex flex-wrap items-center gap-1.5"
+        >
           <button
             type="button"
             class="text-caption rounded-full border px-2.5 py-0.5 font-mono transition-colors"
@@ -258,6 +465,7 @@ useSeoMeta({
           >
             All
           </button>
+
           <button
             v-for="cat in pluginCategories"
             :key="cat"
@@ -276,8 +484,16 @@ useSeoMeta({
 
         <div v-if="serverPlugins.length">
           <p class="text-ink-subtle mb-2 font-mono text-[10px] tracking-widest uppercase">Server-side</p>
-          <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2" role="list">
-            <li v-for="p in serverPlugins" :key="p.name" class="border-border bg-surface rounded-xl border p-4">
+
+          <ul
+            class="grid grid-cols-1 gap-2 sm:grid-cols-2"
+            role="list"
+          >
+            <li
+              v-for="p in serverPlugins"
+              :key="p.name"
+              class="border-border bg-surface rounded-xl border p-4"
+            >
               <div class="flex items-center justify-between gap-2">
                 <component
                   :is="p.url ? 'a' : 'span'"
@@ -287,10 +503,12 @@ useSeoMeta({
                 >
                   {{ p.name }}
                 </component>
+
                 <span class="flex shrink-0 items-center gap-1.5">
                   <span class="border-border text-caption text-ink-subtle rounded-full border px-2 py-0.5 font-mono">
                     {{ p.category }}
                   </span>
+
                   <a
                     v-if="p.url"
                     :href="p.url"
@@ -299,19 +517,34 @@ useSeoMeta({
                     class="text-ink-subtle hover:text-accent transition-colors"
                     :aria-label="`${p.name} documentation`"
                   >
-                    <Icon name="lucide:external-link" size="14" />
+                    <Icon
+                      name="lucide:external-link"
+                      size="14"
+                    />
                   </a>
                 </span>
               </div>
+
               <p class="text-caption text-ink-muted mt-1.5 leading-relaxed">{{ p.purpose }}</p>
             </li>
           </ul>
         </div>
 
-        <div v-if="clientPlugins.length" class="mt-5">
+        <div
+          v-if="clientPlugins.length"
+          class="mt-5"
+        >
           <p class="text-ink-subtle mb-2 font-mono text-[10px] tracking-widest uppercase">Client-side (recommended)</p>
-          <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2" role="list">
-            <li v-for="p in clientPlugins" :key="p.name" class="border-border bg-surface rounded-xl border p-4">
+
+          <ul
+            class="grid grid-cols-1 gap-2 sm:grid-cols-2"
+            role="list"
+          >
+            <li
+              v-for="p in clientPlugins"
+              :key="p.name"
+              class="border-border bg-surface rounded-xl border p-4"
+            >
               <div class="flex items-center justify-between gap-2">
                 <component
                   :is="p.url ? 'a' : 'span'"
@@ -321,10 +554,12 @@ useSeoMeta({
                 >
                   {{ p.name }}
                 </component>
+
                 <span class="flex shrink-0 items-center gap-1.5">
                   <span class="border-border text-caption text-ink-subtle rounded-full border px-2 py-0.5 font-mono">
                     {{ p.category }}
                   </span>
+
                   <a
                     v-if="p.url"
                     :href="p.url"
@@ -333,10 +568,14 @@ useSeoMeta({
                     class="text-ink-subtle hover:text-accent transition-colors"
                     :aria-label="`${p.name} documentation`"
                   >
-                    <Icon name="lucide:external-link" size="14" />
+                    <Icon
+                      name="lucide:external-link"
+                      size="14"
+                    />
                   </a>
                 </span>
               </div>
+
               <p class="text-caption text-ink-muted mt-1.5 leading-relaxed">{{ p.purpose }}</p>
             </li>
           </ul>
@@ -344,15 +583,21 @@ useSeoMeta({
       </section>
 
       <!-- Body / write-up -->
-      <article v-if="hasNotes" class="service-doc border-border mt-10 border-t pt-8">
-        <ContentRenderer v-if="rawDoc" :value="rawDoc" />
+      <article
+        v-if="hasNotes"
+        class="service-doc border-border mt-10 border-t pt-8"
+      >
+        <ContentRenderer
+          v-if="rawDoc"
+          :value="rawDoc"
+        />
       </article>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Prose treatment for the service's rendered markdown body — mirrors the device-doc styling. */
+/* Prose treatment for the service's rendered markdown body; mirrors the device-doc styling. */
 .service-doc :deep(h2) {
   font-family: var(--font-display);
   font-size: var(--text-h5);

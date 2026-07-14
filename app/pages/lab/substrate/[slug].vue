@@ -14,46 +14,143 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ███████████████████████████████████████████ #pages/lab/substrate/[slug].vue ██████████████████████████████████████████
  *
- * Per-device detail page for the Substrate homelab. Renders one device's full markdown doc as a documented runbook —
+ * Per-device detail page for the Substrate homelab. Renders one device's full markdown doc as a documented runbook;
  * specs, wiring (linked to neighbours), and the prose body (config, decisions, learnings). 404s on an unknown slug.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import type { SubstrateCollectionItem } from '@nuxt/content';
+
+import type { IUseSubstrateMetricsReturn } from '~/composables/use-substrate-metrics';
+import type { ISubstrateDevice } from '~/types/substrate';
+import type { ISubstrateInternet } from '~/types/substrate-metrics';
+
+/**
+ * The current route; its slug param selects the device
+ * @internal
+ * @constant
+ */
 const route = useRoute();
-const slug = computed(() => String(route.params.slug ?? ''));
 
-/* ─── Data ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/**
+ * The device slug from the route params
+ * @internal
+ * @constant
+ */
+const slug: ComputedRef<string> = computed((): string => String(route.params.slug ?? ''));
 
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The raw substrate device docs from the content collection
+ * @internal
+ * @constant
+ */
 const { data: devices } = await useAsyncData('substrate-devices-all', () => queryCollection('substrate').all());
 
-/** Raw queried doc (carries the markdown body) for ContentRenderer. */
-const rawDoc = computed(() => (devices.value ?? []).find((d) => d.nodeId === slug.value) ?? null);
+/**
+ * Raw queried doc (carries the markdown body) for ContentRenderer
+ * @internal
+ * @constant
+ */
+const rawDoc: ComputedRef<SubstrateCollectionItem | null> = computed(
+  (): SubstrateCollectionItem | null => (devices.value ?? []).find((doc) => doc.nodeId === slug.value) ?? null,
+);
 
 if (!rawDoc.value) {
-  throw createError({ statusCode: 404, statusMessage: `No device “${slug.value}” in Substrate`, fatal: true });
+  throw createError({
+    statusCode: 404,
+    statusMessage: `No device “${slug.value}” in Substrate`,
+    fatal: true,
+  });
 }
 
-const list = computed(() => normalizeDevices(devices.value ?? []));
-const device = computed(() => list.value.find((d) => d.nodeId === slug.value) ?? null);
+/**
+ * Clean, fully-populated devices; resolves this device and its connection neighbours' titles
+ * @internal
+ * @constant
+ */
+const list: ComputedRef<ISubstrateDevice[]> = computed((): ISubstrateDevice[] => normalizeDevices(devices.value ?? []));
 
-const vendorModel = computed(() =>
+/**
+ * The normalized device for the current slug; null flips the template off (the guard above already 404ed)
+ * @internal
+ * @constant
+ */
+const device: ComputedRef<ISubstrateDevice | null> = computed(
+  (): ISubstrateDevice | null => list.value.find((deviceEntry) => deviceEntry.nodeId === slug.value) ?? null,
+);
+
+/**
+ * The vendor and model joined for the header subtitle; empty when the device declares neither
+ * @internal
+ * @constant
+ */
+const vendorModel: ComputedRef<string> = computed((): string =>
   device.value ? [device.value.vendor, device.value.model].filter(Boolean).join(' · ') : '',
 );
-const titleOf = (id: string) => list.value.find((d) => d.nodeId === id)?.title ?? id;
 
-const hasNotes = computed(() => {
-  const value = (rawDoc.value?.body as unknown as { value?: unknown[] } | undefined)?.value;
+/**
+ * Resolves a device id to its display title, falling back to the id for unknown neighbours
+ * @internal
+ * @function
+ * @param id - The device node id to resolve
+ * @returns The device title, or the id itself when unknown
+ */
+const titleOf = (id: string): string => list.value.find((deviceEntry) => deviceEntry.nodeId === id)?.title ?? id;
+
+/**
+ * Whether the raw doc's minimark body has at least one content node; gates the runbook section
+ * @internal
+ * @constant
+ */
+const hasNotes: ComputedRef<boolean> = computed((): boolean => {
+  // Reach into the raw minimark body and require at least one content node
+  const value: unknown[] | undefined = (rawDoc.value?.body as unknown as { value?: unknown[] } | undefined)?.value;
   return Array.isArray(value) && value.length > 0;
 });
 
-const CONN_LABEL: Record<string, string> = { uplink: 'Uplink', network: 'Network', data: 'Data', power: 'Power' };
-const connLabel = (kind?: string) => CONN_LABEL[kind ?? 'network'] ?? 'Link';
+/**
+ * The display label per connection kind, for the connection pills
+ * @internal
+ * @constant
+ */
+const CONN_LABEL: Record<string, string> = {
+  uplink: 'Uplink',
+  network: 'Network',
+  data: 'Data',
+  power: 'Power',
+};
 
-/* ─── Live internet (WAN node only) ───────────────────────────────────────────────────────────────────────────────── */
+/**
+ * Resolves a connection kind to its display label, defaulting unknown kinds to a generic link
+ * @internal
+ * @function
+ * @param kind - The connection kind declared on the edge, if any
+ * @returns The display label for the connection pill
+ */
+const connLabel = (kind?: string): string => CONN_LABEL[kind ?? 'network'] ?? 'Link';
 
-const { data: liveData, state: liveState, updatedLabel: liveUpdated } = useSubstrateMetrics();
-const liveInternet = computed(() =>
+/* ─── LIVE INTERNET ──────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The live substrate metrics feed; the data payload, the feed state, and a friendly updated label
+ * @internal
+ * @constant
+ */
+const {
+  data: liveData,
+  state: liveState,
+  updatedLabel: liveUpdated,
+}: IUseSubstrateMetricsReturn = useSubstrateMetrics();
+
+/**
+ * The live internet-edge metrics; populated only for the WAN node while the feed is online, null otherwise
+ * @internal
+ * @constant
+ */
+const liveInternet: ComputedRef<ISubstrateInternet | null> = computed((): ISubstrateInternet | null =>
   device.value?.kind === 'internet' && liveState.value !== 'offline' ? (liveData.value?.internet ?? null) : null,
 );
 
@@ -64,14 +161,21 @@ useSeoMeta({
 </script>
 
 <template>
-  <div v-if="device" class="bg-bg min-h-screen">
+  <div
+    v-if="device"
+    class="bg-bg min-h-screen"
+  >
     <div class="mx-auto max-w-3xl px-6 pt-20 pb-24 md:pt-28">
       <!-- Back -->
       <NuxtLink
         to="/lab/substrate"
         class="text-caption text-ink-subtle hover:text-accent mb-7 inline-flex items-center gap-1.5 font-mono tracking-widest uppercase transition-colors"
       >
-        <Icon name="lucide:arrow-left" size="13" /> Substrate
+        <Icon
+          name="lucide:arrow-left"
+          size="13"
+        />
+        Substrate
       </NuxtLink>
 
       <!-- Header -->
@@ -84,56 +188,101 @@ useSeoMeta({
               : 'bg-accent/10 text-accent'
           "
         >
-          <Icon :name="kindIcon(device.kind)" size="28" />
+          <Icon
+            :name="kindIcon(device.kind)"
+            size="28"
+          />
         </span>
 
         <div class="min-w-0 flex-1">
           <p class="text-accent mb-1 font-mono text-[11px] tracking-widest uppercase">{{ kindLabel(device.kind) }}</p>
-          <h1 class="font-display text-ink font-bold tracking-tight" style="font-size: clamp(2rem, 5vw, 3rem)">
+
+          <h1
+            class="font-display text-ink font-bold tracking-tight"
+            style="font-size: clamp(2rem, 5vw, 3rem)"
+          >
             {{ device.title }}
           </h1>
-          <p v-if="vendorModel" class="text-body-sm text-ink-subtle mt-1 font-mono">{{ vendorModel }}</p>
+
+          <p
+            v-if="vendorModel"
+            class="text-body-sm text-ink-subtle mt-1 font-mono"
+          >
+            {{ vendorModel }}
+          </p>
         </div>
 
         <span
           class="text-caption inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 font-mono font-medium"
           :class="statusOf(device.status).tint"
         >
-          <span class="size-2 rounded-full" :class="statusOf(device.status).dot" />
+          <span
+            class="size-2 rounded-full"
+            :class="statusOf(device.status).dot"
+          />
+
           <span :class="statusOf(device.status).text">{{ statusOf(device.status).label }}</span>
         </span>
       </header>
 
-      <p v-if="device.description" class="font-body text-body-lg text-ink-muted mt-6 leading-relaxed">
+      <p
+        v-if="device.description"
+        class="font-body text-body-lg text-ink-muted mt-6 leading-relaxed"
+      >
         {{ device.description }}
       </p>
 
       <!-- Summary: specs + connections -->
       <div class="mt-8 grid gap-4 sm:grid-cols-2">
-        <div v-if="device.specs?.length" class="border-border bg-surface rounded-2xl border p-5">
+        <div
+          v-if="device.specs?.length"
+          class="border-border bg-surface rounded-2xl border p-5"
+        >
           <p class="text-ink-subtle mb-3 font-mono text-[10px] tracking-widest uppercase">Specs</p>
+
           <dl class="flex flex-col gap-2">
-            <div v-for="s in device.specs" :key="s.label" class="flex items-baseline justify-between gap-4">
+            <div
+              v-for="s in device.specs"
+              :key="s.label"
+              class="flex items-baseline justify-between gap-4"
+            >
               <dt class="text-caption text-ink-subtle shrink-0 font-mono uppercase">{{ s.label }}</dt>
+
               <dd class="text-body-sm text-ink text-right font-medium">{{ s.value }}</dd>
             </div>
           </dl>
         </div>
 
-        <div v-if="device.connections?.length" class="border-border bg-surface rounded-2xl border p-5">
+        <div
+          v-if="device.connections?.length"
+          class="border-border bg-surface rounded-2xl border p-5"
+        >
           <p class="text-ink-subtle mb-3 font-mono text-[10px] tracking-widest uppercase">Connections</p>
-          <ul class="flex flex-col gap-1.5" role="list">
-            <li v-for="c in device.connections" :key="`${c.to}-${c.kind}`">
+
+          <ul
+            class="flex flex-col gap-1.5"
+            role="list"
+          >
+            <li
+              v-for="c in device.connections"
+              :key="`${c.to}-${c.kind}`"
+            >
               <NuxtLink
                 :to="`/lab/substrate/${c.to}`"
                 class="group border-border bg-bg/40 hover:border-accent/60 flex items-center gap-2.5 rounded-lg border px-3 py-2 transition-colors"
               >
-                <Icon name="lucide:arrow-up-right" size="14" class="text-ink-subtle shrink-0" />
+                <Icon
+                  name="lucide:arrow-up-right"
+                  size="14"
+                  class="text-ink-subtle shrink-0"
+                />
+
                 <span
                   class="text-body-sm text-ink group-hover:text-accent flex-1 truncate font-medium transition-colors"
                 >
                   {{ titleOf(c.to) }}
                 </span>
+
                 <span class="text-caption text-ink-subtle bg-surface rounded-full px-2 py-0.5 font-mono">
                   {{ c.label ?? connLabel(c.kind) }}
                 </span>
@@ -144,28 +293,43 @@ useSeoMeta({
       </div>
 
       <!-- Live metrics (host only) -->
-      <WidgetsLabSubstrateLiveCard v-if="device.kind === 'hypervisor'" class="mt-8" />
+      <WidgetsLabSubstrateLiveCard
+        v-if="device.kind === 'hypervisor'"
+        class="mt-8"
+      />
 
       <!-- Live internet (WAN only) -->
-      <div v-if="liveInternet" class="border-border bg-surface mt-8 rounded-2xl border p-5">
+      <div
+        v-if="liveInternet"
+        class="border-border bg-surface mt-8 rounded-2xl border p-5"
+      >
         <div class="mb-3 flex items-center justify-between gap-3">
           <span class="inline-flex items-center gap-2">
             <span class="relative flex size-2">
               <span
                 class="bg-accent-secondary absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:hidden"
               />
+
               <span class="bg-accent-secondary relative inline-flex size-2 rounded-full" />
             </span>
+
             <span class="text-caption text-accent-secondary font-mono tracking-widest uppercase">Live</span>
+
             <span class="text-caption text-ink-subtle font-mono">internet edge</span>
           </span>
-          <span v-if="liveUpdated" class="text-caption text-ink-subtle shrink-0 font-mono">
+
+          <span
+            v-if="liveUpdated"
+            class="text-caption text-ink-subtle shrink-0 font-mono"
+          >
             updated {{ liveUpdated }}
           </span>
         </div>
+
         <dl class="grid grid-cols-2 gap-3">
           <div class="border-border bg-bg/40 rounded-xl border px-3 py-2.5">
             <dt class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Reachable</dt>
+
             <dd
               class="font-display text-h5 mt-0.5 leading-none font-bold"
               :class="liveInternet.reachable ? 'text-accent-secondary' : 'text-terra-600'"
@@ -173,18 +337,35 @@ useSeoMeta({
               {{ liveInternet.reachable ? 'Yes' : 'No' }}
             </dd>
           </div>
-          <div v-if="liveInternet.latencyMs !== undefined" class="border-border bg-bg/40 rounded-xl border px-3 py-2.5">
+
+          <div
+            v-if="liveInternet.latencyMs !== undefined"
+            class="border-border bg-bg/40 rounded-xl border px-3 py-2.5"
+          >
             <dt class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Ping</dt>
+
             <dd class="font-display text-h5 text-ink mt-0.5 leading-none font-bold">{{ liveInternet.latencyMs }} ms</dd>
           </div>
         </dl>
       </div>
 
       <!-- Body / runbook -->
-      <article v-if="hasNotes" class="substrate-doc border-border mt-10 border-t pt-8">
-        <ContentRenderer v-if="rawDoc" :value="rawDoc" />
+      <article
+        v-if="hasNotes"
+        class="substrate-doc border-border mt-10 border-t pt-8"
+      >
+        <ContentRenderer
+          v-if="rawDoc"
+          :value="rawDoc"
+        />
       </article>
-      <p v-else class="text-body-sm text-ink-subtle mt-10 font-mono italic">No notes documented yet.</p>
+
+      <p
+        v-else
+        class="text-body-sm text-ink-subtle mt-10 font-mono italic"
+      >
+        No notes documented yet.
+      </p>
     </div>
   </div>
 </template>

@@ -27,63 +27,136 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-const PANELS = 4;
-const PANEL_NAMES = ['About', 'Projects', 'Writing', 'Connect'];
+import { useEventListener, useRafFn } from '@vueuse/core';
+import type { CSSProperties } from 'vue';
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+import { PANEL_NAMES, PANELS } from './constants';
+
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The latest published blog posts rendered as bento cards on the Writing panel
+ * @internal
+ * @constant
+ */
 const { data: posts } = await useAsyncData('journey-posts', () =>
   queryCollection('blog').where('draft', '=', false).order('publishedAt', 'DESC').limit(4).all(),
 );
 
-// ── Scroll tracking ───────────────────────────────────────────────────────────
-const outerRef = ref<HTMLElement | null>(null);
-const rawProgress = ref(0);
-const lerpProgress = ref(0);
-let raf: number;
+/* ─── SCROLL TRACKING ────────────────────────────────────────────────────────────────────────────────────────────── */
 
-function lerp(a: number, b: number, t: number) {
+/**
+ * The template ref for the tall outer wrapper whose scroll-through drives the horizontal sweep
+ * @internal
+ * @constant
+ */
+const outerRef = ref<HTMLElement | null>(null);
+
+/**
+ * The raw 0..1 progress through the wrapper's scrollable range, updated on every scroll event
+ * @internal
+ * @constant
+ */
+const rawProgress: Ref<number> = ref(0);
+
+/**
+ * The eased 0..1 progress lerped toward rawProgress each frame; drives the track translation
+ * @internal
+ * @constant
+ */
+const lerpProgress: Ref<number> = ref(0);
+
+/**
+ * A utility method to linearly interpolate between two values
+ * @internal
+ * @function
+ * @param a - The current value
+ * @param b - The target value
+ * @param t - The interpolation factor in the 0..1 range; lower values move more slowly toward the target
+ * @returns The value moved from a toward b by factor t
+ */
+function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
-function onScroll() {
-  if (!outerRef.value || !import.meta.client) return;
-  const rect = outerRef.value.getBoundingClientRect();
-  const scrollable = rect.height - window.innerHeight;
+/**
+ * A utility method to handle window scroll events; converts how far the outer wrapper has scrolled past the top of
+ * the viewport into a clamped 0..1 raw progress value
+ * @internal
+ * @function
+ */
+function onScroll(): void {
+  if (!outerRef.value || !import.meta.client) {
+    return;
+  }
+  // Convert how far the wrapper has scrolled past the viewport top into clamped 0..1 progress
+  const rect: DOMRect = outerRef.value.getBoundingClientRect();
+  const scrollable: number = rect.height - window.innerHeight;
   rawProgress.value = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
 }
 
-function tick() {
+/**
+ * The per-frame animation loop; eases the lerped progress toward the raw scroll progress. Driven by useRafFn, which
+ * schedules and cancels it with the component lifecycle
+ * @internal
+ * @function
+ */
+function tick(): void {
+  // Ease the lerped progress toward the raw scroll progress
   lerpProgress.value = lerp(lerpProgress.value, rawProgress.value, 0.09);
-  raf = requestAnimationFrame(tick);
 }
 
-onMounted(() => {
-  window.addEventListener('scroll', onScroll, {
-    passive: true,
-  });
-  raf = requestAnimationFrame(tick);
-  onScroll();
+/* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+// Track scroll and run the easing loop; both auto-start client-side and tear down on unmount (useEventListener and
+// useRafFn manage the listener and the raf handle, so no manual cleanup is needed). Sample the initial position on
+// mount, once the outer wrapper is in the DOM
+useEventListener(window, 'scroll', onScroll, {
+  passive: true,
 });
-onUnmounted(() => {
-  window.removeEventListener('scroll', onScroll);
-  cancelAnimationFrame(raf);
-});
+useRafFn(tick);
+onMounted(onScroll);
 
-// ── Derived ───────────────────────────────────────────────────────────────────
-/** Translate the track left by (progress × panels-1 × 100vw). */
-const trackStyle = computed(() => ({
-  transform: `translateX(${-lerpProgress.value * (PANELS - 1) * 100}vw)`,
-}));
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Snap-nearest panel index (for indicators). */
-const activePanel = computed(() => Math.min(PANELS - 1, Math.round(rawProgress.value * (PANELS - 1))));
+/**
+ * The horizontal track style; translates the track left by (progress × panels-1 × 100vw)
+ * @internal
+ * @constant
+ */
+const trackStyle: ComputedRef<CSSProperties> = computed(
+  (): CSSProperties => ({
+    transform: `translateX(${-lerpProgress.value * (PANELS - 1) * 100}vw)`,
+  }),
+);
 
-// ── Navigation click (indicator dots) ────────────────────────────────────────
-function scrollToPanel(i: number) {
-  if (!import.meta.client || !outerRef.value) return;
-  const rect = outerRef.value.getBoundingClientRect();
-  const scrollable = outerRef.value.offsetHeight - window.innerHeight;
-  const target = window.scrollY + rect.top + (i / (PANELS - 1)) * scrollable;
+/**
+ * The snap-nearest panel index for the indicator dots and per-panel entrance transitions
+ * @internal
+ * @constant
+ */
+const activePanel: ComputedRef<number> = computed((): number =>
+  Math.min(PANELS - 1, Math.round(rawProgress.value * (PANELS - 1))),
+);
+
+/* ─── NAVIGATION ─────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * A utility method to smooth-scroll the window to the vertical position mapping to the given panel; used by the
+ * indicator dot buttons for direct navigation
+ * @internal
+ * @function
+ * @param panelIndex - The zero-based index of the panel to scroll to
+ */
+function scrollToPanel(panelIndex: number): void {
+  if (!import.meta.client || !outerRef.value) {
+    return;
+  }
+  // Map the panel index onto the wrapper's scrollable range in document coordinates
+  const rect: DOMRect = outerRef.value.getBoundingClientRect();
+  const scrollable: number = outerRef.value.offsetHeight - window.innerHeight;
+  const target: number = window.scrollY + rect.top + (panelIndex / (PANELS - 1)) * scrollable;
+  // Smooth-scroll the window to the computed position
   window.scrollTo({
     top: target,
     behavior: 'smooth',
@@ -93,7 +166,11 @@ function scrollToPanel(i: number) {
 
 <template>
   <!-- Outer: tall enough for PANELS scroll lengths -->
-  <div ref="outerRef" class="relative" :style="{ height: `${PANELS * 100}vh` }">
+  <div
+    ref="outerRef"
+    class="relative"
+    :style="{ height: `${PANELS * 100}vh` }"
+  >
     <!-- Sticky viewport-height container -->
     <div class="sticky top-0 h-screen overflow-hidden">
       <!-- ── Panel indicator ──────────────────────────────────────────────── -->
@@ -113,6 +190,7 @@ function scrollToPanel(i: number) {
             :class="i === activePanel ? 'text-accent' : 'text-ink-subtle opacity-0 group-hover:opacity-100'"
             >{{ name }}</span
           >
+
           <span
             class="block rounded-full transition-all duration-300"
             :class="i === activePanel ? 'bg-accent h-5 w-1.5' : 'bg-border hover:bg-ink-subtle h-1.5 w-1.5'"
@@ -121,14 +199,23 @@ function scrollToPanel(i: number) {
       </div>
 
       <!-- ── Bottom progress bar ──────────────────────────────────────────── -->
-      <div class="bg-border pointer-events-none absolute right-0 bottom-0 left-0 z-20 h-px" aria-hidden="true">
-        <div class="bg-accent h-full origin-left" :style="{ transform: `scaleX(${rawProgress})` }" />
+      <div
+        class="bg-border pointer-events-none absolute right-0 bottom-0 left-0 z-20 h-px"
+        aria-hidden="true"
+      >
+        <div
+          class="bg-accent h-full origin-left"
+          :style="{ transform: `scaleX(${rawProgress})` }"
+        />
       </div>
 
       <!-- ── Horizontal track ─────────────────────────────────────────────── -->
-      <div class="flex h-full will-change-transform" :style="trackStyle">
+      <div
+        class="flex h-full will-change-transform"
+        :style="trackStyle"
+      >
         <!-- ══════════════════════════════════════════════════════════════════
-             PANEL 01 — ABOUT
+             PANEL 01; ABOUT
         ═══════════════════════════════════════════════════════════════════ -->
         <section class="border-border relative flex h-full w-screen flex-shrink-0 overflow-hidden border-r">
           <!-- Decorative number -->
@@ -141,25 +228,32 @@ function scrollToPanel(i: number) {
 
           <!-- Two-column layout: bio left, animation right -->
           <div class="grid h-full w-full grid-cols-1 lg:grid-cols-2">
-            <!-- Left: bio — always visible (first panel) -->
+            <!-- Left: bio; always visible (first panel) -->
             <div class="z-10 flex flex-col justify-center px-8 lg:px-16">
               <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">01 · About</p>
+
               <h2
                 class="font-display text-ink mb-6 leading-[1.05] font-bold tracking-tight"
                 style="font-size: clamp(2.5rem, 5vw, 4rem)"
               >
                 Engineer by trade.<br />Designer by Obsession.
               </h2>
+
               <p class="font-body text-body text-ink-muted mb-10 max-w-md leading-relaxed">
                 Software engineer based in San Diego. I'm interested in creating products and technology that are rooted
                 in human-centered design, supported by thoughtful systems, and presented through seamless, intuitive
                 experiences.
               </p>
+
               <NuxtLink
                 to="/about"
                 class="font-body text-body-sm text-ink hover:text-accent inline-flex w-fit items-center gap-2 font-semibold transition-colors"
               >
-                Full story <Icon name="lucide:arrow-right" size="14" />
+                Full story
+                <Icon
+                  name="lucide:arrow-right"
+                  size="14"
+                />
               </NuxtLink>
             </div>
 
@@ -171,7 +265,7 @@ function scrollToPanel(i: number) {
         </section>
 
         <!-- ══════════════════════════════════════════════════════════════════
-             PANEL 02 — PROJECTS
+             PANEL 02; PROJECTS
         ═══════════════════════════════════════════════════════════════════ -->
         <section
           class="border-border relative flex h-full w-screen flex-shrink-0 items-center overflow-hidden border-r"
@@ -195,15 +289,24 @@ function scrollToPanel(i: number) {
             >
               <div>
                 <p class="text-caption text-accent mb-2 font-mono tracking-widest uppercase">02 · Projects</p>
-                <h2 class="font-display text-ink leading-tight font-bold" style="font-size: clamp(2rem, 4vw, 3rem)">
+
+                <h2
+                  class="font-display text-ink leading-tight font-bold"
+                  style="font-size: clamp(2rem, 4vw, 3rem)"
+                >
                   Things I've built.
                 </h2>
               </div>
+
               <NuxtLink
                 to="/projects"
                 class="font-body text-body-sm text-ink-muted hover:text-ink hidden items-center gap-1.5 font-medium transition-colors sm:flex"
               >
-                All projects <Icon name="lucide:arrow-right" size="13" />
+                All projects
+                <Icon
+                  name="lucide:arrow-right"
+                  size="13"
+                />
               </NuxtLink>
             </div>
 
@@ -218,8 +321,10 @@ function scrollToPanel(i: number) {
             >
               <div class="border-border bg-surface flex items-center gap-3 rounded-full border px-4 py-2">
                 <span class="bg-accent h-1.5 w-1.5 rounded-full" />
+
                 <span class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Coming soon</span>
               </div>
+
               <p class="font-body text-body text-ink-muted max-w-sm leading-relaxed">
                 Projects are on their way. Check back soon.
               </p>
@@ -228,7 +333,7 @@ function scrollToPanel(i: number) {
         </section>
 
         <!-- ══════════════════════════════════════════════════════════════════
-             PANEL 03 — WRITING
+             PANEL 03; WRITING
         ═══════════════════════════════════════════════════════════════════ -->
         <section
           class="border-border relative flex h-full w-screen flex-shrink-0 items-center overflow-hidden border-r"
@@ -251,17 +356,27 @@ function scrollToPanel(i: number) {
               }"
             >
               <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">03 · Writing</p>
-              <h2 class="font-display text-ink mb-6 leading-[1.05] font-bold" style="font-size: clamp(2rem, 4vw, 3rem)">
+
+              <h2
+                class="font-display text-ink mb-6 leading-[1.05] font-bold"
+                style="font-size: clamp(2rem, 4vw, 3rem)"
+              >
                 Notes on craft<br />and code.
               </h2>
+
               <p class="font-body text-body text-ink-muted mb-8 leading-relaxed">
                 I write about building software: the decisions, the tradeoffs, and the occasional rabbit hole.
               </p>
+
               <NuxtLink
                 to="/blog"
                 class="font-body text-body-sm text-ink hover:text-accent inline-flex w-fit items-center gap-2 font-semibold transition-colors"
               >
-                Browse the archive <Icon name="lucide:arrow-right" size="14" />
+                Browse the archive
+                <Icon
+                  name="lucide:arrow-right"
+                  size="14"
+                />
               </NuxtLink>
             </div>
 
@@ -279,7 +394,10 @@ function scrollToPanel(i: number) {
                   class="group border-border bg-surface hover:border-accent relative block rounded-2xl border p-6 transition-colors"
                   :style="{ transitionDelay: `${i * 60}ms` }"
                 >
-                  <NuxtLink :to="post.path" class="relative z-20 block">
+                  <NuxtLink
+                    :to="post.path"
+                    class="relative z-20 block"
+                  >
                     <!-- Top meta row -->
                     <div class="mb-3 flex items-center gap-3">
                       <span class="text-caption text-accent font-mono tracking-widest uppercase">
@@ -292,7 +410,11 @@ function scrollToPanel(i: number) {
                             : ''
                         }}
                       </span>
-                      <span v-if="post.series" class="text-caption text-ink-subtle font-mono">
+
+                      <span
+                        v-if="post.series"
+                        class="text-caption text-ink-subtle font-mono"
+                      >
                         · {{ post.series.name }} · Part {{ post.series.part }}
                       </span>
                     </div>
@@ -305,12 +427,18 @@ function scrollToPanel(i: number) {
                     </h3>
 
                     <!-- Subtitle -->
-                    <p v-if="post.subtitle" class="font-body text-body-sm text-ink-muted mb-2 leading-snug italic">
+                    <p
+                      v-if="post.subtitle"
+                      class="font-body text-body-sm text-ink-muted mb-2 leading-snug italic"
+                    >
                       {{ post.subtitle }}
                     </p>
 
                     <!-- Description -->
-                    <p v-if="post.description" class="font-body text-body-sm text-ink-muted mb-4 leading-relaxed">
+                    <p
+                      v-if="post.description"
+                      class="font-body text-body-sm text-ink-muted mb-4 leading-relaxed"
+                    >
                       {{ post.description }}
                     </p>
 
@@ -325,6 +453,7 @@ function scrollToPanel(i: number) {
                           {{ tag }}
                         </span>
                       </div>
+
                       <Icon
                         name="lucide:arrow-up-right"
                         size="15"
@@ -334,13 +463,19 @@ function scrollToPanel(i: number) {
                   </NuxtLink>
                 </ContainmentBentoCard>
               </template>
-              <p v-else class="font-body text-body-sm text-ink-subtle py-8">Posts coming soon.</p>
+
+              <p
+                v-else
+                class="font-body text-body-sm text-ink-subtle py-8"
+              >
+                Posts coming soon.
+              </p>
             </div>
           </div>
         </section>
 
         <!-- ══════════════════════════════════════════════════════════════════
-             PANEL 04 — CONNECT
+             PANEL 04; CONNECT
         ═══════════════════════════════════════════════════════════════════ -->
         <section
           class="relative flex h-full w-screen flex-shrink-0 items-center justify-center overflow-hidden text-center"
@@ -361,12 +496,14 @@ function scrollToPanel(i: number) {
             }"
           >
             <p class="text-caption text-accent mb-6 font-mono tracking-widest uppercase">04 · Connect</p>
+
             <h2
               class="font-display text-ink mb-6 leading-[1.05] font-bold tracking-tight"
               style="font-size: clamp(2.5rem, 6vw, 5rem)"
             >
               Let's build<br />something.
             </h2>
+
             <p class="font-body text-body text-ink-muted mb-10 leading-relaxed">
               Always open to interesting projects, collaborations, or just a good conversation about craft.
             </p>
@@ -388,16 +525,26 @@ function scrollToPanel(i: number) {
                 rel="noopener noreferrer"
                 class="border-border font-body text-body-sm text-ink-muted hover:border-ink hover:text-ink flex items-center gap-2 rounded-full border px-5 py-2.5 font-medium transition-colors"
               >
-                <Icon name="lucide:github" size="15" /> GitHub
+                <Icon
+                  name="lucide:github"
+                  size="15"
+                />
+                GitHub
               </a>
+
               <a
                 href="https://linkedin.com/in/jensjohnson"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="border-border font-body text-body-sm text-ink-muted hover:border-ink hover:text-ink flex items-center gap-2 rounded-full border px-5 py-2.5 font-medium transition-colors"
               >
-                <Icon name="lucide:linkedin" size="15" /> LinkedIn
+                <Icon
+                  name="lucide:linkedin"
+                  size="15"
+                />
+                LinkedIn
               </a>
+
               <NuxtLink
                 to="/about"
                 class="bg-accent font-body text-body-sm flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold text-stone-50 transition-opacity hover:opacity-90"

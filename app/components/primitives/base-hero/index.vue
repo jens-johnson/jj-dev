@@ -25,9 +25,9 @@
  * </PrimitivesBaseHero>
  *
  * Slots:
- *   #backdrop — behind content: logo mark, gradient orbs, grain overlay.
- *   #default  — foreground content: headlines, CTAs, body copy.
- *   #hint     — bottom decoration: scroll indicator.
+ *   #backdrop; behind content: logo mark, gradient orbs, grain overlay.
+ *   #default; foreground content: headlines, CTAs, body copy.
+ *   #hint; bottom decoration: scroll indicator.
  *
  * Attributes (class, @mousemove, ref, etc.) fall through to the root <section>
  * automatically via inheritAttrs.
@@ -39,7 +39,9 @@
 <template>
   <section class="relative flex min-h-[92vh] items-center overflow-hidden">
     <slot name="backdrop" />
+
     <slot />
+
     <slot name="hint" />
   </section>
 </template>

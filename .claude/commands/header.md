@@ -1,6 +1,6 @@
 Add the standard jj-dev file header to the file the user specifies (or the current file in context).
 
-**Step 1 — Identify the file type:**
+**Step 1; Identify the file type:**
 
 All files use the same JJ logo block header. Only the comment syntax changes:
 
@@ -13,7 +13,7 @@ All files use the same JJ logo block header. Only the comment syntax changes:
 For `.vue` files: header goes inside `<script setup lang="ts">`. If no script block exists,
 add `<script setup lang="ts">` above `<template>` and put the header inside it.
 
-**Step 2 — Determine the filename banner path:**
+**Step 2; Determine the filename banner path:**
 
 - Root-level files: use the filename as-is (e.g. `.editorconfig`, `nuxt.config.ts`)
 - App source files under `app/`: use the Nuxt alias prefix instead of `app/`:
@@ -23,7 +23,7 @@ add `<script setup lang="ts">` above `<template>` and put the header inside it.
   - `app/composables/…` → `#composables/…`
 - Other paths: use path from project root (e.g. `.github/workflows/ci.yml`)
 
-**Step 3 — Compute the filename banner padding:**
+**Step 3; Compute the filename banner padding:**
 
 The separator bar has 117 `█` chars (total line = 120 chars with `*`, or 119 with `# `).
 Filename banner formula:
@@ -32,7 +32,7 @@ Filename banner formula:
 - `left_pad` = `floor((117 − len − 2) / 2)` `█` chars
 - `right_pad` = `117 − len − 2 − left_pad` `█` chars
 
-**Step 4 — Fill in optional sections:**
+**Step 4; Fill in optional sections:**
 
 | Section     | When to include                                                                   |
 | ----------- | --------------------------------------------------------------------------------- |
@@ -40,9 +40,9 @@ Filename banner formula:
 | `─── SEE`   | When there are relevant external docs worth linking                               |
 
 Omit sections that aren't useful. Additional sections (e.g. `─── PROPS`, `─── EVENTS`) are
-allowed if they add clarity — update `.claude/context-and-memory/code-comments.md` when adding new ones.
+allowed if they add clarity; update `.claude/context-and-memory/code-comments.md` when adding new ones.
 
-**Step 5 — Template (JS / TS / Vue, `/** \*/` style, 120-char lines):\*\*
+**Step 5; Template (JS / TS / Vue, `/** \*/` style, 120-char lines):\*\*
 
 ```
 /**
@@ -64,20 +64,20 @@ allowed if they add clarity — update `.claude/context-and-memory/code-comments
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * <USAGE — omit section if not needed>
+ * <USAGE; omit section if not needed>
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • <URL — omit section if not needed>
+ * • <URL; omit section if not needed>
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 ```
 
-**Step 6 — Template (`#` style, 119-char lines):**
+**Step 6; Template (`#` style, 119-char lines):**
 
 Same structure but prefix every line with `# ` and empty lines with just `#`.
 
-**Step 7 — Apply the header** by editing the target file. Replace any existing old-style
+**Step 7; Apply the header** by editing the target file. Replace any existing old-style
 `// ─── Name ───` banner or previous `/** */` header. Do not alter code below the header.
 Confirm the change when done.

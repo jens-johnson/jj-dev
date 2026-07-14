@@ -19,9 +19,19 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-const year = new Date().getFullYear();
+/**
+ * The current year rendered in the copyright line
+ * @internal
+ * @constant
+ */
+const year: number = new Date().getFullYear();
 
-const socials = [
+/**
+ * The social icon links rendered on the right side of the footer
+ * @internal
+ * @constant
+ */
+const socials: { label: string; href: string; icon: string }[] = [
   {
     label: 'GitHub',
     href: 'https://github.com/jens-johnson',
@@ -59,8 +69,14 @@ const socials = [
       </p>
 
       <!-- Socials -->
-      <ul class="flex items-center gap-4" role="list">
-        <li v-for="social in socials" :key="social.href">
+      <ul
+        class="flex items-center gap-4"
+        role="list"
+      >
+        <li
+          v-for="social in socials"
+          :key="social.href"
+        >
           <a
             :href="social.href"
             target="_blank"
@@ -68,7 +84,10 @@ const socials = [
             :aria-label="social.label"
             class="text-ink-subtle hover:text-ink flex size-8 items-center justify-center transition-colors"
           >
-            <Icon :name="social.icon" size="16" />
+            <Icon
+              :name="social.icon"
+              size="16"
+            />
           </a>
         </li>
       </ul>
