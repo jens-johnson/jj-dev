@@ -21,7 +21,13 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
-import { RATE_LIMIT_MAX, RATE_LIMIT_TIMEOUT_MS, RATE_LIMIT_WINDOW, RATE_LIMIT_WINDOW_MS } from './constants';
+import {
+  RATE_LIMIT_MAX,
+  RATE_LIMIT_MAX_TRACKED_KEYS,
+  RATE_LIMIT_TIMEOUT_MS,
+  RATE_LIMIT_WINDOW,
+  RATE_LIMIT_WINDOW_MS,
+} from './constants';
 
 /**
  * The per-process rate-limit buckets for the in-memory dev fallback, keyed by client, holding recent request times
@@ -83,6 +89,16 @@ function allowRequest(
     hits.set(key, recent);
     return false;
   }
+
+  // Bound the map: a client seen once and never again would otherwise linger forever. When a new key would overflow
+  // the cap, evict the oldest-inserted entry (Map preserves insertion order) before recording this hit.
+  if (!hits.has(key) && hits.size >= RATE_LIMIT_MAX_TRACKED_KEYS) {
+    const oldest: string | undefined = hits.keys().next().value;
+    if (oldest !== undefined) {
+      hits.delete(oldest);
+    }
+  }
+
   recent.push(now);
   hits.set(key, recent);
   return true;
