@@ -74,9 +74,10 @@ export function buildWeeklyMiles(activities: IStravaActivitySummary[], numWeeks:
 
   // Reduce the run activities into per-week mileage buckets, indexed oldest week first
   const buckets: number[] = activities.reduce<number[]>((acc: number[], activity: IStravaActivitySummary): number[] => {
-    // Skip non-runs and activities older than the window; the rest add their miles to their week's bucket
+    // Skip non-runs and activities outside the window; the rest add their miles to their week's bucket. A negative
+    // index (a future-dated activity, e.g. clock skew) is rejected so it cannot write past the end of the buckets.
     const weekIndex: number = Math.floor((now - new Date(activity.start_date).getTime()) / MS_PER_WEEK);
-    if (activity.type !== 'Run' || weekIndex >= numWeeks) {
+    if (activity.type !== 'Run' || weekIndex < 0 || weekIndex >= numWeeks) {
       return acc;
     }
     const bucketIndex: number = numWeeks - 1 - weekIndex;

@@ -57,11 +57,13 @@ import type {
 
 /**
  * Fetches and aggregates the about-page metrics (GitHub contributions plus Strava run stats). Wrapped in Nitro's
- * cache so the upstream APIs are only hit once per CACHE_MAX_AGE_SECONDS; a thrown 502 is never cached, so a failed
- * fetch is retried on the next request
+ * stale-while-revalidate cache: a cold fetch blocks and surfaces a 502 on failure, but once the entry is warm an
+ * expired read returns the last-known value immediately while a background revalidation refreshes it (a failed
+ * revalidation is logged, not surfaced, so the tile rides out transient upstream outages on stale data). The @throws
+ * below therefore apply to the cold-cache fetch
  * @internal
  * @function
- * @throws 502 when the GitHub contributions fetch fails
+ * @throws 502 when the GitHub contributions fetch fails or returns a malformed response
  * @throws 502 when the Strava token exchange fails
  * @throws 502 when the authenticated Strava athlete cannot be resolved
  * @throws 502 when the Strava stats or activities fetch fails
@@ -88,7 +90,13 @@ const fetchAboutMetrics = defineCachedFunction(
       'The GitHub contributions fetch failed.',
     );
 
-    const totalContributions: number = ghRes.total[year] ?? 0;
+    // fetch() does not reject on an HTTP error, so a 5xx/error body with the wrong shape would slip past runUpstream;
+    // validate it here and surface a 502 rather than letting a later property access throw an unhandled 500
+    if (!Array.isArray(ghRes?.contributions)) {
+      throw createError({ statusCode: 502, message: 'The GitHub contributions response was malformed.' });
+    }
+
+    const totalContributions: number = ghRes.total?.[year] ?? 0;
 
     // Filter out future-dated entries; the API returns the full calendar year, and a naive slice would grab
     // months that haven't happened yet.
@@ -191,6 +199,9 @@ const fetchAboutMetrics = defineCachedFunction(
   },
   {
     maxAge: CACHE_MAX_AGE_SECONDS,
+    // Stale-while-revalidate (explicit): once warm, an expired read serves the last-known value and refreshes in the
+    // background, so a slow or briefly-down upstream never blocks or errors the about tile.
+    swr: true,
     name: 'about-metrics',
     getKey: (): string => 'about-metrics',
   },

@@ -50,8 +50,8 @@ const fourteenDays: IGhContribution[] = Array.from(
 const NOW: string = '2026-07-13T00:00:00.000Z';
 
 /**
- * Run and non-run activities at known week offsets from NOW: a run this week, a run two weeks back, a non-run, and a
- * run outside the four-week window
+ * Run and non-run activities at known week offsets from NOW: a run this week, a run two weeks back, a non-run, a run
+ * outside the four-week window, and a future-dated run (negative week index) that the guard must drop
  * @internal
  * @constant
  */
@@ -85,6 +85,14 @@ const activities: IStravaActivitySummary[] = [
     name: 'Too old',
     type: 'Run',
     start_date: '2026-06-01T00:00:00.000Z',
+    distance: 1609.344,
+    moving_time: 600,
+  },
+  {
+    id: 5,
+    name: 'Future dated',
+    type: 'Run',
+    start_date: '2026-07-20T00:00:00.000Z',
     distance: 1609.344,
     moving_time: 600,
   },
@@ -122,8 +130,9 @@ describe(getTestFileName(import.meta.url), (): void => {
       vi.useRealTimers();
     });
 
-    it('buckets run mileage by week, oldest week first, ignoring non-runs and out-of-window activities', (): void => {
-      // 1609.344 m = 1.0 mi this week (bucket 3); 3218.688 m = 2.0 mi two weeks back (bucket 1); ride + old run dropped
+    it('buckets run mileage by week, oldest week first, ignoring non-runs, out-of-window, and future activities', (): void => {
+      // 1609.344 m = 1.0 mi this week (bucket 3); 3218.688 m = 2.0 mi two weeks back (bucket 1); ride, old run, and
+      // the future-dated run are all dropped, so the series stays exactly numWeeks long
       expect(buildWeeklyMiles(activities, 4)).toEqual([0, 2, 0, 1]);
     });
 
