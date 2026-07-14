@@ -46,7 +46,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 import type { TPropsWithDefaults } from '@jens-johnson/style-guide/types/vue';
-import { useEventListener, useRafFn } from '@vueuse/core';
+import { useRafFn } from '@vueuse/core';
 import type { CSSProperties } from 'vue';
 
 import type { IBaseParallaxProps } from './types';
@@ -208,19 +208,9 @@ function markStyle(): CSSProperties {
 
 /* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-// Drive the per-frame loop and keep the scroll offset fresh on scroll; both auto-start client-side and tear down on
-// unmount (useRafFn and useEventListener manage the raf handle and the listener, so no manual cleanup is needed)
+// Drive the per-frame loop; it samples window.scrollY every frame, so no separate scroll listener is needed. useRafFn
+// auto-starts client-side and cancels the raf handle on unmount, so there is no manual cleanup.
 useRafFn(tick);
-useEventListener(
-  window,
-  'scroll',
-  (): void => {
-    scrollY.value = window.scrollY;
-  },
-  {
-    passive: true,
-  },
-);
 </script>
 
 <template>
