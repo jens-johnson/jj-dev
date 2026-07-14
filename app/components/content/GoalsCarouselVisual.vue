@@ -2,24 +2,34 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ▀▀        ▀▀                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████ #components/content/GoalsCarouselVisual.vue ███████████████████████████████████████████████
+ * ████████████████████████████████████ #components/content/GoalsCarouselVisual.vue ████████████████████████████████████
  *
- * Small SVG illustration that lives in the top of each GoalsCarousel card. Animates on parent `.goal-card:hover`.
- * Three variants — `layers` (stacked bare-metal blocks), `leaf` (organic curve), `branch` (git diagram).
+ * Small SVG illustration that lives in the top of each GoalsCarousel card. Animates on parent `.goal-card:hover`. Three
+ * variants; `layers` (stacked bare-metal blocks), `leaf` (organic curve), `branch` (git diagram).
+ *
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • variant
+ *     - Description: Which illustration to render
+ *     - Type: 'layers' | 'leaf' | 'branch'
+ *     - Required: true
+ *   • icon
+ *     - Description: The goal's icon name; accepted from the carousel data but not rendered by the current variants
+ *     - Type: string
+ *     - Required: true
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
-
 defineProps<{
   variant: 'layers' | 'leaf' | 'branch';
   icon: string;
@@ -46,9 +56,32 @@ defineProps<{
       stroke-linejoin="round"
       aria-hidden="true"
     >
-      <rect class="layer-1" x="8" y="24" width="32" height="8" rx="2" />
-      <rect class="layer-2" x="11" y="14" width="26" height="8" rx="2" />
-      <rect class="layer-3" x="14" y="4" width="20" height="8" rx="2" />
+      <rect
+        class="layer-1"
+        x="8"
+        y="24"
+        width="32"
+        height="8"
+        rx="2"
+      />
+
+      <rect
+        class="layer-2"
+        x="11"
+        y="14"
+        width="26"
+        height="8"
+        rx="2"
+      />
+
+      <rect
+        class="layer-3"
+        x="14"
+        y="4"
+        width="20"
+        height="8"
+        rx="2"
+      />
     </svg>
 
     <!-- ── LEAF variant ──────────────────────────────────────────────── -->
@@ -63,10 +96,28 @@ defineProps<{
       stroke-linejoin="round"
       aria-hidden="true"
     >
-      <path class="leaf-shape" d="M 12 38 C 12 18, 28 6, 40 8 C 42 22, 32 38, 14 40 Z" />
-      <line class="leaf-vein" x1="12" y1="38" x2="40" y2="8" />
-      <path class="leaf-vein-2" d="M 20 32 L 28 28" />
-      <path class="leaf-vein-3" d="M 22 24 L 32 18" />
+      <path
+        class="leaf-shape"
+        d="M 12 38 C 12 18, 28 6, 40 8 C 42 22, 32 38, 14 40 Z"
+      />
+
+      <line
+        class="leaf-vein"
+        x1="12"
+        y1="38"
+        x2="40"
+        y2="8"
+      />
+
+      <path
+        class="leaf-vein-2"
+        d="M 20 32 L 28 28"
+      />
+
+      <path
+        class="leaf-vein-3"
+        d="M 22 24 L 32 18"
+      />
     </svg>
 
     <!-- ── BRANCH variant ────────────────────────────────────────────── -->
@@ -81,11 +132,41 @@ defineProps<{
       stroke-linejoin="round"
       aria-hidden="true"
     >
-      <line x1="14" y1="6" x2="14" y2="42" />
-      <path class="branch-fork" d="M 14 18 C 14 24, 32 22, 32 28 L 32 38" />
-      <circle class="git-node-1" cx="14" cy="10" r="3" fill="currentColor" />
-      <circle class="git-node-2" cx="14" cy="38" r="3" fill="currentColor" />
-      <circle class="git-node-3" cx="32" cy="32" r="3" fill="currentColor" />
+      <line
+        x1="14"
+        y1="6"
+        x2="14"
+        y2="42"
+      />
+
+      <path
+        class="branch-fork"
+        d="M 14 18 C 14 24, 32 22, 32 28 L 32 38"
+      />
+
+      <circle
+        class="git-node-1"
+        cx="14"
+        cy="10"
+        r="3"
+        fill="currentColor"
+      />
+
+      <circle
+        class="git-node-2"
+        cx="14"
+        cy="38"
+        r="3"
+        fill="currentColor"
+      />
+
+      <circle
+        class="git-node-3"
+        cx="32"
+        cy="32"
+        r="3"
+        fill="currentColor"
+      />
     </svg>
   </div>
 </template>

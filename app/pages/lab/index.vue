@@ -19,30 +19,77 @@
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { UserSessionComposable } from '#auth-utils';
 
 useSeoMeta({
   title: 'Lab · Jens Johnson',
   description: 'Experiments, demos, and the homelab; things I build to learn. Home of Substrate, my homelab project.',
 });
 
-/** Devices feed the hub card's system-health indicator. No live metrics yet, so this reflects declared status. */
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Devices feed the hub card's system-health indicator. No live metrics yet, so this reflects declared status
+ * @internal
+ * @constant
+ */
 const { data: devices } = await useAsyncData('lab-substrate-devices', () =>
   queryCollection('substrate').where('draft', '=', false).all(),
 );
 
-/** Overall health for the Substrate card; wires to real metrics once the box reports in. */
+/**
+ * Overall health for the Substrate card; wires to real metrics once the box reports in
+ * @internal
+ * @constant
+ */
 const health = computed(() => {
-  const d = devices.value ?? [];
-  if (!d.length) return { label: 'No data', dot: 'bg-ink-subtle', pulse: false };
-  if (d.some((x) => x.status === 'offline')) return { label: 'Degraded', dot: 'bg-terra-600', pulse: true };
-  return { label: 'Operational', dot: 'bg-accent-secondary', pulse: true };
+  const deviceList = devices.value ?? [];
+  if (!deviceList.length) {
+    return {
+      label: 'No data',
+      dot: 'bg-ink-subtle',
+      pulse: false,
+    };
+  }
+  if (deviceList.some((device) => device.status === 'offline')) {
+    return {
+      label: 'Degraded',
+      dot: 'bg-terra-600',
+      pulse: true,
+    };
+  }
+  return {
+    label: 'Operational',
+    dot: 'bg-accent-secondary',
+    pulse: true,
+  };
 });
 
-const { session } = useUserSession();
-/** The Vertifix tool is internal; its card only reveals once an admin session resolves client-side. */
+/* ─── ADMIN ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The auth-session state; carries the admin flag that gates the Vertifix card
+ * @internal
+ * @constant
+ */
+const { session }: UserSessionComposable = useUserSession();
+
+/**
+ * The Vertifix tool is internal; its card only reveals once an admin session resolves client-side
+ * @internal
+ * @constant
+ */
 const isAdmin = computed(() => session.value?.isAdmin === true);
 
+/* ─── ENTRANCE ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the entrance animations have been triggered; flips true shortly after mount
+ * @internal
+ * @constant
+ */
 const revealed = ref(false);
+
 onMounted(() => {
   setTimeout(() => {
     revealed.value = true;
@@ -61,6 +108,7 @@ onMounted(() => {
         >
           Lab
         </p>
+
         <h1
           class="font-display text-ink font-bold tracking-tight transition-all delay-75 duration-700"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
@@ -68,6 +116,7 @@ onMounted(() => {
         >
           My (digital) workshop
         </h1>
+
         <p
           class="font-body text-body-lg text-ink-muted mt-5 max-w-2xl leading-relaxed transition-all delay-100 duration-700"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
@@ -87,16 +136,25 @@ onMounted(() => {
           class="group border-border bg-surface hover:border-accent/60 relative flex flex-col justify-between overflow-hidden rounded-2xl border p-7 transition-all hover:-translate-y-0.5 hover:shadow-lg md:col-span-2"
         >
           <!-- Dotted topology backdrop -->
-          <div class="lab-grid pointer-events-none absolute inset-0" aria-hidden="true" />
+          <div
+            class="lab-grid pointer-events-none absolute inset-0"
+            aria-hidden="true"
+          />
 
           <div class="relative">
             <div class="mb-5 flex items-center gap-3">
               <span class="bg-accent/10 text-accent flex size-11 items-center justify-center rounded-xl">
-                <Icon name="lucide:network" size="22" />
+                <Icon
+                  name="lucide:network"
+                  size="22"
+                />
               </span>
+
               <span class="text-caption text-accent font-mono tracking-widest uppercase">Flagship · Homelab</span>
             </div>
+
             <h2 class="font-display text-h3 text-ink font-bold tracking-tight">Substrate</h2>
+
             <p class="font-body text-body text-ink-muted mt-3 max-w-md leading-relaxed">
               A living, interactive dashboard for my HomeLab project. The networking setup, the nitty-gritty sysadmin
               work, and everything in between.
@@ -112,7 +170,11 @@ onMounted(() => {
                   class="absolute inline-flex size-full animate-ping rounded-full opacity-60 motion-reduce:hidden"
                   :class="health.dot"
                 />
-                <span class="relative inline-flex size-2 rounded-full" :class="health.dot" />
+
+                <span
+                  class="relative inline-flex size-2 rounded-full"
+                  :class="health.dot"
+                />
               </span>
               {{ health.label }}
             </span>
@@ -121,7 +183,11 @@ onMounted(() => {
               class="text-body-sm text-ink group-hover:text-accent inline-flex items-center gap-1.5 font-semibold transition-colors"
             >
               Explore
-              <Icon name="lucide:arrow-right" size="15" class="transition-transform group-hover:translate-x-0.5" />
+              <Icon
+                name="lucide:arrow-right"
+                size="15"
+                class="transition-transform group-hover:translate-x-0.5"
+              />
             </span>
           </div>
         </NuxtLink>
@@ -135,26 +201,40 @@ onMounted(() => {
           <div>
             <div class="mb-5 flex items-center gap-3">
               <span class="bg-accent/10 text-accent flex size-11 items-center justify-center rounded-xl">
-                <Icon name="lucide:mountain-snow" size="22" />
+                <Icon
+                  name="lucide:mountain-snow"
+                  size="22"
+                />
               </span>
+
               <span
                 class="border-accent/30 bg-accent/10 text-caption text-accent inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono font-medium"
               >
-                <Icon name="lucide:shield-check" size="11" />
+                <Icon
+                  name="lucide:shield-check"
+                  size="11"
+                />
                 Admin
               </span>
             </div>
+
             <h2 class="font-display text-h4 text-ink font-bold tracking-tight">Vertifix</h2>
+
             <p class="font-body text-body-sm text-ink-muted mt-3 leading-relaxed">
               Restore elevation gain on Strava treadmill runs from a photo of the console. Internal tool, my account
               only.
             </p>
           </div>
+
           <span
             class="text-body-sm text-ink group-hover:text-accent mt-6 inline-flex items-center gap-1.5 font-semibold transition-colors"
           >
             Open tool
-            <Icon name="lucide:arrow-right" size="15" class="transition-transform group-hover:translate-x-0.5" />
+            <Icon
+              name="lucide:arrow-right"
+              size="15"
+              class="transition-transform group-hover:translate-x-0.5"
+            />
           </span>
         </NuxtLink>
 
@@ -164,13 +244,19 @@ onMounted(() => {
             <span
               class="bg-bg text-ink-subtle border-border flex size-11 items-center justify-center rounded-xl border"
             >
-              <Icon name="lucide:flask-conical" size="22" />
+              <Icon
+                name="lucide:flask-conical"
+                size="22"
+              />
             </span>
+
             <h2 class="font-display text-h4 text-ink mt-5 font-bold tracking-tight">More brewing</h2>
+
             <p class="font-body text-body-sm text-ink-muted mt-3 leading-relaxed">
               More features always cooking. Check back soon.
             </p>
           </div>
+
           <span class="text-caption text-ink-subtle mt-6 font-mono tracking-widest uppercase">Coming soon</span>
         </div>
       </div>

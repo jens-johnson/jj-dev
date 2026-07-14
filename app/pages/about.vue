@@ -14,7 +14,7 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * █████████████████████████████████████████████████ #pages/about.vue ██████████████████████████████████████████████████
  *
- * About page — background, philosophy, stack, and experience timeline.
+ * About page; background, philosophy, stack, and experience timeline.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
@@ -27,9 +27,14 @@ useSeoMeta({
   ogDescription: 'Full-stack software engineer based in San Diego, CA.',
 });
 
-/* ─── Typewriter ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── TYPEWRITER ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const TYPEWRITER_WORDS = [
+/**
+ * The rotating identity words the hero typewriter cycles through
+ * @internal
+ * @constant
+ */
+const TYPEWRITER_WORDS: string[] = [
   'Engineer',
   'Builder',
   'Tinkerer',
@@ -41,15 +46,48 @@ const TYPEWRITER_WORDS = [
   'Sushi Enthusiast',
 ];
 
-const typeText = ref('');
-const typeWordIdx = ref(0);
-const typeIsDeleting = ref(false);
-const typeTimer = ref<ReturnType<typeof setTimeout> | null>(null);
+/**
+ * The currently rendered slice of the active typewriter word
+ * @internal
+ * @constant
+ */
+const typeText: Ref<string> = ref('');
 
-function typeStep() {
-  const word = TYPEWRITER_WORDS[typeWordIdx.value];
-  if (!word) return;
+/**
+ * The index of the typewriter word currently being typed
+ * @internal
+ * @constant
+ */
+const typeWordIdx: Ref<number> = ref(0);
+
+/**
+ * Whether the typewriter is in its deleting phase (vs typing)
+ * @internal
+ * @constant
+ */
+const typeIsDeleting: Ref<boolean> = ref(false);
+
+/**
+ * The pending typewriter timeout; held so unmount can cancel it
+ * @internal
+ * @constant
+ */
+const typeTimer: Ref<ReturnType<typeof setTimeout> | null> = ref<ReturnType<typeof setTimeout> | null>(null);
+
+/**
+ * Advances the hero typewriter by one character; types the current word out, pauses, deletes it, then moves to the
+ * next word, rescheduling itself with a cadence that varies per phase
+ * @internal
+ * @function
+ */
+function typeStep(): void {
+  // Grab the word currently being typed; bail if the index is somehow out of range
+  const word: string | undefined = TYPEWRITER_WORDS[typeWordIdx.value];
+  if (!word) {
+    return;
+  }
   if (typeIsDeleting.value) {
+    // Delete one character; once the word is empty, advance to the next one and pause before typing resumes
     typeText.value = word.slice(0, typeText.value.length - 1);
     if (typeText.value.length === 0) {
       typeIsDeleting.value = false;
@@ -59,6 +97,7 @@ function typeStep() {
     }
     typeTimer.value = setTimeout(typeStep, 45);
   } else {
+    // Type one character; once the word is complete, dwell on it before deleting
     typeText.value = word.slice(0, typeText.value.length + 1);
     if (typeText.value === word) {
       typeIsDeleting.value = true;
@@ -69,8 +108,13 @@ function typeStep() {
   }
 }
 
-/* ─── Stack ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── STACK ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The technology stack groups rendered in the Stack section
+ * @internal
+ * @constant
+ */
 const stack = [
   {
     category: 'Languages',
@@ -123,8 +167,13 @@ const stack = [
   },
 ];
 
-/* ─── Experience ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── EXPERIENCE ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+/**
+ * The experience timeline; one entry per role, newest first
+ * @internal
+ * @constant
+ */
 const experience = [
   {
     title: 'Senior Software Engineer',
@@ -191,9 +240,14 @@ const experience = [
   },
 ];
 
-/* ─── Hero background carousel ───────────────────────────────────────────────────────────────────────────────────── */
+/* ─── HERO CAROUSEL ──────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const heroBgImages = [
+/**
+ * The hero background carousel images, cross-faded on a fixed cadence
+ * @internal
+ * @constant
+ */
+const heroBgImages: { src: string; alt: string }[] = [
   {
     src: '/images/jens-images/paragliding.jpg',
     alt: 'Paragliding in the Swiss Alps',
@@ -212,32 +266,68 @@ const heroBgImages = [
   },
 ];
 
-const heroBgIdx = ref(0);
-const heroBgFading = ref(false);
+/**
+ * The index of the hero background image currently shown
+ * @internal
+ * @constant
+ */
+const heroBgIdx: Ref<number> = ref(0);
+
+/**
+ * Whether the hero background is mid cross-fade (fully transparent, safe to swap the image)
+ * @internal
+ * @constant
+ */
+const heroBgFading: Ref<boolean> = ref(false);
+
+/**
+ * The hero carousel interval; held so unmount can cancel it
+ * @internal
+ */
 let heroBgTimer: ReturnType<typeof setInterval> | null = null;
 
-function advanceHeroBg() {
+/**
+ * Advances the hero background carousel; fades the current image out, then swaps in the next one once the fade lands
+ * @internal
+ * @function
+ */
+function advanceHeroBg(): void {
+  // Start the cross-fade out
   heroBgFading.value = true;
-  setTimeout(() => {
+  // Once the fade lands, swap to the next image and fade back in
+  setTimeout((): void => {
     heroBgIdx.value = (heroBgIdx.value + 1) % heroBgImages.length;
     heroBgFading.value = false;
   }, 1000);
 }
 
-/* ─── Entrance animation ──────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── ENTRANCE ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const revealed = ref(false);
-onMounted(() => {
-  setTimeout(() => {
+/**
+ * Whether the entrance animations have been triggered; flips true shortly after mount
+ * @internal
+ * @constant
+ */
+const revealed: Ref<boolean> = ref(false);
+
+onMounted((): void => {
+  // Reveal the page content just after mount so the entrance transitions play
+  setTimeout((): void => {
     revealed.value = true;
   }, 80);
+  // Kick off the typewriter and the background carousel on their own cadences
   typeTimer.value = setTimeout(typeStep, 900);
   heroBgTimer = setInterval(advanceHeroBg, 5500);
 });
 
-onUnmounted(() => {
-  if (typeTimer.value) clearTimeout(typeTimer.value);
-  if (heroBgTimer) clearInterval(heroBgTimer);
+onUnmounted((): void => {
+  // Tear both timers down so they cannot fire after the page unmounts
+  if (typeTimer.value) {
+    clearTimeout(typeTimer.value);
+  }
+  if (heroBgTimer) {
+    clearInterval(heroBgTimer);
+  }
 });
 </script>
 
@@ -255,6 +345,7 @@ onUnmounted(() => {
         />
         <!-- Fade edges into bg so it blends seamlessly -->
         <div class="from-bg to-bg absolute inset-0 bg-gradient-to-r via-transparent" />
+
         <div class="from-bg/60 to-bg absolute inset-0 bg-gradient-to-b via-transparent" />
       </div>
 
@@ -272,6 +363,7 @@ onUnmounted(() => {
         >
           About me
         </p>
+
         <h1
           class="font-display text-h1 text-ink leading-tight font-bold tracking-tight"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'"
@@ -282,9 +374,15 @@ onUnmounted(() => {
             transition-delay: 80ms;
           "
         >
-          <span class="text-accent">{{ typeText }}</span
-          ><span class="text-accent" style="animation: blink 1s step-end infinite">|</span>
+          <span class="text-accent">{{ typeText }}</span>
+
+          <span
+            class="text-accent"
+            style="animation: blink 1s step-end infinite"
+            >|</span
+          >
         </h1>
+
         <p
           class="font-body text-body-lg text-ink-muted mt-6 max-w-2xl leading-relaxed"
           :class="revealed ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'"
@@ -311,24 +409,31 @@ onUnmounted(() => {
         <!-- Section label -->
         <p class="text-caption text-ink-subtle mb-10 font-mono tracking-widest uppercase">Background</p>
 
-        <!-- Bento grid — 12 col, 4 row -->
+        <!-- Bento grid; 12 col, 4 row -->
         <div class="grid auto-rows-auto grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12">
-          <!-- A: Location — cols 1–2 -->
+          <!-- A: Location; cols 1–2 -->
           <ContainmentBentoCard
             class="border-border bg-surface relative flex flex-col items-start justify-between rounded-2xl border p-6 lg:col-span-2"
           >
-            <Icon name="lucide:map-pin" size="20" class="text-accent" />
+            <Icon
+              name="lucide:map-pin"
+              size="20"
+              class="text-accent"
+            />
+
             <div>
               <p class="font-display text-h5 text-ink font-bold">San Diego</p>
+
               <p class="text-caption text-ink-subtle font-mono">California</p>
             </div>
           </ContainmentBentoCard>
 
-          <!-- B: The Engineer — cols 3–10 -->
+          <!-- B: The Engineer; cols 3–10 -->
           <ContainmentBentoCard
             class="border-border bg-surface relative flex flex-col justify-start rounded-2xl border p-8 lg:col-span-8"
           >
             <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">The Engineer</p>
+
             <p class="font-body text-body text-ink-muted leading-relaxed">
               I'm an engineer in the classical sense. I love understanding how things work, and designing, building, and
               (sometimes) breaking systems to solve problems creatively. But I also consider myself a product-focused,
@@ -339,32 +444,40 @@ onUnmounted(() => {
             </p>
           </ContainmentBentoCard>
 
-          <!-- C: Years — cols 11–12 -->
+          <!-- C: Years; cols 11–12 -->
           <ContainmentBentoCard
             class="border-border bg-bg relative flex flex-col items-start justify-between rounded-2xl border p-6 lg:col-span-2"
           >
-            <Icon name="lucide:briefcase" size="20" class="text-accent" />
+            <Icon
+              name="lucide:briefcase"
+              size="20"
+              class="text-accent"
+            />
+
             <div>
               <p class="font-display text-h5 text-ink font-bold">5+ Years</p>
+
               <p class="text-caption text-ink-subtle font-mono">Industry experience</p>
             </div>
           </ContainmentBentoCard>
 
-          <!-- D: Quote — cols 1–4 -->
+          <!-- D: Quote; cols 1–4 -->
           <ContainmentBentoCard
             :intensity="8"
             :shine-opacity="0.08"
             class="bg-accent/10 relative flex flex-col justify-center rounded-2xl p-8 lg:col-span-4"
           >
             <span class="font-display text-accent mb-3 block text-4xl leading-none opacity-50">"</span>
+
             <p class="font-body text-body-lg text-ink leading-relaxed font-medium">
               Technology is best when grounded in natural principles and designed in service of the people that use it.
             </p>
           </ContainmentBentoCard>
 
-          <!-- E: The Builder — cols 5–12 -->
+          <!-- E: The Builder; cols 5–12 -->
           <ContainmentBentoCard class="border-border bg-surface relative rounded-2xl border p-8 lg:col-span-8">
             <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">The Builder</p>
+
             <p class="font-body text-body text-ink-muted leading-relaxed">
               My professional career has provided me with the ability to develop and create solutions for a variety of
               organizations and end-users, from designing sport research platforms at Nike to developing data center
@@ -374,9 +487,10 @@ onUnmounted(() => {
             </p>
           </ContainmentBentoCard>
 
-          <!-- F: The Human — cols 1–8 -->
+          <!-- F: The Human; cols 1–8 -->
           <ContainmentBentoCard class="border-border bg-surface relative rounded-2xl border p-8 lg:col-span-8">
             <p class="text-caption text-accent mb-4 font-mono tracking-widest uppercase">The Human</p>
+
             <p class="font-body text-body text-ink-muted leading-relaxed">
               When I'm not behind a keyboard, my passions lie outdoors: hiking, trail running, going to the beach to
               catch a sunset on the southern California coast. You'll inevitably see some "non-tech" subject matter on
@@ -398,6 +512,7 @@ onUnmounted(() => {
       <div class="mx-auto max-w-6xl px-6 py-20">
         <div class="mb-12 grid gap-4 md:grid-cols-[200px_1fr]">
           <p class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Experience</p>
+
           <p class="font-body text-body text-ink-muted">
             5+ years across sports technology, cloud infrastructure, and gemological science.
           </p>
@@ -416,6 +531,7 @@ onUnmounted(() => {
                 <span class="text-caption text-accent font-mono font-medium tracking-widest uppercase">
                   {{ role.orgShort }}
                 </span>
+
                 <span
                   v-if="role.current"
                   class="bg-accent/10 text-caption text-accent rounded-full px-2 py-0.5 font-mono"
@@ -423,21 +539,28 @@ onUnmounted(() => {
                   Now
                 </span>
               </div>
+
               <p class="font-body text-body-sm text-ink-subtle">{{ role.dates }}</p>
+
               <p class="font-body text-body-sm text-ink-subtle">{{ role.location }}</p>
             </div>
 
             <!-- Right: content -->
             <div>
               <h3 class="font-display text-h5 text-ink mb-1 font-bold">{{ role.title }}</h3>
+
               <p class="font-body text-body-sm text-ink-muted mb-4">{{ role.org }}</p>
+
               <ul class="space-y-2.5">
                 <li
                   v-for="highlight in role.highlights"
                   :key="highlight"
                   class="font-body text-body text-ink-muted flex gap-3"
                 >
-                  <span class="bg-accent mt-2 size-1 shrink-0 rounded-full" aria-hidden="true" />
+                  <span
+                    class="bg-accent mt-2 size-1 shrink-0 rounded-full"
+                    aria-hidden="true"
+                  />
                   {{ highlight }}
                 </li>
               </ul>
@@ -455,10 +578,15 @@ onUnmounted(() => {
         </div>
 
         <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <div v-for="group in stack" :key="group.category" class="border-border bg-surface rounded-xl border p-5">
+          <div
+            v-for="group in stack"
+            :key="group.category"
+            class="border-border bg-surface rounded-xl border p-5"
+          >
             <p class="text-caption text-accent mb-3 font-mono tracking-widest uppercase">
               {{ group.category }}
             </p>
+
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="item in group.items"
@@ -486,23 +614,34 @@ onUnmounted(() => {
               rel="noopener noreferrer"
               class="border-border font-body text-body-sm text-ink-muted hover:border-ink hover:text-ink inline-flex items-center gap-2 rounded-full border px-5 py-2.5 font-medium transition-colors"
             >
-              <Icon name="lucide:github" size="15" />
+              <Icon
+                name="lucide:github"
+                size="15"
+              />
               GitHub
             </a>
+
             <a
               href="https://linkedin.com/in/jens-johnson"
               target="_blank"
               rel="noopener noreferrer"
               class="border-border font-body text-body-sm text-ink-muted hover:border-ink hover:text-ink inline-flex items-center gap-2 rounded-full border px-5 py-2.5 font-medium transition-colors"
             >
-              <Icon name="lucide:linkedin" size="15" />
+              <Icon
+                name="lucide:linkedin"
+                size="15"
+              />
               LinkedIn
             </a>
+
             <a
               href="mailto:jens@jens-johnson.com"
               class="bg-accent font-body text-body-sm inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold text-stone-50 transition-opacity hover:opacity-90"
             >
-              <Icon name="lucide:mail" size="15" />
+              <Icon
+                name="lucide:mail"
+                size="15"
+              />
               Say hello
             </a>
           </div>

@@ -14,47 +14,96 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * █████████████████████████████████████ #components/layout/auth-button/index.vue ██████████████████████████████████████
  *
- * Nav auth control — a Sign in button when logged out, an avatar menu with sign-out when logged in.
+ * Nav auth control; a Sign in button when logged out, an avatar menu with sign-out when logged in.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * <LayoutAuthButton /> — placed in the nav right-controls cluster, next to the theme toggle.
+ * <LayoutAuthButton />; placed in the nav right-controls cluster, next to the theme toggle.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { UserSessionComposable } from '#auth-utils';
 
-const { loggedIn, user, session, clear } = useUserSession();
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const menuOpen = ref(false);
+/**
+ * The auth session state (logged-in flag, user profile, server session) and the clear action for sign-out
+ * @internal
+ * @constant
+ */
+const { loggedIn, user, session, clear }: UserSessionComposable = useUserSession();
+
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the account menu is open
+ * @internal
+ * @constant
+ */
+const menuOpen: Ref<boolean> = ref(false);
+
+/**
+ * The template ref for the component root; document clicks outside it close the account menu
+ * @internal
+ * @constant
+ */
 const root = ref<HTMLElement | null>(null);
 
-/* Close the account menu when clicking anywhere outside it. The toggle button lives inside
-   `root`, so opening it doesn't immediately re-close via this handler. */
-function onDocumentClick(e: MouseEvent) {
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * A utility method to handle document-level click events; closes the account menu when the click lands outside the
+ * component root. The toggle button lives inside `root`, so opening the menu doesn't immediately re-close it via this
+ * handler
+ * @internal
+ * @function
+ * @param e - The triggering mouse event
+ */
+function onDocumentClick(e: MouseEvent): void {
+  // Close the menu only when the click lands outside the component root
   if (root.value && !root.value.contains(e.target as Node)) {
     menuOpen.value = false;
   }
 }
 
-onMounted(() => document.addEventListener('click', onDocumentClick));
-onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick));
+onMounted((): void => document.addEventListener('click', onDocumentClick));
+onBeforeUnmount((): void => document.removeEventListener('click', onDocumentClick));
 
-/** Two-letter fallback for when the Google avatar is missing or fails to load. */
-const initials = computed(() => {
-  const parts = (user.value?.name ?? '').trim().split(/\s+/);
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The two-letter fallback rendered when the Google avatar is missing or fails to load
+ * @internal
+ * @constant
+ */
+const initials: ComputedRef<string> = computed((): string => {
+  // Split the display name into words
+  const parts: string[] = (user.value?.name ?? '').trim().split(/\s+/);
+  // Take the first letter of the first two words, falling back to "?" when the name is empty
   return (
     parts
       .slice(0, 2)
-      .map((p) => p[0] ?? '')
+      .map((part: string): string => part[0] ?? '')
       .join('')
       .toUpperCase() || '?'
   );
 });
 
-/* Google avatar URLs occasionally 403; fall back to initials if the image errors. */
-const avatarFailed = ref(false);
+/**
+ * Whether the avatar image failed to load; Google avatar URLs occasionally 403, so the template falls back to the
+ * initials when this flips true
+ * @internal
+ * @constant
+ */
+const avatarFailed: Ref<boolean> = ref(false);
 
-async function signOut() {
+/**
+ * A utility method to sign the user out; clears the server session and closes the account menu
+ * @internal
+ * @function
+ */
+async function signOut(): Promise<void> {
+  // Clear the server session, then close the account menu
   await clear();
   menuOpen.value = false;
 }
@@ -67,12 +116,20 @@ async function signOut() {
     href="/auth/callback"
     class="border-border text-body-sm text-ink-muted hover:border-accent hover:text-accent flex h-9 items-center gap-2 rounded-full border px-3.5 font-medium transition-colors"
   >
-    <Icon name="lucide:log-in" size="16" />
+    <Icon
+      name="lucide:log-in"
+      size="16"
+    />
+
     <span>Sign in</span>
   </a>
 
   <!-- Logged in: avatar button toggles a small account menu -->
-  <div v-else ref="root" class="relative">
+  <div
+    v-else
+    ref="root"
+    class="relative"
+  >
     <button
       type="button"
       class="border-border text-body-sm text-ink-muted hover:border-accent hover:text-accent flex size-9 items-center justify-center overflow-hidden rounded-full border font-semibold transition-colors"
@@ -89,6 +146,7 @@ async function signOut() {
         class="size-full object-cover"
         @error="avatarFailed = true"
       />
+
       <span v-else>{{ initials }}</span>
     </button>
 
@@ -117,20 +175,29 @@ async function signOut() {
               referrerpolicy="no-referrer"
               class="size-full object-cover"
             />
+
             <span v-else>{{ initials }}</span>
           </div>
+
           <div class="min-w-0">
             <p class="text-body-sm text-ink truncate font-semibold">{{ user?.name }}</p>
+
             <p class="text-caption text-ink-muted truncate">{{ user?.email }}</p>
           </div>
         </div>
 
-        <!-- Admin badge — only shown for the allow-listed account -->
-        <div v-if="session?.isAdmin" class="px-2.5 pb-1">
+        <!-- Admin badge; only shown for the allow-listed account -->
+        <div
+          v-if="session?.isAdmin"
+          class="px-2.5 pb-1"
+        >
           <span
             class="border-accent/30 bg-accent/10 text-caption text-accent inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-medium"
           >
-            <Icon name="lucide:shield-check" size="12" />
+            <Icon
+              name="lucide:shield-check"
+              size="12"
+            />
             Admin
           </span>
         </div>
@@ -144,7 +211,10 @@ async function signOut() {
           class="text-body-sm text-ink-muted hover:bg-surface hover:text-ink flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left font-medium transition-colors"
           @click="signOut"
         >
-          <Icon name="lucide:log-out" size="16" />
+          <Icon
+            name="lucide:log-out"
+            size="16"
+          />
           Sign out
         </button>
       </div>

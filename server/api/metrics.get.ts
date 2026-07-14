@@ -1,245 +1,222 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ██        ██                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ████████████████████████████████████████████ server/api/metrics.get.ts ████████████████████████████████████████████████
+ * ████████████████████████████████████████████ #server/api/metrics.get.ts █████████████████████████████████████████████
  *
- * Server API route that aggregates GitHub contribution data and Strava activity stats for the
- * about page metrics card. Strava credentials never reach the client — all token exchange and
- * API calls happen here in the Nitro server layer. Responses are cached in-process for 1 hour
- * to avoid hammering third-party APIs on every page load.
+ * Server API route that aggregates GitHub contribution data and Strava activity stats for the about page metrics card.
+ * Strava credentials never reach the client; all token exchange and API calls happen here in the Nitro server layer.
+ * Responses are cached for CACHE_MAX_AGE_SECONDS via Nitro's cache to avoid hammering third-party APIs on every load.
+ *
+ * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ * GET /api/metrics
+ *
+ * ─── RETURNS ─────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • IMetricsResponse: GitHub contribution weeks plus Strava year-to-date run totals and a weekly-mileage series
+ *
+ * ─── THROWS ──────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • 502 when the GitHub contributions fetch fails
+ *   • 502 when the Strava token exchange fails
+ *   • 502 when the authenticated Strava athlete cannot be resolved
+ *   • 502 when the Strava stats or activities fetch fails
+ *
+ * ─── SIDE EFFECTS ────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • Caches the aggregated response via Nitro's cache for CACHE_MAX_AGE_SECONDS
  *
  * ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * • https://developers.strava.com/docs/reference/
- * • https://github-contributions-api.jogruber.de/
+ *   • https://developers.strava.com/docs/reference/
+ *   • https://github-contributions-api.jogruber.de/
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-/* ─── Types ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+import { metersToFeet, metersToMiles } from '#shared/utils/units';
+import type {
+  IGhContribution,
+  IGhContributionsResponse,
+  IMetricsResponse,
+  IMetricsWeek,
+  IStravaActivitySummary,
+  IStravaStatsResponse,
+  IStravaTokenResponse,
+} from '#utils/metrics';
 
-interface GhContribution {
-  date: string;
-  count: number;
-  level: 0 | 1 | 2 | 3 | 4;
-}
+/**
+ * Fetches and aggregates the about-page metrics (GitHub contributions plus Strava run stats). Wrapped in Nitro's
+ * stale-while-revalidate cache: a cold fetch blocks and surfaces a 502 on failure, but once the entry is warm an
+ * expired read returns the last-known value immediately while a background revalidation refreshes it (a failed
+ * revalidation is logged, not surfaced, so the tile rides out transient upstream outages on stale data). The @throws
+ * below therefore apply to the cold-cache fetch
+ * @internal
+ * @function
+ * @throws 502 when the GitHub contributions fetch fails or returns a malformed response
+ * @throws 502 when the Strava token exchange fails
+ * @throws 502 when the authenticated Strava athlete cannot be resolved
+ * @throws 502 when the Strava stats or activities fetch fails
+ * @returns The GitHub contribution weeks plus Strava year-to-date run totals and the weekly-mileage series
+ */
+const fetchAboutMetrics = defineCachedFunction(
+  async (): Promise<IMetricsResponse> => {
+    // Resolve the Strava credentials from server-only runtime config, falling back to process.env directly;
+    // Nuxt's runtimeConfig auto-override requires the NUXT_ prefix, but Vercel injects the bare env var names too.
+    const config: ReturnType<typeof useRuntimeConfig> = useRuntimeConfig();
+    const stravaClientId: string | undefined = config.stravaClientId || process.env.STRAVA_CLIENT_ID;
+    const stravaClientSecret: string | undefined = config.stravaClientSecret || process.env.STRAVA_CLIENT_SECRET;
+    const stravaRefreshToken: string | undefined = config.stravaRefreshToken || process.env.STRAVA_REFRESH_TOKEN;
 
-interface GhContributionsResponse {
-  total: Record<string, number>;
-  contributions: GhContribution[];
-}
+    const year: number = new Date().getFullYear();
 
-interface StravaTokenResponse {
-  access_token: string;
-  athlete: { id: number };
-}
+    /* ─── GitHub ─────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-interface StravaTotals {
-  count: number;
-  distance: number; // metres
-  moving_time: number; // seconds
-  elapsed_time: number;
-  elevation_gain: number;
-}
+    // Fetch the current calendar year of contribution activity from the GitHub contributions API
+    const ghRes: IGhContributionsResponse = await runUpstream(
+      fetch(`https://github-contributions-api.jogruber.de/v4/jens-johnson?y=${year}`).then(
+        (response: Response): Promise<IGhContributionsResponse> => response.json(),
+      ),
+      'The GitHub contributions fetch failed.',
+    );
 
-interface StravaStatsResponse {
-  ytd_run_totals: StravaTotals;
-  all_run_totals: StravaTotals;
-  recent_run_totals: StravaTotals;
-}
-
-interface StravaActivity {
-  id: number;
-  name: string;
-  type: string;
-  start_date: string;
-  distance: number; // metres
-  moving_time: number; // seconds
-}
-
-export interface MetricsWeek {
-  days: { count: number; level: 0 | 1 | 2 | 3 | 4 }[];
-}
-
-export interface MetricsResponse {
-  github: {
-    totalContributions: number;
-    weeks: MetricsWeek[]; // last 26 weeks, each with 7 days
-  };
-  strava: {
-    ytdMiles: number;
-    ytdRuns: number;
-    ytdElevationFt: number;
-    weeklyMiles: number[]; // last 16 weeks, miles per week (for sparkline)
-  };
-}
-
-/* ─── In-process cache ────────────────────────────────────────────────────────────────────────────────────────────── */
-
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
-let cachedData: MetricsResponse | null = null;
-let cacheTimestamp = 0;
-
-/* ─── Helpers ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-function metresToMiles(m: number): number {
-  return Math.round((m / 1609.344) * 10) / 10;
-}
-
-function metresToFeet(m: number): number {
-  return Math.round(m * 3.28084);
-}
-
-/** Groups a flat array of daily contributions into ISO weeks (Mon–Sun), newest last. */
-function groupIntoWeeks(contributions: GhContribution[], numWeeks: number): MetricsWeek[] {
-  // Pad the contributions array so it starts on a Monday
-  const result: MetricsWeek[] = [];
-  const days = contributions.slice(-(numWeeks * 7));
-
-  for (let w = 0; w < numWeeks; w++) {
-    const slice = days.slice(w * 7, w * 7 + 7);
-    result.push({
-      days: slice.map((d) => ({
-        count: d.count,
-        level: d.level,
-      })),
-    });
-  }
-  return result;
-}
-
-/** Returns an array of total miles per week for the last N weeks from raw Strava activities. */
-function buildWeeklyMiles(activities: StravaActivity[], numWeeks: number): number[] {
-  const now = Date.now();
-  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
-  const buckets = Array(numWeeks).fill(0);
-
-  for (const act of activities) {
-    if (act.type !== 'Run') continue;
-    const age = now - new Date(act.start_date).getTime();
-    const weekIdx = Math.floor(age / msPerWeek);
-    if (weekIdx < numWeeks) {
-      buckets[numWeeks - 1 - weekIdx] += metresToMiles(act.distance);
+    // fetch() does not reject on an HTTP error, so a 5xx/error body with the wrong shape would slip past runUpstream;
+    // validate it here and surface a 502 rather than letting a later property access throw an unhandled 500
+    if (!Array.isArray(ghRes?.contributions)) {
+      throw createError({ statusCode: 502, message: 'The GitHub contributions response was malformed.' });
     }
-  }
 
-  return buckets.map((v) => Math.round(v * 10) / 10);
-}
+    const totalContributions: number = ghRes.total?.[year] ?? 0;
 
-/* ─── Handler ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
+    // Filter out future-dated entries; the API returns the full calendar year, and a naive slice would grab
+    // months that haven't happened yet.
+    const today: string = new Date().toISOString().slice(0, 10);
+    const pastContributions: IGhContribution[] = ghRes.contributions.filter(
+      (contribution: IGhContribution): boolean => contribution.date <= today,
+    );
+    const weeks: IMetricsWeek[] = groupIntoWeeks(pastContributions, CONTRIBUTION_WEEKS);
 
-export default defineEventHandler(async (): Promise<MetricsResponse> => {
-  // Serve from cache if fresh
-  if (cachedData && Date.now() - cacheTimestamp < CACHE_TTL_MS) {
-    return cachedData;
-  }
+    /* ─── Strava token exchange ──────────────────────────────────────────────────────────────────────────────────── */
 
-  const config = useRuntimeConfig();
+    // Exchange the long-lived refresh token for a short-lived access token
+    const tokenRes: Partial<IStravaTokenResponse> & { errors?: unknown; message?: string } = await runUpstream(
+      fetch('https://www.strava.com/oauth/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          client_id: stravaClientId,
+          client_secret: stravaClientSecret,
+          refresh_token: stravaRefreshToken,
+          grant_type: 'refresh_token',
+        }),
+      }).then(
+        (response: Response): Promise<Partial<IStravaTokenResponse> & { errors?: unknown; message?: string }> =>
+          response.json(),
+      ),
+      'The Strava token exchange failed.',
+    );
 
-  // Fall back to process.env directly — Nuxt's runtimeConfig auto-override
-  // requires the NUXT_ prefix, but Vercel injects the bare env var names too.
-  const stravaClientId = config.stravaClientId || process.env.STRAVA_CLIENT_ID;
-  const stravaClientSecret = config.stravaClientSecret || process.env.STRAVA_CLIENT_SECRET;
-  const stravaRefreshToken = config.stravaRefreshToken || process.env.STRAVA_REFRESH_TOKEN;
+    // A failed exchange (bad credentials, revoked token) surfaces as a 502; the upstream API is the failing party
+    if (tokenRes.errors || !tokenRes.access_token) {
+      console.error('[metrics] Strava token exchange failed:', JSON.stringify(tokenRes));
+      throw createError({
+        statusCode: 502,
+        message: `Strava auth failed: ${tokenRes.message ?? JSON.stringify(tokenRes)}`,
+      });
+    }
 
-  const year = new Date().getFullYear();
+    const { access_token }: IStravaTokenResponse = tokenRes as IStravaTokenResponse;
 
-  /* ─── GitHub ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
+    // Get the authenticated athlete to retrieve their ID
+    const athleteRes: { id?: number } = await runUpstream(
+      fetch('https://www.strava.com/api/v3/athlete', {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }).then((response: Response): Promise<{ id?: number }> => response.json()),
+      'The Strava athlete lookup failed.',
+    );
 
-  const ghRes = await fetch(`https://github-contributions-api.jogruber.de/v4/jens-johnson?y=${year}`).then(
-    (r) => r.json() as Promise<GhContributionsResponse>,
-  );
+    // An unresolvable athlete also surfaces as a 502; the token was accepted but the profile lookup failed
+    if (!athleteRes.id) {
+      console.error('[metrics] Could not resolve Strava athlete:', JSON.stringify(athleteRes));
+      throw createError({
+        statusCode: 502,
+        message: 'Could not resolve Strava athlete',
+      });
+    }
 
-  const totalContributions = ghRes.total[year] ?? 0;
-  // Filter out future-dated entries — the API returns the full calendar year,
-  // and a naive .slice(-182) would grab months that haven't happened yet.
-  const today = new Date().toISOString().slice(0, 10);
-  const pastContributions = ghRes.contributions.filter((c) => c.date <= today);
-  const weeks = groupIntoWeeks(pastContributions, 26);
+    const athleteId: number = athleteRes.id;
 
-  /* ─── Strava token exchange ──────────────────────────────────────────────────────────────────────────────────────── */
+    /* ─── Strava stats ───────────────────────────────────────────────────────────────────────────────────────────── */
 
-  const tokenRes = await fetch('https://www.strava.com/oauth/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      client_id: stravaClientId,
-      client_secret: stravaClientSecret,
-      refresh_token: stravaRefreshToken,
-      grant_type: 'refresh_token',
-    }),
-  }).then((r) => r.json());
+    // Fetch the aggregate run totals and the recent-activity list in parallel
+    const [statsRes, activitiesRes]: [IStravaStatsResponse, IStravaActivitySummary[]] = await Promise.all([
+      runUpstream(
+        fetch(`https://www.strava.com/api/v3/athletes/${athleteId}/stats`, {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }).then((response: Response): Promise<IStravaStatsResponse> => response.json()),
+        'The Strava stats fetch failed.',
+      ),
 
-  if (tokenRes.errors || !tokenRes.access_token) {
-    console.error('[metrics] Strava token exchange failed:', JSON.stringify(tokenRes));
-    throw createError({
-      statusCode: 502,
-      message: `Strava auth failed: ${tokenRes.message ?? JSON.stringify(tokenRes)}`,
-    });
-  }
+      runUpstream(
+        fetch(`https://www.strava.com/api/v3/athlete/activities?per_page=${STRAVA_ACTIVITY_PAGE_SIZE}`, {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }).then((response: Response): Promise<IStravaActivitySummary[]> => response.json()),
+        'The Strava activities fetch failed.',
+      ),
+    ]);
 
-  const { access_token } = tokenRes as StravaTokenResponse;
-
-  // Get the authenticated athlete to retrieve their ID
-  const athleteRes = await fetch('https://www.strava.com/api/v3/athlete', {
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
-  }).then((r) => r.json());
-
-  if (!athleteRes.id) {
-    console.error('[metrics] Could not resolve Strava athlete:', JSON.stringify(athleteRes));
-    throw createError({
-      statusCode: 502,
-      message: 'Could not resolve Strava athlete',
-    });
-  }
-
-  const athleteId: number = athleteRes.id;
-
-  /* ─── Strava stats ───────────────────────────────────────────────────────────────────────────────────────────────── */
-
-  const [statsRes, activitiesRes] = await Promise.all([
-    fetch(`https://www.strava.com/api/v3/athletes/${athleteId}/stats`, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
+    // Assemble the payload: contribution weeks for the heatmap, run totals and weekly miles for the sparkline
+    return {
+      github: {
+        totalContributions,
+        weeks,
       },
-    }).then((r) => r.json() as Promise<StravaStatsResponse>),
-
-    fetch('https://www.strava.com/api/v3/athlete/activities?per_page=200', {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
+      strava: {
+        ytdMiles: metersToMiles(statsRes.ytd_run_totals.distance),
+        ytdRuns: statsRes.ytd_run_totals.count,
+        ytdElevationFt: metersToFeet(statsRes.ytd_run_totals.elevation_gain),
+        weeklyMiles: buildWeeklyMiles(activitiesRes, MILEAGE_WEEKS),
       },
-    }).then((r) => r.json() as Promise<StravaActivity[]>),
-  ]);
+    };
+  },
+  {
+    maxAge: CACHE_MAX_AGE_SECONDS,
+    // Stale-while-revalidate (explicit): once warm, an expired read serves the last-known value and refreshes in the
+    // background, so a slow or briefly-down upstream never blocks or errors the about tile.
+    swr: true,
+    name: 'about-metrics',
+    getKey: (): string => 'about-metrics',
+  },
+);
 
-  const data: MetricsResponse = {
-    github: {
-      totalContributions,
-      weeks,
-    },
-    strava: {
-      ytdMiles: metresToMiles(statsRes.ytd_run_totals.distance),
-      ytdRuns: statsRes.ytd_run_totals.count,
-      ytdElevationFt: metresToFeet(statsRes.ytd_run_totals.elevation_gain),
-      weeklyMiles: buildWeeklyMiles(activitiesRes, 16),
-    },
-  };
-
-  cachedData = data;
-  cacheTimestamp = Date.now();
-
-  return data;
-});
+/**
+ * Aggregates GitHub contribution data and Strava year-to-date run stats for the about page metrics card, serving the
+ * cached aggregate when it is fresh
+ * @public
+ * @default
+ * @function
+ * @throws 502 when the GitHub contributions fetch fails
+ * @throws 502 when the Strava token exchange fails
+ * @throws 502 when the authenticated Strava athlete cannot be resolved
+ * @throws 502 when the Strava stats or activities fetch fails
+ * @returns The GitHub contribution weeks plus Strava year-to-date run totals and the weekly-mileage series
+ */
+export default defineEventHandler((): Promise<IMetricsResponse> => fetchAboutMetrics());

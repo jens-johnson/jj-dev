@@ -101,6 +101,22 @@ comments (either via `#`, `//`, `/**/`, `<!--->`, etc.) is applicable for having
 - This is obviously a very "subjective" matter, so lean towards verbosity when unsure. We can work together on building
   out the context, skill, and memory for this
 
+## Punctuation
+
+- Prefer semicolons (or a rewrite) over em dashes (`—`). Em dashes read as AI-sloppy, and they are banned across
+  comments, JSDoc, and site copy. The en dash (`–`, used for numeric ranges like `-1..+1`) and the box-drawing dash
+  (`─`, used in headers/dividers) are different glyphs and are fine.
+- Outside JSDoc, periods can be used sparingly, but try to write whole sentences rather than fragments.
+
+## JSDoc and Member Comments
+
+- Apply JSDoc (`/** */`) uniformly to interfaces, type aliases, functions, and exported constants. Tag with
+  `@interface` / `@typedef` / `@constant` etc. where it adds clarity.
+- Comment **interface and type members** with a single `/* ... */` line (not a `/** */` block), spilling to
+  multiple lines only to respect the 120-char limit. Do the same for object/schema property docs (e.g. the Zod
+  fields in `content.config.ts`).
+- Type and interface naming follows the `I` / `T` prefix convention documented in `CLAUDE.md`.
+
 ## Other Notes
 
 - Use JSDoc with verbosity where available

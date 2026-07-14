@@ -19,17 +19,43 @@
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * <LayoutAppNav /> — placed once in the root layout, above <slot />.
+ * <LayoutAppNav />; placed once in the root layout, above <slot />.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { IUseThemeReturn } from '~/composables/use-theme';
 
-const { theme, cycleTheme } = useTheme();
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The active theme and the cycle action driving the theme toggle button
+ * @internal
+ * @constant
+ */
+const { theme, cycleTheme }: IUseThemeReturn = useTheme();
+
+/**
+ * The current route; used to mark the active link and close the mobile menu on navigation
+ * @internal
+ * @constant
+ */
 const route = useRoute();
 
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the mobile slide-down menu panel is open
+ * @internal
+ * @constant
+ */
 const menuOpen = ref(false);
 
-const links = [
+/**
+ * The primary navigation links rendered in both the desktop bar and the mobile panel
+ * @internal
+ * @constant
+ */
+const links: { label: string; to: string }[] = [
   {
     label: 'Projects',
     to: '/projects',
@@ -48,9 +74,13 @@ const links = [
   },
 ];
 
-/* ─── Theme toggle ────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── THEME TOGGLE ───────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Icon hints at the *next* theme — what you'll switch to. */
+/**
+ * The toggle button icon; hints at the *next* theme, i.e. what you'll switch to
+ * @internal
+ * @constant
+ */
 const themeIcon = computed(
   () =>
     ({
@@ -60,6 +90,11 @@ const themeIcon = computed(
     })[theme.value],
 );
 
+/**
+ * The toggle button aria-label; names the *next* theme, matching the icon hint
+ * @internal
+ * @constant
+ */
 const themeLabel = computed(
   () =>
     ({
@@ -69,9 +104,9 @@ const themeLabel = computed(
     })[theme.value],
 );
 
-/* ─── Mobile menu ─────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── MOBILE MENU ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Close the menu whenever the route changes (link tapped). */
+// Close the menu whenever the route changes (link tapped)
 watch(
   () => route.path,
   () => {
@@ -93,12 +128,19 @@ watch(
         aria-label="Jens Johnson, home"
       >
         <BrandLogoMark class="size-7 shrink-0" />
+
         <span class="font-display text-h5 font-bold tracking-tight">Jens Johnson</span>
       </NuxtLink>
 
       <!-- Desktop links -->
-      <ul class="hidden items-center gap-8 md:flex" role="list">
-        <li v-for="link in links" :key="link.to">
+      <ul
+        class="hidden items-center gap-8 md:flex"
+        role="list"
+      >
+        <li
+          v-for="link in links"
+          :key="link.to"
+        >
           <NuxtLink
             :to="link.to"
             class="text-body-sm text-ink-muted hover:text-ink relative font-medium transition-colors"
@@ -124,7 +166,10 @@ watch(
           :aria-label="themeLabel"
           @click="cycleTheme"
         >
-          <Icon :name="themeIcon" size="16" />
+          <Icon
+            :name="themeIcon"
+            size="16"
+          />
         </button>
 
         <!-- Auth (Sign in / account menu) -->
@@ -138,7 +183,10 @@ watch(
           :aria-expanded="menuOpen"
           @click="menuOpen = !menuOpen"
         >
-          <Icon :name="menuOpen ? 'lucide:x' : 'lucide:menu'" size="16" />
+          <Icon
+            :name="menuOpen ? 'lucide:x' : 'lucide:menu'"
+            size="16"
+          />
         </button>
       </div>
     </nav>
@@ -152,9 +200,18 @@ watch(
       leave-from-class="opacity-100 translate-y-0"
       leave-to-class="opacity-0 -translate-y-2"
     >
-      <div v-if="menuOpen" class="border-border border-t md:hidden">
-        <ul class="mx-auto max-w-6xl space-y-1 px-6 py-3" role="list">
-          <li v-for="link in links" :key="link.to">
+      <div
+        v-if="menuOpen"
+        class="border-border border-t md:hidden"
+      >
+        <ul
+          class="mx-auto max-w-6xl space-y-1 px-6 py-3"
+          role="list"
+        >
+          <li
+            v-for="link in links"
+            :key="link.to"
+          >
             <NuxtLink
               :to="link.to"
               class="text-body text-ink-muted hover:bg-surface hover:text-ink block rounded-md px-3 py-2.5 font-medium transition-colors"

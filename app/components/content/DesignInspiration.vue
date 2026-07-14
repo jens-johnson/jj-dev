@@ -12,7 +12,7 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ██████████████████████████████ #components/content/DesignInspiration.vue ██████████████████████████████████████████
+ * ████████████████████████████████████ #components/content/DesignInspiration.vue ████████████████████████████████████
  *
  * MDC component embedded as `::design-inspiration`. Tells the design story: three nature photos (mountain valley,
  * coastal sunset, city twilight) each became one of the three themes on the site (day / sunset / night). Each card
@@ -24,19 +24,48 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-import type { Theme } from '~/composables/useTheme';
+import type { IUseThemeReturn, TTheme } from '~/composables/use-theme';
 
-const { theme, setTheme } = useTheme();
+/* ─── COMPOSABLES ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-interface InspirationCard {
-  theme: Theme;
+/**
+ * The active site theme and the setter backing the live preview CTA on each card
+ * @internal
+ * @constant
+ */
+const { theme, setTheme }: IUseThemeReturn = useTheme();
+
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * An inspiration card pairing a source photograph with the site theme derived from it, including the extracted
+ * palette swatches and their design-token mappings
+ * @internal
+ * @interface
+ */
+interface IInspirationCard {
+  /* The site theme this card previews */
+  theme: TTheme;
+
+  /* The card title; the theme's display name */
   title: string;
+
+  /* The one-line mood description of the source photograph */
   vibe: string;
+
+  /* The source photograph: its public src, alt text, and photographer credit */
   image: { src: string; alt: string; credit: string };
+
+  /* The dominant palette extracted from the photo, mapped onto the design tokens it feeds */
   palette: { name: string; hex: string; token: string }[];
 }
 
-const cards: InspirationCard[] = [
+/**
+ * The three inspiration cards: one per site theme (day / sunset / night), each traced back to its source photo
+ * @internal
+ * @constant
+ */
+const cards: IInspirationCard[] = [
   {
     theme: 'day',
     title: 'Day',
@@ -47,10 +76,26 @@ const cards: InspirationCard[] = [
       credit: 'Kalen Emsley',
     },
     palette: [
-      { name: 'Sky', hex: '#F8F4EE', token: '--color-bg' },
-      { name: 'Stone', hex: '#DDD0BF', token: '--color-border' },
-      { name: 'Earth', hex: '#8B6534', token: '--color-accent' },
-      { name: 'Forest', hex: '#5E8C65', token: '--color-accent-secondary' },
+      {
+        name: 'Sky',
+        hex: '#F8F4EE',
+        token: '--color-bg',
+      },
+      {
+        name: 'Stone',
+        hex: '#DDD0BF',
+        token: '--color-border',
+      },
+      {
+        name: 'Earth',
+        hex: '#8B6534',
+        token: '--color-accent',
+      },
+      {
+        name: 'Forest',
+        hex: '#5E8C65',
+        token: '--color-accent-secondary',
+      },
     ],
   },
   {
@@ -63,10 +108,26 @@ const cards: InspirationCard[] = [
       credit: 'Iris Papillon',
     },
     palette: [
-      { name: 'Haze', hex: '#F4D9B8', token: '--color-bg' },
-      { name: 'Rose', hex: '#C8765A', token: '--color-border' },
-      { name: 'Ember', hex: '#A84835', token: '--color-accent' },
-      { name: 'Gold', hex: '#D4763B', token: '--color-accent-secondary' },
+      {
+        name: 'Haze',
+        hex: '#F4D9B8',
+        token: '--color-bg',
+      },
+      {
+        name: 'Rose',
+        hex: '#C8765A',
+        token: '--color-border',
+      },
+      {
+        name: 'Ember',
+        hex: '#A84835',
+        token: '--color-accent',
+      },
+      {
+        name: 'Gold',
+        hex: '#D4763B',
+        token: '--color-accent-secondary',
+      },
     ],
   },
   {
@@ -79,16 +140,40 @@ const cards: InspirationCard[] = [
       credit: 'Martin Fu',
     },
     palette: [
-      { name: 'Twilight', hex: '#1A2138', token: '--color-bg' },
-      { name: 'Steel', hex: '#3A4760', token: '--color-border' },
-      { name: 'Spark', hex: '#9DB8A0', token: '--color-accent' },
-      { name: 'Horizon', hex: '#D4763B', token: '--color-accent-secondary' },
+      {
+        name: 'Twilight',
+        hex: '#1A2138',
+        token: '--color-bg',
+      },
+      {
+        name: 'Steel',
+        hex: '#3A4760',
+        token: '--color-border',
+      },
+      {
+        name: 'Spark',
+        hex: '#9DB8A0',
+        token: '--color-accent',
+      },
+      {
+        name: 'Horizon',
+        hex: '#D4763B',
+        token: '--color-accent-secondary',
+      },
     ],
   },
 ];
 
-function preview(t: Theme) {
-  setTheme(t);
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * A utility method to apply the given theme site-wide as a live preview when a card's CTA is clicked
+ * @internal
+ * @function
+ * @param nextTheme - The theme to activate
+ */
+function preview(nextTheme: TTheme): void {
+  setTheme(nextTheme);
 }
 </script>
 
@@ -107,7 +192,7 @@ function preview(t: Theme) {
         class="inspiration-card group bg-surface relative overflow-hidden rounded-2xl border transition-all duration-500"
         :class="theme === card.theme ? 'border-accent ring-accent/30 shadow-lg ring-1' : 'border-border'"
       >
-        <!-- Image — clean, no text overlay -->
+        <!-- Image; clean, no text overlay -->
         <div class="relative aspect-[4/5] overflow-hidden">
           <NuxtImg
             :src="card.image.src"
@@ -120,7 +205,7 @@ function preview(t: Theme) {
             class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
 
-          <!-- Active indicator — only thing on the image -->
+          <!-- Active indicator; only thing on the image -->
           <span
             v-if="theme === card.theme"
             class="bg-accent absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] tracking-widest text-stone-50 uppercase"
@@ -132,7 +217,7 @@ function preview(t: Theme) {
 
         <!-- Palette + meta -->
         <div class="p-5">
-          <!-- Photo credit — tiny caption, low contrast. Uses <span> + display:block to avoid the prose `<p>` overrides. -->
+          <!-- Photo credit; tiny caption, low contrast. Uses <span> + display:block to avoid the prose `<p>` overrides. -->
           <span class="credit-line text-ink-subtle/60 font-mono tracking-wide">
             {{ card.image.credit }} · Unsplash
           </span>
@@ -160,6 +245,7 @@ function preview(t: Theme) {
                 class="border-border bg-bg text-ink-muted pointer-events-none absolute -top-12 left-1/2 z-10 -translate-x-1/2 rounded-md border px-2 py-1 font-mono text-[10px] whitespace-nowrap opacity-0 transition-opacity group-hover/sw:opacity-100"
               >
                 <span class="font-medium">{{ swatch.hex }}</span>
+
                 <span class="text-ink-subtle ml-1.5">{{ swatch.token }}</span>
               </div>
             </div>
@@ -177,8 +263,17 @@ function preview(t: Theme) {
             :disabled="theme === card.theme"
             @click="preview(card.theme)"
           >
-            <Icon v-if="theme === card.theme" name="lucide:check" size="13" />
-            <Icon v-else name="lucide:eye" size="13" />
+            <Icon
+              v-if="theme === card.theme"
+              name="lucide:check"
+              size="13"
+            />
+
+            <Icon
+              v-else
+              name="lucide:eye"
+              size="13"
+            />
             {{ theme === card.theme ? 'Previewing' : 'Preview theme' }}
           </button>
         </div>
@@ -188,9 +283,11 @@ function preview(t: Theme) {
     <!-- Footnote / lineage explanation -->
     <p class="font-body text-body-sm text-ink-muted mt-6 leading-relaxed">
       Each palette feeds the same set of semantic design tokens:
-      <code class="text-caption text-accent font-mono">--color-bg</code>,
-      <code class="text-caption text-accent font-mono">--color-accent</code>, etc. The themes themselves are nothing
-      more than a single CSS attribute swap on <code class="text-caption text-accent font-mono">&lt;html&gt;</code>.
+      <code class="text-caption text-accent font-mono">--color-bg</code>
+      ,
+      <code class="text-caption text-accent font-mono">--color-accent</code>
+      , etc. The themes themselves are nothing more than a single CSS attribute swap on
+      <code class="text-caption text-accent font-mono">&lt;html&gt;</code>.
     </p>
   </div>
 </template>

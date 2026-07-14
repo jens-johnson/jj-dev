@@ -10,10 +10,10 @@
 #                             ████▀     ████▀
 #
 # █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
-# ████████████████████████████████████████████████ .github/dependabot.yml ████████████████████████████████████████████
+# ████████████████████████████████████████████████ .github/dependabot.yml █████████████████████████████████████████████
 #
-# Dependabot configuration. Automatically opens PRs for npm dependency updates on a
-# weekly schedule. Security alerts are surfaced immediately regardless of schedule.
+# Dependabot configuration. Automatically opens PRs for npm dependency updates on a weekly schedule. Security alerts
+# are surfaced immediately regardless of schedule.
 #
 # ─── SEE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
 #
@@ -24,9 +24,9 @@
 version: 2
 
 updates:
-  # ─── npm ──────────────────────────────────────────────────────────────────────
-  # Weekly check for outdated npm packages. Groups minor + patch updates into a
-  # single PR to reduce noise; major version bumps get their own PR per package.
+  # ─── npm ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+  # Weekly check for outdated npm packages. Groups minor + patch updates into a single PR to reduce noise; major
+  # version bumps get their own PR per package.
   - package-ecosystem: npm
     directory: /
     schedule:
@@ -40,8 +40,9 @@ updates:
         update-types:
           - minor
           - patch
+
+    # Pin major versions of framework packages; upgrade intentionally.
     ignore:
-      # Pin major versions of framework packages — upgrade intentionally.
       - dependency-name: nuxt
         update-types: [version-update:semver-major]
       - dependency-name: vue
@@ -55,7 +56,7 @@ updates:
       prefix-development: chore
       include: scope
 
-  # ─── GitHub Actions ───────────────────────────────────────────────────────────
+  # ─── GitHub Actions ────────────────────────────────────────────────────────────────────────────────────────────────
   # Weekly check for outdated action versions in workflow files.
   - package-ecosystem: github-actions
     directory: /

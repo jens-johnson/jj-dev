@@ -2,52 +2,57 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ▀▀        ▀▀                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ██████████████████████████████████████ #components/data/status-badge/index.vue ██████████████████████████████████████
  *
- * Inline status badge for a content status value — active | wip | archived — with matching color treatment.
+ * Inline status badge for a content status value; active | wip | archived; with matching color treatment.
  *
- * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
  * <DataStatusBadge status="active" />
  * <DataStatusBadge status="wip" />
  * <DataStatusBadge status="archived" />
  *
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • status
+ *     - Description: The content status to render; unknown values fall back to a neutral badge showing the raw value
+ *     - Type: string
+ *     - Required: false
+ *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import { BADGE_VISUAL_BY_STATUS } from './constants';
+import type { IStatusBadgeProps, IStatusBadgeVisual } from './types';
 
-interface Props {
-  status?: string;
-}
-const props = defineProps<Props>();
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const config: Record<string, { label: string; cls: string }> = {
-  active: {
-    label: 'Active',
-    cls: 'bg-accent/10 text-accent',
-  },
-  wip: {
-    label: 'In progress',
-    cls: 'bg-earth-300/20 text-earth-500',
-  },
-  archived: {
-    label: 'Archived',
-    cls: 'bg-surface text-ink-subtle',
-  },
-};
+/**
+ * Component props; the status value is optional and unknown values fall back to a neutral badge
+ * @internal
+ * @constant
+ */
+const props = defineProps<IStatusBadgeProps>();
 
-const badge = computed(
-  () =>
-    config[props.status ?? ''] ?? {
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The visual treatment for the current status; unknown statuses fall back to a neutral badge showing the raw value
+ * @internal
+ * @constant
+ */
+const badge: ComputedRef<IStatusBadgeVisual> = computed(
+  (): IStatusBadgeVisual =>
+    BADGE_VISUAL_BY_STATUS[props.status ?? ''] ?? {
       label: props.status ?? '',
       cls: 'bg-surface text-ink-subtle',
     },

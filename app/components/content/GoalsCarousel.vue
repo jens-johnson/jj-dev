@@ -23,7 +23,36 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
-const goals = [
+/* ─── DATA ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * A single foundational project goal rendered as a carousel card
+ * @internal
+ * @interface
+ */
+interface IGoal {
+  /* The two-digit ordinal label (i.e. "01") */
+  num: string;
+
+  /* The card heading */
+  title: string;
+
+  /* The Lucide icon name shown on the card */
+  icon: string;
+
+  /* The card body copy */
+  body: string;
+
+  /* The visual treatment key handed to the paired GoalsCarouselVisual */
+  visual: 'layers' | 'leaf' | 'branch';
+}
+
+/**
+ * The three foundational project goals, in display order
+ * @internal
+ * @constant
+ */
+const goals: IGoal[] = [
   {
     num: '01',
     title: 'Bare Metal, No Template',
@@ -47,24 +76,53 @@ const goals = [
   },
 ];
 
-const activeIdx = ref(0);
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The index of the currently active goal card; drives the indicator dots and mobile snap position
+ * @internal
+ * @constant
+ */
+const activeIndex: Ref<number> = ref(0);
+
+/**
+ * A template ref to the horizontally-scrolling carousel track on mobile
+ * @internal
+ * @constant
+ */
 const scrollContainer = ref<HTMLElement | null>(null);
 
-function scrollTo(i: number) {
-  activeIdx.value = i;
-  if (!scrollContainer.value) return;
-  const target = scrollContainer.value.children[i] as HTMLElement | undefined;
+/* ─── HANDLERS ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * A utility method to activate the goal card at the given index and smooth-scroll the mobile carousel to it; used by
+ * the mobile indicator dots
+ * @internal
+ * @function
+ * @param i - The zero-based index of the goal card to scroll to
+ */
+function scrollTo(i: number): void {
+  // Activate the target card's indicator dot immediately
+  activeIndex.value = i;
+  if (!scrollContainer.value) {
+    return;
+  }
+  // Smooth-scroll the carousel so the target card snaps into view
+  const target: HTMLElement | undefined = scrollContainer.value.children[i] as HTMLElement | undefined;
   if (target) {
     scrollContainer.value.scrollTo({ left: target.offsetLeft - 16, behavior: 'smooth' });
   }
 }
 
-/** Track scroll position to update activeIdx on mobile swipe. */
-function onScroll() {
-  if (!scrollContainer.value) return;
-  const { scrollLeft, clientWidth } = scrollContainer.value;
-  const i = Math.round(scrollLeft / (clientWidth * 0.85));
-  activeIdx.value = Math.min(goals.length - 1, Math.max(0, i));
+/** Track scroll position to update the active index on mobile swipe. */
+function onScroll(): void {
+  if (!scrollContainer.value) {
+    return;
+  }
+  // Derive the visible card index from the scroll offset (each card spans 85% of the container width)
+  const { scrollLeft, clientWidth }: { scrollLeft: number; clientWidth: number } = scrollContainer.value;
+  const i: number = Math.round(scrollLeft / (clientWidth * 0.85));
+  activeIndex.value = Math.min(goals.length - 1, Math.max(0, i));
 }
 </script>
 
@@ -80,11 +138,17 @@ function onScroll() {
         v-for="(goal, i) in goals"
         :key="goal.num"
         class="goal-card border-border bg-surface w-[85%] shrink-0 snap-center rounded-2xl border p-6"
-        :class="{ 'is-active': i === activeIdx }"
+        :class="{ 'is-active': i === activeIndex }"
       >
-        <ContentGoalsCarouselVisual :variant="goal.visual" :icon="goal.icon" />
+        <ContentGoalsCarouselVisual
+          :variant="goal.visual"
+          :icon="goal.icon"
+        />
+
         <p class="text-caption text-accent mt-4 font-mono tracking-widest">{{ goal.num }}</p>
+
         <h3 class="font-display text-h5 text-ink mt-1 mb-3 leading-tight font-bold">{{ goal.title }}</h3>
+
         <p class="font-body text-body-sm text-ink-muted leading-relaxed">{{ goal.body }}</p>
       </article>
     </div>
@@ -96,7 +160,7 @@ function onScroll() {
         :key="i"
         type="button"
         class="h-1.5 rounded-full transition-all"
-        :class="i === activeIdx ? 'bg-accent w-8' : 'bg-border w-1.5'"
+        :class="i === activeIndex ? 'bg-accent w-8' : 'bg-border w-1.5'"
         :aria-label="`Goal ${i + 1}`"
         @click="scrollTo(i)"
       />
@@ -108,8 +172,8 @@ function onScroll() {
         v-for="(goal, i) in goals"
         :key="goal.num"
         class="goal-card group border-border bg-surface relative overflow-hidden rounded-2xl border p-7 transition-all duration-500"
-        :class="{ 'is-active': i === activeIdx }"
-        @mouseenter="activeIdx = i"
+        :class="{ 'is-active': i === activeIndex }"
+        @mouseenter="activeIndex = i"
       >
         <!-- Decorative number watermark (giant, behind content) -->
         <span
@@ -120,14 +184,19 @@ function onScroll() {
 
         <!-- Visual illustration -->
         <div class="relative z-10 mb-5">
-          <ContentGoalsCarouselVisual :variant="goal.visual" :icon="goal.icon" />
+          <ContentGoalsCarouselVisual
+            :variant="goal.visual"
+            :icon="goal.icon"
+          />
         </div>
 
         <!-- Meta -->
         <p class="text-caption text-accent relative z-10 font-mono tracking-widest">{{ goal.num }}</p>
+
         <h3 class="font-display text-h5 text-ink relative z-10 mt-1 mb-3 leading-tight font-bold">
           {{ goal.title }}
         </h3>
+
         <p class="font-body text-body-sm text-ink-muted relative z-10 leading-relaxed">
           {{ goal.body }}
         </p>

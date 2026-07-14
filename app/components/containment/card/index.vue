@@ -2,56 +2,67 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ▀▀        ▀▀                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  * ██████████████████████████████████████ #components/containment/card/index.vue ███████████████████████████████████████
  *
  * Surface card primitive. Elevated container with border, rounded corners, and a background surface color.
  *
- * ─── USAGE ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
- * <ContainmentCard :as="li" pad="lg">content</ContainmentCard>
+ * <ContainmentCard as="li" pad="lg">content</ContainmentCard>
  *
- * Props:
- *   as  — root element tag. Default "div". Use "article", "li", etc. as needed.
- *   pad — inner padding preset. Default "md". One of: none | sm | md | lg.
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • as
+ *     - Description: The root element tag; use "article", "li", etc. as needed
+ *     - Type: string
+ *     - Required: false
+ *     - Default: 'div'
+ *   • pad
+ *     - Description: The inner padding preset
+ *     - Type: 'sm' | 'md' | 'lg' | 'none'
+ *     - Required: false
+ *     - Default: 'md'
+ *
+ * ─── SLOTS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • default
+ *     - Description: The card content rendered inside the padded surface
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { TPropsWithDefaults } from '@jens-johnson/style-guide/types/vue';
 
-type PadPreset = 'sm' | 'md' | 'lg' | 'none';
+import { PAD_CLASS_BY_PRESET } from './constants';
+import type { ICardProps } from './types';
 
-interface Props {
-  as?: string;
-  pad?: PadPreset;
-}
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const props = withDefaults(defineProps<Props>(), {
+/**
+ * Component props; allows users to consume the Card component and alter the root element tag and inner padding preset
+ * @internal
+ * @constant
+ */
+const props: TPropsWithDefaults<ICardProps, 'as' | 'pad'> = withDefaults(defineProps<ICardProps>(), {
   as: 'div',
   pad: 'md',
 });
-
-const padClass: Record<PadPreset, string> = {
-  none: '',
-  sm: 'p-4',
-  md: 'p-6',
-  lg: 'p-8',
-};
 </script>
 
 <template>
   <component
     :is="props.as"
     class="border-border bg-surface overflow-hidden rounded-2xl border"
-    :class="padClass[props.pad]"
+    :class="PAD_CLASS_BY_PRESET[props.pad]"
   >
     <slot />
   </component>

@@ -19,31 +19,66 @@
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
 
+import { REVEAL_DELAY_MS } from './constants';
+
+/* ─── STATE ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Whether the staggered entrance reveal has begun; flips true shortly after mount to trigger the CSS transitions
+ * @internal
+ * @constant
+ */
 const revealed = ref(false);
 
+/* ─── LIFECYCLE ──────────────────────────────────────────────────────────────────────────────────────────────────── */
+
 onMounted(() => {
+  // Kick off the staggered entrance reveal shortly after mount
   setTimeout(() => {
     revealed.value = true;
-  }, 80);
+  }, REVEAL_DELAY_MS);
 });
 </script>
 
 <template>
-  <PrimitivesBaseParallax v-slot="{ layerStyle, markStyle, scrollY }" :lerp="0.055">
+  <PrimitivesBaseParallax
+    v-slot="{ layerStyle, markStyle, scrollY }"
+    :lerp="0.055"
+  >
     <PrimitivesBaseHero>
       <template #backdrop>
         <!-- ── Grain overlay ──────────────────────────────────────────────── -->
-        <div class="pointer-events-none fixed inset-0 z-[5] opacity-[0.06]" aria-hidden="true">
-          <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+        <div
+          class="pointer-events-none fixed inset-0 z-[5] opacity-[0.06]"
+          aria-hidden="true"
+        >
+          <svg
+            class="h-full w-full"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <filter id="grain-filter">
-              <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-              <feColorMatrix type="saturate" values="0" />
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.65"
+                numOctaves="3"
+                stitchTiles="stitch"
+              />
+
+              <feColorMatrix
+                type="saturate"
+                values="0"
+              />
             </filter>
-            <rect width="100%" height="100%" filter="url(#grain-filter)" />
+
+            <rect
+              width="100%"
+              height="100%"
+              filter="url(#grain-filter)"
+            />
           </svg>
         </div>
 
-        <!-- ── Orb A — top right ──────────────────────────────────────────── -->
+        <!-- ── Orb A; top right ──────────────────────────────────────────── -->
         <div
           class="orb orb-a pointer-events-none absolute -top-24 -right-24 z-[10] h-[640px] w-[640px] rounded-full will-change-transform"
           :style="{
@@ -54,7 +89,7 @@ onMounted(() => {
           aria-hidden="true"
         />
 
-        <!-- ── Orb B — bottom left ────────────────────────────────────────── -->
+        <!-- ── Orb B; bottom left ────────────────────────────────────────── -->
         <div
           class="orb orb-b pointer-events-none absolute -bottom-16 -left-24 z-[10] h-[520px] w-[520px] rounded-full will-change-transform"
           :style="{
@@ -65,7 +100,7 @@ onMounted(() => {
           aria-hidden="true"
         />
 
-        <!-- ── Orb C — mid drift ──────────────────────────────────────────── -->
+        <!-- ── Orb C; mid drift ──────────────────────────────────────────── -->
         <div
           class="orb orb-c pointer-events-none absolute top-[30%] left-[40%] z-[10] h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full will-change-transform"
           :style="{
@@ -76,7 +111,7 @@ onMounted(() => {
           aria-hidden="true"
         />
 
-        <!-- ── Logo mark — scroll-reveal backdrop ────────────────────────── -->
+        <!-- ── Logo mark; scroll-reveal backdrop ────────────────────────── -->
         <div
           class="pointer-events-none absolute inset-0 z-[15] flex items-center justify-center will-change-transform select-none"
           :style="markStyle()"
@@ -105,7 +140,7 @@ onMounted(() => {
           Software engineer · San Diego, CA
         </p>
 
-        <!-- Headline — clip-based line reveal -->
+        <!-- Headline; clip-based line reveal -->
         <h1 class="font-display text-ink leading-[1.02] font-bold tracking-tight">
           <span class="block overflow-hidden">
             <span
@@ -122,6 +157,7 @@ onMounted(() => {
               Jens
             </span>
           </span>
+
           <span class="block overflow-hidden">
             <span
               class="block"
@@ -169,8 +205,12 @@ onMounted(() => {
             class="bg-accent font-body text-body-sm inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-stone-50 transition-opacity hover:opacity-90"
           >
             My work
-            <Icon name="lucide:arrow-right" size="14" />
+            <Icon
+              name="lucide:arrow-right"
+              size="14"
+            />
           </NuxtLink>
+
           <NuxtLink
             to="/about"
             class="border-border font-body text-body-sm text-ink-muted hover:border-ink hover:text-ink inline-flex items-center gap-2 rounded-full border px-6 py-3 font-semibold transition-colors"
@@ -188,6 +228,7 @@ onMounted(() => {
           aria-hidden="true"
         >
           <span class="text-caption text-ink-subtle font-mono tracking-widest uppercase">Scroll</span>
+
           <div
             class="from-ink-subtle h-10 w-[1px] origin-top bg-gradient-to-b to-transparent"
             style="animation: scroll-pulse 1.8s ease-in-out infinite"
@@ -200,7 +241,7 @@ onMounted(() => {
 
 <style scoped>
 /*
- * Ambient orb life — slow, independent `scale`/`translate`/opacity drift so the backdrop breathes. These animate the
+ * Ambient orb life; slow, independent `scale`/`translate`/opacity drift so the backdrop breathes. These animate the
  * CSS `scale`/`translate` properties (not `transform`), so they compose with the inline parallax transform instead of
  * overriding it. Gated behind prefers-reduced-motion: no-preference so it's fully static for motion-sensitive users.
  */

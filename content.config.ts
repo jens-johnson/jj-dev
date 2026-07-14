@@ -62,21 +62,16 @@ const baseSchema = z.object({
  * @constant
  */
 const blogSchema = baseSchema.extend({
-  /**
-   * Optional subtitle — renders below the title on both the post detail page and listing cards.
+  /*
+   * Optional subtitle; renders below the title on both the post detail page and listing cards.
    * Use when the title sets the topic and the subtitle hints at the angle / question.
    */
   subtitle: z.string().optional(),
 
-  /**
-   * The reading time estimate in minutes — auto-generated if omitted.
-   */
+  /* The reading time estimate in minutes; auto-generated if omitted. */
   readingTime: z.number().optional(),
 
-  /**
-   * Series grouping. Articles in a series link to each other.
-   * i.e. `{ name: 'Building jj-dev', part: 1 }`
-   */
+  /* Series grouping. Articles in a series link to each other. i.e. `{ name: 'Building jj-dev', part: 1 }` */
   series: z
     .object({
       name: z.string(),
@@ -92,19 +87,13 @@ const blogSchema = baseSchema.extend({
  * @constant
  */
 const projectsSchema = baseSchema.extend({
-  /**
-   * A short label shown on cards (falls back to title if omitted)
-   */
+  /* A short label shown on cards (falls back to title if omitted) */
   shortTitle: z.string().optional(),
 
-  /**
-   * A project status (drives the badge on project cards)
-   */
+  /* A project status (drives the badge on project cards) */
   status: z.enum(['active', 'archived', 'wip']).default('active'),
 
-  /**
-   * Year(s) worked on the project
-   */
+  /* Year(s) worked on the project */
   year: z.union([
     z.number(),
     z.object({
@@ -113,9 +102,7 @@ const projectsSchema = baseSchema.extend({
     }),
   ]),
 
-  /**
-   * Links associated with the project
-   */
+  /* Links associated with the project */
   links: z
     .object({
       live: z.string().url().optional(),
@@ -124,19 +111,13 @@ const projectsSchema = baseSchema.extend({
     })
     .optional(),
 
-  /**
-   * Primary technologies / stack used
-   */
+  /* Primary technologies / stack used */
   stack: z.array(z.string()).default([]),
 
-  /**
-   * Whether to feature this project on the homepage
-   */
+  /* Whether to feature this project on the homepage */
   featured: z.boolean().default(false),
 
-  /**
-   * Sort weight — lower numbers appear first
-   */
+  /* Sort weight; lower numbers appear first */
   order: z.number().default(100),
 });
 
@@ -147,38 +128,32 @@ const projectsSchema = baseSchema.extend({
  * @constant
  */
 const labSchema = baseSchema.extend({
-  /**
-   * Category for grouping lab entries
-   */
+  /* Category for grouping lab entries */
   category: z.enum(['animation', 'generative', 'interaction', 'typography', 'tool', 'other']).default('other'),
 
-  /**
-   * Live demo URL (iframe embed or external link)
-   */
+  /* Live demo URL (iframe embed or external link) */
   demo: z.string().url().optional(),
 
-  /**
-   * Whether the experiment is interactive (vs. just a write-up)
-   */
+  /* Whether the experiment is interactive (vs. just a write-up) */
   interactive: z.boolean().default(false),
 });
 
 /**
- * The schema representing a single piece of homelab hardware — one node in the Substrate topology.
+ * The schema representing a single piece of homelab hardware; one node in the Substrate topology.
  * Each device is its own markdown doc; the body holds free-form notes, learnings, and config snippets.
  * Example path: `content/substrate/pve-01.md`
  * @internal
  * @constant
  */
 const substrateSchema = baseSchema.extend({
-  /**
+  /*
    * Stable node id, referenced by other devices' `connections[].to`. Named `nodeId` (not `id`) because
    * `id` is reserved by @nuxt/content as the document's internal primary key. e.g. `pve-01`.
    */
   nodeId: z.string(),
 
-  /**
-   * Device class — drives the node icon and reads as the device's "what it is". `internet` is the upstream
+  /*
+   * Device class; drives the node icon and reads as the device's "what it is". `internet` is the upstream
    * WAN/ISP cloud that everything ultimately uplinks to.
    */
   kind: z
@@ -201,29 +176,19 @@ const substrateSchema = baseSchema.extend({
     ])
     .default('other'),
 
-  /**
-   * Topology band — drives vertical placement, from `edge` (top, faces the internet) down to `power` (bottom).
-   */
+  /* Topology band; drives vertical placement, from `edge` (top, faces the internet) down to `power` (bottom). */
   layer: z.enum(['edge', 'network', 'compute', 'storage', 'service', 'client', 'power']).default('compute'),
 
-  /**
-   * Operational status — drives the node's status dot and inspector badge colour.
-   */
+  /* Operational status; drives the node's status dot and inspector badge colour. */
   status: z.enum(['online', 'offline', 'planned', 'maintenance']).default('online'),
 
-  /**
-   * Manufacturer, e.g. `Protectli`, `Synology`, `Raspberry Pi`.
-   */
+  /* Manufacturer, e.g. `Protectli`, `Synology`, `Raspberry Pi`. */
   vendor: z.string().optional(),
 
-  /**
-   * Specific model, e.g. `VP2420`, `DS923+`.
-   */
+  /* Specific model, e.g. `VP2420`, `DS923+`. */
   model: z.string().optional(),
 
-  /**
-   * Key spec rows shown in the inspector panel, e.g. `{ label: 'CPU', value: 'i5-1235U' }`.
-   */
+  /* Key spec rows shown in the inspector panel, e.g. `{ label: 'CPU', value: 'i5-1235U' }`. */
   specs: z
     .array(
       z.object({
@@ -233,12 +198,10 @@ const substrateSchema = baseSchema.extend({
     )
     .default([]),
 
-  /**
-   * Typical idle draw in watts — summed into the dashboard's total-power stat.
-   */
+  /* Typical idle draw in watts; summed into the dashboard's total-power stat. */
   power: z.number().optional(),
 
-  /**
+  /*
    * Links to other devices, referenced by their `id`. `kind` styles the drawn edge: `uplink` (toward the
    * internet/gateway), `network` (LAN), `data` (storage / replication traffic), `power` (UPS feed).
    */
@@ -252,14 +215,12 @@ const substrateSchema = baseSchema.extend({
     )
     .default([]),
 
-  /**
-   * Sort weight within a layer — lower numbers sit further left in the topology row.
-   */
+  /* Sort weight within a layer; lower numbers sit further left in the topology row. */
   order: z.number().default(100),
 });
 
 /**
- * The schema representing a deployed homelab service — one entry in the Substrate "Services" layer. Where the
+ * The schema representing a deployed homelab service; one entry in the Substrate "Services" layer. Where the
  * `substrate` collection documents the hardware, this documents what *runs* on it. The body holds the long-form
  * write-up (architecture, setup, decisions); frontmatter drives the card, the detail header, and the metrics tiles.
  * Example path: `content/services/jenscraft.md`
@@ -267,53 +228,39 @@ const substrateSchema = baseSchema.extend({
  * @constant
  */
 const servicesSchema = baseSchema.extend({
-  /**
+  /*
    * Stable service id, used in routes and as the live-metrics key. Named `serviceId` (not `id`) because `id` is
    * reserved by @nuxt/content as the document's internal primary key. e.g. `jenscraft`.
    */
   serviceId: z.string(),
 
-  /**
-   * Service class — drives the card icon and reads as the service's "what it is".
-   */
+  /* Service class; drives the card icon and reads as the service's "what it is". */
   kind: z
     .enum(['game-server', 'media', 'monitoring', 'network', 'automation', 'storage', 'web', 'other'])
     .default('other'),
 
-  /**
-   * Operational status — drives the status dot and badge colour. `planned` covers a service that is documented but
+  /*
+   * Operational status; drives the status dot and badge colour. `planned` covers a service that is documented but
    * not yet stood up (Jenscraft today).
    */
   status: z.enum(['online', 'offline', 'planned', 'maintenance', 'degraded']).default('planned'),
 
-  /**
-   * Optional explicit Lucide icon name, overriding the per-kind default.
-   */
+  /* Optional explicit Lucide icon name, overriding the per-kind default. */
   icon: z.string().optional(),
 
-  /**
-   * Short tagline shown on the service card (falls back to `description`).
-   */
+  /* Short tagline shown on the service card (falls back to `description`). */
   summary: z.string().optional(),
 
-  /**
-   * `nodeId` of the substrate device this service runs on (e.g. `srv-01`), linking a service back to its hardware.
-   */
+  /* `nodeId` of the substrate device this service runs on (e.g. `srv-01`), linking a service back to its hardware. */
   host: z.string().optional(),
 
-  /**
-   * Player/visitor-facing connect address, e.g. `jenscraft.world`.
-   */
+  /* Player/visitor-facing connect address, e.g. `jenscraft.world`. */
   address: z.string().optional(),
 
-  /**
-   * Primary technologies / stack powering the service.
-   */
+  /* Primary technologies / stack powering the service. */
   stack: z.array(z.string()).default([]),
 
-  /**
-   * Outbound links shown on the detail page. `map` is the public BlueMap (or similar) web view.
-   */
+  /* Outbound links shown on the detail page. `map` is the public BlueMap (or similar) web view. */
   links: z
     .object({
       live: z.string().url().optional(),
@@ -323,7 +270,7 @@ const servicesSchema = baseSchema.extend({
     })
     .optional(),
 
-  /**
+  /*
    * Installed plugins / add-ons. `side` marks whether it runs on the server or is a client-side recommendation;
    * `category` groups the list in the UI.
    */
@@ -341,8 +288,8 @@ const servicesSchema = baseSchema.extend({
     )
     .default([]),
 
-  /**
-   * Declared dashboard tiles — the metrics this service plans to surface. The live feed fills the values once the
+  /*
+   * Declared dashboard tiles; the metrics this service plans to surface. The live feed fills the values once the
    * service's metrics publisher reports in; until then the dashboard renders each tile as "awaiting feed".
    */
   metrics: z
@@ -357,9 +304,7 @@ const servicesSchema = baseSchema.extend({
     )
     .default([]),
 
-  /**
-   * Sort weight on the Services grid — lower numbers appear first.
-   */
+  /* Sort weight on the Services grid; lower numbers appear first. */
   order: z.number().default(100),
 });
 

@@ -2,72 +2,124 @@
 /**
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  *
- *                                ██        ██                     ▄▄
- *                                ▀▀        ▀▀                     ██
- *                              ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
- *                                ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
- *                                ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
- *                                ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
- *                                ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
- *                             ████▀     ████▀
+ *                                 ██        ██                     ▄▄
+ *                                 ▀▀        ▀▀                     ██
+ *                               ████      ████                ▄███▄██   ▄████▄   ██▄  ▄██
+ *                                 ██        ██               ██▀  ▀██  ██▄▄▄▄██   ██  ██
+ *                                 ██        ██      █████    ██    ██  ██▀▀▀▀▀▀   ▀█▄▄█▀
+ *                                 ██        ██               ▀██▄▄███  ▀██▄▄▄▄█    ████
+ *                                 ██        ██                 ▀▀▀ ▀▀    ▀▀▀▀▀      ▀▀
+ *                              ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████████████████ #components/data/spark-line/index.vue ████████████████████████████████████
+ * ███████████████████████████████████████ #components/data/spark-line/index.vue ███████████████████████████████████████
  *
  * A tiny dependency-free sparkline: an inline SVG polyline (with a faint area fill and an end-point dot) plotting a
- * short numeric series. Auto-scales to the series' own min/max so flat, low-variance data still reads as a trend.
- * Colour comes from `currentColor`, so callers set it with a Tailwind text-* class.
+ * short numeric series. Auto-scales to the series' own min/max so flat, low-variance data still reads as a trend. Color
+ * comes from `currentColor`, so callers set it with a Tailwind text-* class.
  *
  * ─── USAGE ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  *
  * <DataSparkLine :points="cpuSeries" class="text-accent-secondary" />
  *
+ * ─── PROPS ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ *
+ *   • points
+ *     - Description: The numeric series to plot; fewer than two points renders a placeholder glyph instead
+ *     - Type: number[]
+ *     - Required: true
+ *   • width
+ *     - Description: The rendered SVG width in pixels
+ *     - Type: number
+ *     - Required: false
+ *     - Default: 88
+ *   • height
+ *     - Description: The rendered SVG height in pixels
+ *     - Type: number
+ *     - Required: false
+ *     - Default: 24
+ *   • fill
+ *     - Description: Whether to render the faint area fill beneath the line
+ *     - Type: boolean
+ *     - Required: false
+ *     - Default: true
+ *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
+import type { TPropsWithDefaults } from '@jens-johnson/style-guide/types/vue';
 
-const props = withDefaults(
-  defineProps<{
-    points: number[];
-    width?: number;
-    height?: number;
-    fill?: boolean;
-  }>(),
-  { width: 88, height: 24, fill: true },
+import { SPARK_LINE_END_DOT_RADIUS_PX } from './constants';
+import type { ISparkLineGeometry, ISparkLineProps } from './types';
+import { buildSparkLineGeometry } from './utils';
+
+/* ─── PROPS ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Component props; the numeric series to plot plus optional sizing and area-fill tuning
+ * @internal
+ * @constant
+ */
+const props: TPropsWithDefaults<ISparkLineProps, 'width' | 'height' | 'fill'> = withDefaults(
+  defineProps<ISparkLineProps>(),
+  {
+    width: 88,
+    height: 24,
+    fill: true,
+  },
 );
 
-const PAD = 2;
+/* ─── COMPUTED ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-const geom = computed(() => {
-  const pts = props.points;
-  if (pts.length < 2) return null;
-
-  const min = Math.min(...pts);
-  const max = Math.max(...pts);
-  const range = max - min || 1;
-  const stepX = (props.width - PAD * 2) / (pts.length - 1);
-
-  const coords = pts.map((v, i) => {
-    const x = PAD + i * stepX;
-    const y = PAD + (1 - (v - min) / range) * (props.height - PAD * 2);
-    return [x, y] as const;
-  });
-
-  const first = coords[0];
-  const last = coords[coords.length - 1];
-  if (!first || !last) return null;
-
-  const line = coords.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
-  const area = `${line} L${last[0].toFixed(1)},${props.height} L${first[0].toFixed(1)},${props.height} Z`;
-
-  return { line, area, end: last };
-});
+/**
+ * The sparkline SVG geometry for the current series and sizing; null when the series is too short to draw, which
+ * flips the template to its placeholder glyph. The math itself is the pure core in ./utils, exercised by its tests
+ * @internal
+ * @constant
+ */
+const geometry: ComputedRef<ISparkLineGeometry | null> = computed((): ISparkLineGeometry | null =>
+  buildSparkLineGeometry(props.points, props.width, props.height),
+);
 </script>
 
 <template>
-  <svg v-if="geom" :width="width" :height="height" :viewBox="`0 0 ${width} ${height}`" fill="none" aria-hidden="true">
-    <path v-if="fill" :d="geom.area" fill="currentColor" class="opacity-10" />
-    <path :d="geom.line" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-    <circle :cx="geom.end[0]" :cy="geom.end[1]" r="1.7" fill="currentColor" />
+  <svg
+    v-if="geometry"
+    :width="width"
+    :height="height"
+    :viewBox="`0 0 ${width} ${height}`"
+    fill="none"
+    aria-hidden="true"
+  >
+    <!-- The faint area fill beneath the line, when enabled -->
+    <path
+      v-if="fill"
+      :d="geometry.area"
+      fill="currentColor"
+      class="opacity-10"
+    />
+
+    <!-- The stroked series line -->
+    <path
+      :d="geometry.line"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- The dot marking the series' final point -->
+    <circle
+      :cx="geometry.end[0]"
+      :cy="geometry.end[1]"
+      :r="SPARK_LINE_END_DOT_RADIUS_PX"
+      fill="currentColor"
+    />
   </svg>
-  <span v-else class="text-ink-subtle font-mono text-[10px]">—</span>
+
+  <!-- The placeholder glyph when the series is too short to draw -->
+  <span
+    v-else
+    class="text-ink-subtle font-mono text-[10px]"
+    >;
+  </span>
 </template>
