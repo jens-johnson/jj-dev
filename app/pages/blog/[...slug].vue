@@ -163,12 +163,12 @@ function formatDate(iso: string): string {
 
     <!-- ─── Body ──────────────────────────────────────────────────────────────── -->
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <!-- Poetic layout: a single, wider, serif column centred so full-bleed scene videos stay centred. -->
+      <!-- Poetic layout: a single serif column at full content width so prose blends with the full-bleed scenes. -->
       <div
         v-if="post.prose === 'poetic'"
-        class="mx-auto max-w-[48rem]"
+        class="w-full"
       >
-        <article class="prose-jj prose-jj--poetic min-w-0">
+        <article class="prose-jj prose-jj--poetic max-w-none min-w-0">
           <ContentRenderer :value="post" />
         </article>
       </div>
