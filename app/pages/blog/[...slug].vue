@@ -93,7 +93,9 @@ function formatDate(iso: string): string {
   >
     <!-- ─── Header ────────────────────────────────────────────────────────────── -->
     <header class="border-border relative overflow-hidden border-b">
-      <WidgetsBlogHeaderAnimation />
+      <WidgetsBlogEtherealHeader v-if="post.hero === 'ethereal'" />
+
+      <WidgetsBlogHeaderAnimation v-else />
 
       <div class="relative mx-auto max-w-3xl px-6 pt-20 pb-12 md:pt-28">
         <!-- Back link -->
@@ -161,7 +163,21 @@ function formatDate(iso: string): string {
 
     <!-- ─── Body ──────────────────────────────────────────────────────────────── -->
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <div class="lg:grid lg:grid-cols-[1fr_220px] lg:gap-16">
+      <!-- Poetic layout: a single serif column at full content width so prose blends with the full-bleed scenes. -->
+      <div
+        v-if="post.prose === 'poetic'"
+        class="w-full"
+      >
+        <article class="prose-jj prose-jj--poetic max-w-none min-w-0">
+          <ContentRenderer :value="post" />
+        </article>
+      </div>
+
+      <!-- Default layout: prose column + optional TOC sidebar. -->
+      <div
+        v-else
+        class="lg:grid lg:grid-cols-[1fr_220px] lg:gap-16"
+      >
         <!-- Main column: rendered markdown -->
         <article class="prose-jj max-w-[68ch] min-w-0">
           <ContentRenderer :value="post" />
@@ -226,6 +242,9 @@ function formatDate(iso: string): string {
 .prose-jj {
   counter-reset: section;
 }
+
+/* Poetic posts (`prose: poetic`) render at full content width; the body keeps the standard sans-serif prose font so
+   the passages match the scene-video sections and the rest of the site. */
 
 /* ─── Headings ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 

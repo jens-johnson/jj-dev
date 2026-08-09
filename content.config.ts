@@ -78,6 +78,14 @@ const blogSchema = baseSchema.extend({
       part: z.number(),
     })
     .optional(),
+
+  /* The header backdrop for the post detail page. `code` is the default browser-wireframe build sequence; `ethereal`
+     swaps in a drifting, breathing colour field for atmospheric, essay-style posts. */
+  hero: z.enum(['code', 'ethereal']).default('code'),
+
+  /* The reading treatment for the post body. `poetic` widens the measure and sets the body in the serif display face
+     for a slower, more literary read; `default` keeps the standard sans-serif prose. */
+  prose: z.enum(['default', 'poetic']).default('default'),
 });
 
 /**
