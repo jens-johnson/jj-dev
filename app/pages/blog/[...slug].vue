@@ -243,21 +243,8 @@ function formatDate(iso: string): string {
   counter-reset: section;
 }
 
-/* ─── Poetic variant ─────────────────────────────────────────────────────────────────────────────────────────────── */
-
-/* Essay-style posts (frontmatter `prose: poetic`) read in the serif display face at a slightly larger, looser measure
-   for a slower, more literary cadence. Applied on top of the base prose rules below. */
-
-.prose-jj--poetic :deep(p),
-.prose-jj--poetic :deep(li) {
-  font-family: var(--font-heading);
-  font-size: var(--text-body-lg);
-  line-height: 1.85;
-}
-
-.prose-jj--poetic :deep(blockquote) {
-  font-family: var(--font-heading);
-}
+/* Poetic posts (`prose: poetic`) render at full content width; the body keeps the standard sans-serif prose font so
+   the passages match the scene-video sections and the rest of the site. */
 
 /* ─── Headings ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 

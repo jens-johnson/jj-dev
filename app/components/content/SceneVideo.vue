@@ -273,9 +273,11 @@ onBeforeUnmount(() => {
 
 .scene__text :deep(p) {
   margin: 0;
-  font-family: var(--font-heading);
+
+  /* Match the surrounding prose body font (sans-serif) so scenes blend with the other sections. */
+  font-family: var(--font-body);
   font-size: var(--text-body-lg);
-  line-height: 1.85;
+  line-height: 1.7;
   color: var(--color-ink);
   text-shadow: 0 1px 24px color-mix(in oklch, var(--color-bg) 72%, transparent);
 }
