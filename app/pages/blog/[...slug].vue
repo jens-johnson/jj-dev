@@ -93,7 +93,9 @@ function formatDate(iso: string): string {
   >
     <!-- ─── Header ────────────────────────────────────────────────────────────── -->
     <header class="border-border relative overflow-hidden border-b">
-      <WidgetsBlogHeaderAnimation />
+      <WidgetsBlogEtherealHeader v-if="post.hero === 'ethereal'" />
+
+      <WidgetsBlogHeaderAnimation v-else />
 
       <div class="relative mx-auto max-w-3xl px-6 pt-20 pb-12 md:pt-28">
         <!-- Back link -->
@@ -161,7 +163,21 @@ function formatDate(iso: string): string {
 
     <!-- ─── Body ──────────────────────────────────────────────────────────────── -->
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <div class="lg:grid lg:grid-cols-[1fr_220px] lg:gap-16">
+      <!-- Poetic layout: a single, wider, serif column centred so full-bleed scene videos stay centred. -->
+      <div
+        v-if="post.prose === 'poetic'"
+        class="mx-auto max-w-[48rem]"
+      >
+        <article class="prose-jj prose-jj--poetic min-w-0">
+          <ContentRenderer :value="post" />
+        </article>
+      </div>
+
+      <!-- Default layout: prose column + optional TOC sidebar. -->
+      <div
+        v-else
+        class="lg:grid lg:grid-cols-[1fr_220px] lg:gap-16"
+      >
         <!-- Main column: rendered markdown -->
         <article class="prose-jj max-w-[68ch] min-w-0">
           <ContentRenderer :value="post" />
@@ -225,6 +241,22 @@ function formatDate(iso: string): string {
 
 .prose-jj {
   counter-reset: section;
+}
+
+/* ─── Poetic variant ─────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/* Essay-style posts (frontmatter `prose: poetic`) read in the serif display face at a slightly larger, looser measure
+   for a slower, more literary cadence. Applied on top of the base prose rules below. */
+
+.prose-jj--poetic :deep(p),
+.prose-jj--poetic :deep(li) {
+  font-family: var(--font-heading);
+  font-size: var(--text-body-lg);
+  line-height: 1.85;
+}
+
+.prose-jj--poetic :deep(blockquote) {
+  font-family: var(--font-heading);
 }
 
 /* ─── Headings ───────────────────────────────────────────────────────────────────────────────────────────────────── */

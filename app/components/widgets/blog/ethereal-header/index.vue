@@ -12,11 +12,12 @@
  *                             ████▀     ████▀
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
- * ███████████████████████████████████████ #components/content/EtherealField.vue ███████████████████████████████████████
+ * ████████████████████████████████ #components/widgets/blog/ethereal-header/index.vue █████████████████████████████████
  *
- * Decorative full-bleed ethereal backdrop for the "A Habit of Nothing" post. Layered, slowly drifting blurred
- * colour fields breathe against a soft base while a faint display word hovers at centre, evoking stillness. Pure
- * CSS; theme-aware via design tokens and honours prefers-reduced-motion by holding the composition static.
+ * Ethereal full-bleed backdrop for the blog post detail header, selected per-post via the `hero: ethereal`
+ * frontmatter. Layered, slowly drifting blurred colour fields breathe behind the title to evoke stillness. Pure
+ * CSS; theme-aware via the accent tokens and held static under prefers-reduced-motion. Kept subtle so header text
+ * stays legible.
  *
  * █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
  */
@@ -24,206 +25,161 @@
 
 <template>
   <div
-    class="ethereal"
+    class="ethereal-header"
     aria-hidden="true"
   >
-    <div class="ethereal__orb ethereal__orb--a" />
+    <div class="ethereal-header__orb ethereal-header__orb--a" />
 
-    <div class="ethereal__orb ethereal__orb--b" />
+    <div class="ethereal-header__orb ethereal-header__orb--b" />
 
-    <div class="ethereal__orb ethereal__orb--c" />
+    <div class="ethereal-header__orb ethereal-header__orb--c" />
 
-    <div class="ethereal__orb ethereal__orb--d" />
+    <div class="ethereal-header__orb ethereal-header__orb--d" />
 
-    <div class="ethereal__grain" />
-
-    <span class="ethereal__word">nothing</span>
+    <div class="ethereal-header__grain" />
   </div>
 </template>
 
 <style scoped>
-/* ─── Field ──────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* ─── Backdrop ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-.ethereal {
-  position: relative;
-  width: 100%;
-  height: clamp(280px, 46vh, 480px);
-  margin: 2.75rem 0;
-  border-radius: 20px;
+.ethereal-header {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
+  pointer-events: none;
   isolation: isolate;
-  border: 1px solid var(--color-border);
-  background: radial-gradient(
-    130% 90% at 50% 0%,
-    color-mix(in oklch, var(--color-accent) 7%, var(--color-surface)),
-    var(--color-surface)
-  );
 }
 
 /* ─── Drifting colour fields (theme-adaptive via the accent tokens) ──────────────────────────────────────────────── */
 
-.ethereal__orb {
+.ethereal-header__orb {
   position: absolute;
   aspect-ratio: 1;
   border-radius: 50%;
-  filter: blur(64px);
-  opacity: 0.5;
+  filter: blur(72px);
+  opacity: 0.42;
   will-change: transform, opacity;
 }
 
-.ethereal__orb--a {
-  width: 54%;
-  top: -22%;
-  left: -8%;
+.ethereal-header__orb--a {
+  width: 44%;
+  top: -30%;
+  left: -6%;
   background: radial-gradient(circle at center, var(--color-accent-secondary), transparent 68%);
   animation:
-    drift-a 26s ease-in-out infinite,
-    breathe 9s ease-in-out infinite;
+    eh-drift-a 28s ease-in-out infinite,
+    eh-breathe 9s ease-in-out infinite;
 }
 
-.ethereal__orb--b {
-  width: 50%;
-  top: 4%;
+.ethereal-header__orb--b {
+  width: 42%;
+  top: -18%;
   right: -6%;
   background: radial-gradient(circle at center, var(--color-accent), transparent 68%);
   animation:
-    drift-b 32s ease-in-out infinite,
-    breathe 11s ease-in-out infinite 1.5s;
+    eh-drift-b 34s ease-in-out infinite,
+    eh-breathe 11s ease-in-out infinite 1.5s;
 }
 
-.ethereal__orb--c {
-  width: 46%;
-  bottom: -26%;
-  left: 16%;
+.ethereal-header__orb--c {
+  width: 40%;
+  bottom: -34%;
+  left: 22%;
   background: radial-gradient(circle at center, var(--color-accent), transparent 70%);
   animation:
-    drift-c 30s ease-in-out infinite,
-    breathe 10s ease-in-out infinite 0.7s;
+    eh-drift-c 31s ease-in-out infinite,
+    eh-breathe 10s ease-in-out infinite 0.7s;
 }
 
-.ethereal__orb--d {
-  width: 32%;
-  right: 20%;
-  bottom: -12%;
-  opacity: 0.38;
+.ethereal-header__orb--d {
+  width: 28%;
+  right: 24%;
+  bottom: -18%;
+  opacity: 0.3;
   background: radial-gradient(circle at center, var(--color-accent-secondary), transparent 70%);
   animation:
-    drift-d 36s ease-in-out infinite,
-    breathe 13s ease-in-out infinite 2.2s;
+    eh-drift-d 38s ease-in-out infinite,
+    eh-breathe 13s ease-in-out infinite 2.2s;
 }
 
-@keyframes drift-a {
+@keyframes eh-drift-a {
   0%,
   100% {
     transform: translate(0, 0);
   }
 
   50% {
-    transform: translate(12%, 8%);
+    transform: translate(14%, 10%);
   }
 }
 
-@keyframes drift-b {
+@keyframes eh-drift-b {
   0%,
   100% {
     transform: translate(0, 0);
   }
 
   50% {
-    transform: translate(-10%, 10%);
+    transform: translate(-12%, 12%);
   }
 }
 
-@keyframes drift-c {
+@keyframes eh-drift-c {
   0%,
   100% {
     transform: translate(0, 0);
   }
 
   50% {
-    transform: translate(9%, -11%);
+    transform: translate(10%, -12%);
   }
 }
 
-@keyframes drift-d {
+@keyframes eh-drift-d {
   0%,
   100% {
     transform: translate(0, 0);
   }
 
   50% {
-    transform: translate(-9%, -7%);
+    transform: translate(-10%, -8%);
   }
 }
 
-@keyframes breathe {
+@keyframes eh-breathe {
   0%,
   100% {
-    opacity: 0.36;
+    opacity: 0.3;
   }
 
   50% {
-    opacity: 0.6;
+    opacity: 0.5;
   }
 }
 
-/* ─── Grain + edge vignette so the field melts into the page ──────────────────────────────────────────────────────── */
+/* ─── Grain + edge fade so the field melts into the header ────────────────────────────────────────────────────────── */
 
-.ethereal__grain {
+.ethereal-header__grain {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.35;
   mix-blend-mode: soft-light;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.ethereal::after {
+.ethereal-header::after {
   content: '';
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    125% 95% at 50% 45%,
-    transparent 52%,
-    color-mix(in oklch, var(--color-bg) 55%, transparent)
-  );
-}
-
-/* ─── Hovering display word ──────────────────────────────────────────────────────────────────────────────────────── */
-
-.ethereal__word {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2.75rem, 11vw, 7.5rem);
-  letter-spacing: -0.03em;
-  color: var(--color-ink);
-  opacity: 0.07;
-  user-select: none;
-  animation: word-breathe 8s ease-in-out infinite;
-}
-
-@keyframes word-breathe {
-  0%,
-  100% {
-    opacity: 0.05;
-  }
-
-  50% {
-    opacity: 0.11;
-  }
+  background: linear-gradient(to bottom, transparent 40%, color-mix(in oklch, var(--color-bg) 45%, transparent));
 }
 
 /* ─── Reduced motion: hold everything still ──────────────────────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .ethereal__orb,
-  .ethereal__word {
+  .ethereal-header__orb {
     animation: none;
   }
 }
