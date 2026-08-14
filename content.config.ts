@@ -360,6 +360,100 @@ const resumeSchema = z.object({
   }),
 });
 
+/**
+ * The tile footprint on the bento grid; maps to a column/row span in the grid widget. Shared by every card variant.
+ * @internal
+ * @constant
+ */
+const bentoCardSize = z.enum(['sm', 'wide', 'tall', 'large']);
+
+/**
+ * The schema representing one bento edition ("My Picks of the Week" / "This Month's Hyperfixations"); a recurring
+ * post rendered as an interactive bento grid rather than long-form prose. Post-level meta drives the header; `cards`
+ * is a discriminated union (on `type`) of the tile variants the grid knows how to render. `category` is intentionally
+ * free-form for iteration 1 (the category tag falls back to a neutral treatment for unknown values) so the final set
+ * can settle against real editions.
+ * Example path: `content/picks/2026-08-hyperfixations.md`
+ * @internal
+ * @constant
+ */
+const bentoSchema = z.object({
+  title: z.string(),
+  description: z.string().optional(),
+  publishedAt: z.string().date(),
+  updatedAt: z.string().date().optional(),
+  draft: z.boolean().default(false),
+
+  /* An optional human label for the edition, e.g. "August 2026" */
+  edition: z.string().optional(),
+
+  /* The tiles making up the grid; a discriminated union keyed on `type` */
+  cards: z
+    .array(
+      z.discriminatedUnion('type', [
+        /* A picture tile; an image that fills the card with an optional caption */
+        z.object({
+          type: z.literal('image'),
+          category: z.string(),
+          size: bentoCardSize.default('sm'),
+          src: z.string(),
+          alt: z.string(),
+          caption: z.string().optional(),
+          href: z.string().url().optional(),
+          tags: z.array(z.string()).default([]),
+        }),
+
+        /* A pull-quote tile; a short passage with optional attribution */
+        z.object({
+          type: z.literal('quote'),
+          category: z.string().default('quotes'),
+          size: bentoCardSize.default('wide'),
+          text: z.string(),
+          attribution: z.string().optional(),
+          href: z.string().url().optional(),
+          tags: z.array(z.string()).default([]),
+        }),
+
+        /* An outbound link tile; a titled link with an optional preview image and note */
+        z.object({
+          type: z.literal('link'),
+          category: z.string(),
+          size: bentoCardSize.default('sm'),
+          title: z.string(),
+          href: z.string().url(),
+          note: z.string().optional(),
+          src: z.string().optional(),
+          alt: z.string().optional(),
+          tags: z.array(z.string()).default([]),
+        }),
+
+        /* A free-text tile; a short written note with an optional heading */
+        z.object({
+          type: z.literal('text'),
+          category: z.string(),
+          size: bentoCardSize.default('sm'),
+          title: z.string().optional(),
+          body: z.string(),
+          href: z.string().url().optional(),
+          tags: z.array(z.string()).default([]),
+        }),
+
+        /* A playable-media tile; an embedded Spotify or YouTube miniplayer built from the share URL */
+        z.object({
+          type: z.literal('embed'),
+          category: z.string(),
+          size: bentoCardSize.default('wide'),
+          provider: z.enum(['spotify', 'youtube']),
+          url: z.string().url(),
+          title: z.string().optional(),
+          note: z.string().optional(),
+          tags: z.array(z.string()).default([]),
+        }),
+      ]),
+    )
+    .default([]),
+});
+
 /* ─── Collections ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 /**
@@ -386,6 +480,12 @@ export default defineContentConfig({
       type: 'page',
       source: 'lab/**/*.md',
       schema: labSchema,
+    }),
+
+    bento: defineCollection({
+      type: 'page',
+      source: 'picks/**/*.md',
+      schema: bentoSchema,
     }),
 
     substrate: defineCollection({
