@@ -47,6 +47,23 @@ const { data: allPosts } = await useAsyncData('blog-index', () =>
 );
 
 /**
+ * All published bento "picks" editions, newest first; the recurring scrapbook-style posts surfaced under the Picks view
+ * @internal
+ * @constant
+ */
+const { data: editions } = await useAsyncData('blog-picks', () =>
+  queryCollection('bento').where('draft', '=', false).order('publishedAt', 'DESC').all(),
+);
+
+/**
+ * The active view from the `?view=` query param; `picks` opens the picks editions, otherwise the writing timeline. The
+ * value round-trips through the URL so an edition's back link can deep-link straight to the Picks view
+ * @internal
+ * @constant
+ */
+const view = computed<'writing' | 'picks'>(() => (route.query.view === 'picks' ? 'picks' : 'writing'));
+
+/**
  * The active tag filter from the `?tag=` query param; null when unfiltered
  * @internal
  * @constant
@@ -188,9 +205,9 @@ onMounted(() => {
           about.
         </p>
 
-        <!-- All tags pill row -->
+        <!-- All tags pill row (writing view only) -->
         <div
-          v-if="allTags.length > 0"
+          v-if="view === 'writing' && allTags.length > 0"
           class="mt-8 flex flex-wrap items-center gap-2"
         >
           <NuxtLink
@@ -222,8 +239,46 @@ onMounted(() => {
       </div>
     </section>
 
-    <!-- ─── Posts ─────────────────────────────────────────────────────────────── -->
-    <section class="mx-auto max-w-6xl px-6 py-16">
+    <!-- ─── View toggle: Writing / Picks ──────────────────────────────────────── -->
+    <section class="border-border border-b">
+      <div class="mx-auto flex max-w-6xl items-center gap-2 px-6 py-4">
+        <NuxtLink
+          to="/blog"
+          class="text-caption rounded-full border px-3.5 py-1.5 font-mono tracking-widest uppercase transition-colors"
+          :class="
+            view === 'writing'
+              ? 'border-accent bg-accent text-stone-50'
+              : 'border-border bg-surface text-ink-muted hover:border-accent hover:text-accent'
+          "
+        >
+          Writing
+        </NuxtLink>
+
+        <NuxtLink
+          :to="{ path: '/blog', query: { view: 'picks' } }"
+          class="text-caption inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 font-mono tracking-widest uppercase transition-colors"
+          :class="
+            view === 'picks'
+              ? 'border-accent bg-accent text-stone-50'
+              : 'border-border bg-surface text-ink-muted hover:border-accent hover:text-accent'
+          "
+        >
+          Picks
+          <span
+            v-if="editions?.length"
+            class="opacity-70"
+          >
+            · {{ editions.length }}
+          </span>
+        </NuxtLink>
+      </div>
+    </section>
+
+    <!-- ─── Posts (writing view) ──────────────────────────────────────────────── -->
+    <section
+      v-if="view === 'writing'"
+      class="mx-auto max-w-6xl px-6 py-16"
+    >
       <!-- Filter banner -->
       <div
         v-if="activeTag"
@@ -388,6 +443,65 @@ onMounted(() => {
           </div>
         </div>
       </template>
+    </section>
+
+    <!-- ─── Picks editions (picks view) ───────────────────────────────────────── -->
+    <section
+      v-else
+      class="mx-auto max-w-6xl px-6 py-16"
+    >
+      <!-- Empty state -->
+      <div
+        v-if="!editions?.length"
+        class="flex flex-col items-center py-24 text-center"
+      >
+        <p class="text-caption text-ink-subtle font-mono tracking-widest uppercase">No picks yet</p>
+
+        <p class="font-body text-body text-ink-muted mt-3 max-w-sm">The first edition of picks is on the way.</p>
+      </div>
+
+      <!-- Editions list -->
+      <ul
+        v-else
+        class="space-y-0"
+        role="list"
+      >
+        <li
+          v-for="ed in editions"
+          :key="ed.path"
+          class="border-border border-t first:border-t-0"
+        >
+          <NuxtLink
+            :to="ed.path"
+            class="group grid gap-4 py-8 md:grid-cols-[160px_1fr] md:gap-8"
+          >
+            <p class="text-caption text-ink-subtle font-mono">
+              {{ ed.edition ?? formatDate(ed.publishedAt) }}
+            </p>
+
+            <div>
+              <div class="mb-1 flex items-center gap-2">
+                <span
+                  class="bg-accent/10 text-caption text-accent rounded-full px-2.5 py-0.5 font-mono tracking-widest uppercase"
+                >
+                  Picks
+                </span>
+              </div>
+
+              <h3 class="font-display text-h5 text-ink group-hover:text-accent mb-1 font-bold transition-colors">
+                {{ ed.title }}
+              </h3>
+
+              <p
+                v-if="ed.description"
+                class="font-body text-body text-ink-muted max-w-3xl"
+              >
+                {{ ed.description }}
+              </p>
+            </div>
+          </NuxtLink>
+        </li>
+      </ul>
     </section>
   </div>
 </template>

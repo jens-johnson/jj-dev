@@ -1,15 +1,17 @@
 ---
 title: This Month's Hyperfixations
-description: August's rotation — a dip I can't stop eating, a song on repeat, a book about fungi, some NFC tinkering, and a couple things worth pressing play on.
+description: What I've been listening to, snacking on, reading, and more this summer.
 publishedAt: 2026-08-14
 draft: false
 edition: August 2026
 cards:
   - type: link
     category: food
-    size: sm
+    size: wide
     title: Trader Joe's Roasted Tomato Labneh Dip
     href: https://www.traderjoes.com/home/products/pdp/roasted-tomato-labneh-dip-081050
+    src: /images/picks/2026-08/labneh.png
+    alt: A tub of Trader Joe's Roasted Tomato Labneh Dip
     note: A newfound summer staple. Un-freaking-real with sandwiches, pita, and pretty much anything else.
     tags:
       - Cuisine
@@ -37,11 +39,10 @@ cards:
       - Stoicism
       - Motivation
 
-  - type: text
+  - type: quote
     category: humor
     size: sm
-    title: A joke
-    body: |
+    text: |
       A horse walks into a bar.
 
       Bartender: "Hey."
@@ -65,14 +66,15 @@ cards:
 
   - type: link
     category: book
-    size: sm
-    title: Entangled Life — Merlin Sheldrake
-    href: https://a.co/d/0bpNVwxl
-    note: Fungi are so damn fascinating. Been reading/listening to this lately and completely geeking out over mycelium.
+    size: wide
+    title: The Anthropocene Reviewed — John Green
+    href: https://www.penguinrandomhouse.com/books/672554/the-anthropocene-reviewed-by-john-green/
+    src: /images/picks/2026-08/anthropocene-reviewed.jpg
+    alt: Cover of The Anthropocene Reviewed by John Green
+    note: A covid-era gem that I somehow missed. Green's illustrative, witty writing is so thought provoking and entertaining.
     tags:
       - Book
-      - Science
-      - Nature
+      - Essays
       - Non-Fiction
 
   - type: embed
