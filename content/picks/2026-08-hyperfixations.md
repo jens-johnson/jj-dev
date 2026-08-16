@@ -55,8 +55,8 @@ cards:
     size: tall
     title: NFC Tags
     href: https://www.amazon.com/dp/B0F24L4GDM
-    src: /images/picks/2026-08/nfc-tags.jpg
-    alt: A sheet of small round NFC sticker tags
+    src: /images/picks/2026-08/nfc-illustration.png
+    alt: An illustration of a round NFC sticker tag
     note: Having a blast with these little stickers — phone-tap alarm and chore routines, smart-home triggers, and more. A cheap, fun "hacking" project.
     tags:
       - Tech
