@@ -35,7 +35,7 @@ const props = defineProps<ICategoryTagProps>();
 
 /**
  * The visual treatment for the current category; unknown categories fall back to a neutral tag showing the
- * capitalized raw value with a generic icon
+ * capitalized raw value with a muted dot
  * @internal
  * @constant
  */
@@ -44,21 +44,17 @@ const tag: ComputedRef<ICategoryTagVisual> = computed((): ICategoryTagVisual => 
   return (
     TAG_VISUAL_BY_CATEGORY[raw] ?? {
       label: raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : 'Pick',
-      icon: 'lucide:sparkles',
-      cls: 'bg-surface text-ink-subtle',
+      dot: 'bg-ink-subtle',
     }
   );
 });
 </script>
 
 <template>
-  <span
-    class="text-caption inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 font-mono font-medium tracking-wide"
-    :class="tag.cls"
-  >
-    <Icon
-      :name="tag.icon"
-      size="11"
+  <span class="text-caption text-ink-subtle inline-flex w-fit items-center gap-1.5 font-mono tracking-widest uppercase">
+    <span
+      class="size-1.5 shrink-0 rounded-full"
+      :class="tag.dot"
     />
     {{ tag.label }}
   </span>

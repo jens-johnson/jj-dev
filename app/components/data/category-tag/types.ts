@@ -29,18 +29,14 @@ export interface ICategoryTagProps {
 }
 
 /**
- * The visual treatment rendered for a category: the human-readable label, the Lucide icon, and the Tailwind color
- * classes.
+ * The visual treatment rendered for a category: the human-readable label and the leading dot's color.
  * @public
  * @interface
  */
 export interface ICategoryTagVisual {
-  /* The human-readable label rendered inside the tag */
+  /* The human-readable label rendered as an uppercase mono eyebrow */
   label: string;
 
-  /* The Lucide icon name shown before the label */
-  icon: string;
-
-  /* The Tailwind background/text color classes applied to the tag */
-  cls: string;
+  /* The Tailwind background color class applied to the small leading dot */
+  dot: string;
 }

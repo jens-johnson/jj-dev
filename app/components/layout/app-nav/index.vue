@@ -65,10 +65,6 @@ const links: { label: string; to: string }[] = [
     to: '/blog',
   },
   {
-    label: 'Picks',
-    to: '/picks',
-  },
-  {
     label: 'Lab',
     to: '/lab',
   },

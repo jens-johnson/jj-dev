@@ -101,7 +101,7 @@ function formatDate(iso: string): string {
       <div class="mx-auto max-w-6xl px-6 pt-20 pb-12 md:pt-28">
         <!-- Back link -->
         <NuxtLink
-          to="/picks"
+          :to="{ path: '/blog', query: { view: 'picks' } }"
           class="text-caption text-ink-subtle hover:text-accent mb-8 inline-flex items-center gap-1.5 font-mono tracking-widest uppercase transition-colors"
         >
           <Icon
