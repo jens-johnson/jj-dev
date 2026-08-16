@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.5.0](https://github.com/jens-johnson/jj-dev/compare/jj-dev-v0.4.0...jj-dev-v0.5.0) (2026-08-16)
+
+
+### ✨ Features
+
+* **blog:** add "a habit of nothing" essay with an ethereal animated backdrop ([b248192](https://github.com/jens-johnson/jj-dev/commit/b248192fd70e1fc8c9c528a8a3727acd41cffdb5))
+* **blog:** add bento picks format with first edition ([d02e107](https://github.com/jens-johnson/jj-dev/commit/d02e107b20fc8feaa68ed71aecaa54bbecf57032))
+* **blog:** add scene-video parallax, ethereal header, and poetic reading mode ([7f8e6ce](https://github.com/jens-johnson/jj-dev/commit/7f8e6ce014e7ef1d61f04ed8dc16afaaf10cc08f))
+* **blog:** bento picks format + first edition (JEN-126) ([f006587](https://github.com/jens-johnson/jj-dev/commit/f0065870cd366cc35ad13ed5deb0fc11e603813b))
+* **blog:** rework picks as a blog format with refined bento cards ([8ee5608](https://github.com/jens-johnson/jj-dev/commit/8ee5608d8c9a8252018c577f4e2c308c73ffea1f))
+* **blog:** rework picks as blog format + refined bento cards (JEN-126) ([a3c6253](https://github.com/jens-johnson/jj-dev/commit/a3c62538489a5b89b34e9ef81890f4aa58a71ede))
+* **blog:** swap NFC card to on-brand illustration (JEN-126) ([c859630](https://github.com/jens-johnson/jj-dev/commit/c85963040c3dfef5f9951dd039592e29c4093df7))
+* **blog:** swap nfc card to the on-brand nfc illustration ([fe750f4](https://github.com/jens-johnson/jj-dev/commit/fe750f4b7d3b6873cf95ad07459c14e8bf7fbb5b))
+
+
+### 🐛 Bug Fixes
+
+* **blog:** correct essay typos and widen poetic body to full content width ([8e01f75](https://github.com/jens-johnson/jj-dev/commit/8e01f750ac30926a46a8921d0487067efcc08a27))
+
+
+### 💅 Styles
+
+* **blog:** set scene-video passages in the sans-serif body font ([159c52c](https://github.com/jens-johnson/jj-dev/commit/159c52c8805286ae199f9775d8d01657a70c2858))
+
+
+### 👷 CI
+
+* **deps:** bump actions/setup-node from 6 to 7 ([7a8f8fd](https://github.com/jens-johnson/jj-dev/commit/7a8f8fd580a1f7a3391c675df2c9637d6b0abea9))
+
 ## [0.4.0](https://github.com/jens-johnson/jj-dev/compare/jj-dev-v0.3.0...jj-dev-v0.4.0) (2026-07-14)
 
 
