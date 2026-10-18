@@ -31,7 +31,8 @@
     "check": "run-s lint typecheck test build",
     "commit": "cz",
     "header": "file-header-generator",
-    "gen:favicon": "node scripts/gen-favicon.mjs"
+    "gen:favicon": "node scripts/gen-favicon.mjs",
+    "data:neighborhoods": "tsx scripts/neighborhood-explorer/build-dataset.ts"
   },
   "config": {
     "commitizen": {
@@ -67,6 +68,7 @@
     "better-sqlite3": "^12.8.0",
     "exifr": "^7.1.3",
     "lodash": "^4.18.1",
+    "maplibre-gl": "^5.24.0",
     "nuxt": "^4.4.6",
     "nuxt-auth-utils": "^0.5.29",
     "unstorage": "1.17.5",
