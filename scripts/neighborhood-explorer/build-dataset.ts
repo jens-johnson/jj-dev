@@ -37,7 +37,7 @@
 /* eslint-disable no-console -- this is a CLI script; stdout/stderr is its interface. */
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type {
@@ -223,7 +223,55 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Fetches a URL as text through the on-disk cache, retrying rate limits and gateway timeouts with backoff
+ * The largest upstream body the cache accepts; the biggest real response (Brooklyn's ACS tables) is about 3 MB
+ * @internal
+ * @constant
+ */
+const MAX_CACHED_BYTES: number = 50 * 1024 * 1024;
+
+/**
+ * Resolves a cache key to a file inside the cache directory, rejecting keys that could escape it
+ * @internal
+ * @function
+ * @param key - The cache filename
+ * @throws Error when the key has characters outside [\w.,-] or resolves outside the cache directory
+ * @returns The absolute cache path
+ */
+function cachePath(key: string): string {
+  const path: string = resolve(CACHE_DIR, key);
+  if (!/^[\w.,-]+$/.test(key) || !path.startsWith(resolve(CACHE_DIR) + sep)) {
+    throw new Error(`Refusing unsafe cache key: ${key}`);
+  }
+  return path;
+}
+
+/**
+ * Checks that an upstream body is worth caching: under the size cap and, for JSON keys, parseable. A 200 that carries
+ * an HTML error page would otherwise poison every later offline run
+ * @internal
+ * @function
+ * @param key - The cache filename, whose extension names the expected format
+ * @param body - The response body
+ * @returns Whether the body is safe to cache
+ */
+function isCacheable(key: string, body: string): boolean {
+  if (Buffer.byteLength(body) > MAX_CACHED_BYTES) {
+    return false;
+  }
+  if (!key.endsWith('.json')) {
+    return true;
+  }
+  try {
+    JSON.parse(body);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Fetches a URL as text through the on-disk cache, retrying rate limits and gateway timeouts with backoff. Only
+ * well-formed bodies under the size cap are written, and only inside the cache directory
  * @internal
  * @function
  * @param key - The cache filename
@@ -232,7 +280,7 @@ function sleep(ms: number): Promise<void> {
  * @returns The response body
  */
 async function cachedFetch(key: string, url: string, init?: RequestInit): Promise<string> {
-  const path: string = join(CACHE_DIR, key);
+  const path: string = cachePath(key);
   try {
     return await readFile(path, 'utf8');
   } catch {
@@ -246,6 +294,9 @@ async function cachedFetch(key: string, url: string, init?: RequestInit): Promis
     });
     if (response.ok) {
       const body: string = await response.text();
+      if (!isCacheable(key, body)) {
+        throw new Error(`Malformed or oversized response for ${url}; not caching it`);
+      }
       await mkdir(dirname(path), { recursive: true });
       await writeFile(path, body);
       return body;
